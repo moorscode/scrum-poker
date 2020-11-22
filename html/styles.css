@@ -12,7 +12,7 @@ html, body {
     color: white;
 }
 
-button {
+button, .rooms input[type=submit] {
     box-shadow: 2px 2px 2px rgba(0.8, 0.8, 0.8, 0.2);
 }
 
@@ -43,7 +43,7 @@ button.highlighted, button.highlighted:hover, button.highlighted.active {
     color: white;
 }
 
-button.new {
+button.new, .rooms input[type=submit] {
     padding: 6px;
     cursor: pointer;
     border: 1px solid darkgray;
@@ -70,4 +70,12 @@ p.final > button, p.final > button.active {
     border-width: 2px;
     border-style: solid;
     outline: 0;
+}
+
+.rooms {
+    margin-bottom: 1em;
+}
+.rooms input {
+    padding: 4px;
+    font-size: 14px;
 }

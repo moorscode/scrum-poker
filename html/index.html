@@ -18,24 +18,40 @@
 <main id="v-app">
     <section class="chat">
         <h1>Scrum Poker</h1>
-        <button @click.prevent="resetVotes()" :class="['new']">New story</button>
-        <p>
-            <span v-for="point of points"><button @click.prevent="castVote(point)" :class="[ 'choice', myVote === point ? 'highlighted' : '' ]">
+
+        <form class="rooms">
+            <input type="text" v-model="joinPoker"/>
+            <input type="submit" @click.prevent="joinRoom()" value="join scrum room">
+        </form>
+
+        <div v-if="!activePoker">
+            Join a scrum room to start voting!
+        </div>
+
+        <div v-if="activePoker">
+            <p>
+                <button @click.prevent="resetVotes()" :class="['new']">New story</button>
+            </p>
+
+            <p>
+            <span v-for="point of points"><button @click.prevent="castVote(point)"
+                                                  :class="[ 'choice', myVote === point ? 'highlighted' : '' ]">
                 <i :class="['fas','fa-mug-hot']" v-if="point === 'coffee'"></i>
                 {{ point }}</button></span>
-        </p>
+            </p>
 
-        <p :class="[ 'results', this.members === this.voteCount ? 'final' : '' ]">
-            <button v-for="vote of votes">
-                <i :class="['fas','fa-mug-hot']" v-if="vote === 'coffee'"></i>
-                {{ vote }}
-            </button>
-        </p>
+            <p :class="[ 'results', this.members === this.voteCount ? 'final' : '' ]">
+                <button v-for="vote of votes">
+                    <i :class="['fas','fa-mug-hot']" v-if="vote === 'coffee'"></i>
+                    {{ vote }}
+                </button>
+            </p>
 
-        <p>Average: {{ average }}<br/>
-        Average story point: {{ averagePoint }}</p>
-        </p>
-        <!-- /Tabs -->
+            <p v-if="average !== ''">
+                Average: {{ average }}<br/>
+                Average story point: {{ averagePoint }}</p>
+            </p>
+        </div>
     </section>
 </main>
 <script>
@@ -45,6 +61,7 @@
             socket: {pokers: null},
             votes: [],
             activePoker: false,
+            joinPoker: '',
             members: 0,
             points: {},
             myVote: '',
@@ -54,14 +71,14 @@
         methods: {
             castVote(vote) {
                 if (this.activePoker) {
-                    if ( this.voteCount === this.members ) {
+                    if (this.voteCount === this.members) {
                         return;
                     }
 
                     this.socket.pokers.emit('vote', {poker: this.activePoker, vote: vote});
                     this.myVote = vote;
                 } else {
-                    alert('You must join the room before voting messages!');
+                    alert('You must join a room before voting!');
                 }
             },
             receiveVote(msg) {
@@ -69,7 +86,7 @@
                     this.votes = msg.votes;
                     this.voteCount = msg.voteCount;
 
-                    if ( this.voteCount === 0 ) {
+                    if (this.voteCount === 0) {
                         this.calculateAverage();
                         this.myVote = '';
                     }
@@ -88,8 +105,16 @@
             setPoints(msg) {
                 this.points = msg.points;
             },
+            joinRoom() {
+                if( this.activePoker === this.joinPoker) {
+                    return;
+                }
+
+                this.activePoker = this.joinPoker;
+                this.socket.pokers.emit('join', {poker: this.activePoker});
+            },
             calculateAverage() {
-                if ( this.voteCount === 0 ) {
+                if (this.voteCount === 0) {
                     this.average = '';
                     this.averagePoint = '';
                     return;
@@ -139,7 +164,9 @@
             }
         },
         created() {
-            this.activePoker = prompt('Enter your poker room:');
+            let uri = window.location.search.substring(1);
+            let params = new URLSearchParams(uri);
+            this.joinPoker = params.get('room');
 
             this.socket.pokers = io('http://localhost:3000/pokers');
             this.socket.pokers.on('membersUpdated', (msg) => {
@@ -147,6 +174,7 @@
             });
 
             this.socket.pokers.on('joined', () => {
+                this.joinPoker = this.activePoker;
                 this.socket.pokers.emit('getVotes', {poker: this.activePoker});
             });
 
@@ -156,9 +184,11 @@
 
             this.socket.pokers.on('points', (msg) => {
                 this.setPoints(msg);
-            })
+            });
 
-            this.socket.pokers.emit('join', {poker: this.activePoker});
+            if ( this.joinPoker ) {
+                this.joinRoom();
+            }
         }
     });
 
