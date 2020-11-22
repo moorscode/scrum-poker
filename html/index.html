@@ -14,42 +14,45 @@
 <body>
 <main id="v-app">
     <section class="chat">
-        <h1>Websockets Tester</h1>
-        <form>
-            <input v-model="vote" type="text"/>
-            <button type="submit" @click.prevent="castVote()">Send</button>
-        </form>
-        <div class="tab-row">
-            <p>Status: {{ activePoker }}</p>
-            <p>Members: {{ members }}</p>
-        </div>
+        <h1>Scrum Poker</h1>
+        <button @click.prevent="resetVotes()">New story</button>
         <p>
-        <ul>
-            <li v-for="vote of votes">
-                <strong>{{ vote }}</strong>
-            </li>
-        </ul>
+            <span v-for="point of points"><button @click.prevent="castVote(point)" :class="[ 'choice', myVote === point ? 'highlighted' : '' ]">{{ point }}</button></span>
+        </p>
+
+        <p :class="[ 'results', this.members === this.voteCount ? 'final' : '' ]">
+            <button v-for="vote of showVotes">{{ vote }}</button>
+        </p>
+
+        <p>Average: {{ average }}<br/>
+        Average story point: {{ averagePoint }}</p>
         </p>
         <!-- /Tabs -->
     </section>
 </main>
 <script>
-    Vue.component('alerts-component', VueSimpleNotify.VueSimpleNotify);
-    var app = new Vue({
+    new Vue({
         el: '#v-app',
         data: {
             socket: {pokers: null},
-            vote: '',
             votes: [],
+            showVotes: [],
             activePoker: false,
             members: 0,
+            points: {},
+            myVote: '',
+            average: '',
+            averagePoint: '',
         },
         methods: {
-            castVote() {
+            castVote(vote) {
                 if (this.activePoker) {
-                    console.log('casting vote');
-                    this.socket.pokers.emit('vote', {poker: this.activePoker, vote: parseInt(this.vote, 10)});
-                    this.vote = "";
+                    if ( this.voteCount === this.members ) {
+                        return;
+                    }
+
+                    this.socket.pokers.emit('vote', {poker: this.activePoker, vote: vote});
+                    this.myVote = vote;
                 } else {
                     alert('You must join the room before voting messages!');
                 }
@@ -57,11 +60,19 @@
             receiveVote(msg) {
                 if (msg.poker === this.activePoker) {
                     this.votes = msg.votes;
-                }
-            },
-            clearVotes(msg) {
-                if (msg.poker === this.activePoker) {
-                    this.votes = [];
+                    this.voteCount = msg.voteCount;
+
+                    this.showVotes = this.votes;
+
+                    if ( this.voteCount === 0 ) {
+                        this.calculateAverage();
+                        this.myVote = '';
+                    }
+
+                    if (this.voteCount === this.members) {
+                        this.calculateAverage();
+                        return;
+                    }
                 }
             },
             membersUpdated(msg) {
@@ -69,6 +80,59 @@
                     this.members = msg.members;
                 }
             },
+            setPoints(msg) {
+                this.points = msg.points;
+            },
+            calculateAverage() {
+                if ( this.voteCount === 0 ) {
+                    this.average = '';
+                    this.averagePoint = '';
+                    return;
+                }
+
+                let sum = 0;
+                for (let i = 0; i < this.votes.length; i++) {
+                    if (isNaN(this.votes[i])) {
+                        this.average = 'Coffee break';
+                        this.averagePoint = '';
+                        return;
+                    }
+                    sum += parseFloat(this.votes[i]); //don't forget to add the base
+                }
+
+                this.average = Math.round((sum / this.votes.length) * 100) / 100;
+
+                if (this.points.indexOf(this.average) !== -1) {
+                    this.averagePoint = this.average;
+                    return;
+                }
+
+                const rounded = Math.round(this.average * 10) / 10;
+                console.log(rounded);
+                if (this.points.indexOf(rounded) !== -1) {
+                    this.averagePoint = rounded;
+                    return;
+                }
+
+                // find nearest point.
+                for (let index = 0; index < this.points.length - 1; index++) {
+                    if (isNaN(this.points[index + 1])) {
+                        this.averagePoint = this.average;
+                        return;
+                    }
+                    if (this.average - this.points[index] > 0 && this.average - this.points[index + 1] < 0) {
+                        if (this.average - this.points[index] < Math.abs(this.average - this.points[index + 1])) {
+                            this.averagePoint = this.points[index];
+                        } else {
+                            this.averagePoint = this.points[index + 1];
+                        }
+                        return;
+                    }
+                }
+            },
+            resetVotes() {
+                this.socket.pokers.emit('resetVotes', {poker: this.activePoker});
+            }
         },
         created() {
             this.activePoker = prompt('Enter your poker room:');
@@ -86,11 +150,11 @@
                 this.receiveVote(msg);
             });
 
-            this.socket.pokers.on('clearVotes', (msg) => {
-                this.clearVotes(msg);
-            });
+            this.socket.pokers.on('points', (msg) => {
+                this.setPoints(msg);
+            })
 
-            this.socket.pokers.emit('join', {id: this.activePoker});
+            this.socket.pokers.emit('join', {poker: this.activePoker});
         }
     });
 
