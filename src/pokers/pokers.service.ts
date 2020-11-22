@@ -28,7 +28,7 @@ export class PokersService {
       this.pokers[poker].splice(index, 1);
     }
 
-    if (this.votes[poker][client.id]) {
+    if (this.votes[poker] && this.votes[poker][client.id]) {
       delete this.votes[poker][client.id];
     }
 

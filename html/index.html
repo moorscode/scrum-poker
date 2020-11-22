@@ -31,7 +31,7 @@
         <div v-if="activePoker">
             <p>
                 <button @click.prevent="resetVotes()" :class="['new']">New story</button>
-                <span :class="'new'" v-if="voteCount === members">Use the button to start a new story!</span>
+                <span :class="'new'" v-if="voteCount === members">All votes are in, start a new story!</span>
             </p>
 
             <p>
@@ -51,7 +51,7 @@
             <section v-if="average !== ''">
                 <p>
                     Average: {{ average }}<br/>
-                    Average story point: {{ averagePoint }}
+                    <strong>Average story point: {{ averagePoint }}</strong>
                 </p>
             </section>
         </div>
@@ -134,7 +134,7 @@
                 for (let i = 0; i < this.votes.length; i++) {
                     if (isNaN(this.votes[i])) {
                         this.average = 'Coffee break';
-                        this.averagePoint = '';
+                        this.averagePoint = 'Coffee break';
                         return;
                     }
                     sum += parseFloat(this.votes[i]); //don't forget to add the base

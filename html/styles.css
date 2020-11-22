@@ -7,8 +7,9 @@ html, body {
     max-width: 800px;
     margin: 20px auto;
     padding: 20px;
-    border: 1px solid darkgray;
-    box-shadow: 0px 4px 20px rgba(0.8,0.8,0.8,0.2);
+    border: 1px solid #a4286a;
+    border-radius: 4px;
+    box-shadow: 0px 4px 20px rgba(0,0,0,0.2);
 }
 
 .tab-row {
@@ -21,7 +22,7 @@ html, body {
 }
 
 button, .rooms input[type=submit] {
-    box-shadow: 2px 2px 2px rgba(0.8, 0.8, 0.8, 0.2);
+    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
 }
 
 h1 {
@@ -29,6 +30,11 @@ h1 {
     font-weight: 700;
     font-size: 4em;
     margin: 0 0 0.2em 0;
+    color: #a4286a;
+}
+
+.fas {
+    color: #a4286a;
 }
 
 button.choice, button.choice:focus {
@@ -47,7 +53,10 @@ button.choice:hover {
 }
 
 button.highlighted, button.highlighted:hover, button.highlighted.active {
-    background-color: black;
+    background-color: #a4286a;
+    color: white;
+}
+button.highlighted .fas {
     color: white;
 }
 
@@ -80,9 +89,10 @@ p.results > button:focus {
 }
 p.final > button, p.final > button.active {
     font-weight: bold;
-    border-color: darkgray;
+    border-color: #a4286a;
     border-width: 2px;
     border-style: solid;
+    color: #a4286a;
     outline: 0;
 }
 
