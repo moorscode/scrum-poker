@@ -27,6 +27,12 @@ export class PokersService {
     if (index !== -1) {
       this.pokers[poker].splice(index, 1);
     }
+
+    if (this.votes[poker][client.id]) {
+      delete this.votes[poker][client.id];
+    }
+
+    client.leave(poker);
   }
 
   getMembers(poker: string) {

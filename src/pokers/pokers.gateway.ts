@@ -37,13 +37,26 @@ export class PokersGateway {
   @SubscribeMessage('join')
   join(client: Socket, message: { poker: string }) {
     this.pokersService.join(client, message.poker);
+    client.emit('joined', { poker: message.poker });
 
     this.server.to(message.poker).emit('membersUpdated', {
       poker: message.poker,
       members: this.pokersService.getMembers(message.poker),
     });
 
-    client.emit('joined', { poker: message.poker });
+    this.sendAllVotes(message.poker);
+  }
+
+  @SubscribeMessage('leave')
+  leave(client: Socket, message: { poker: string }) {
+    this.pokersService.leave(client, message.poker);
+
+    this.server.to(message.poker).emit('membersUpdated', {
+      poker: message.poker,
+      members: this.pokersService.getMembers(message.poker),
+    });
+
+    this.sendAllVotes(message.poker);
   }
 
   @SubscribeMessage('vote')

@@ -114,11 +114,14 @@
                     return;
                 }
 
+                this.socket.pokers.emit('leave', {poker:this.activePoker});
+
+                this.activePoker = this.joinPoker;
+                this.socket.pokers.emit('join', {poker: this.activePoker});
+
                 this.myVote = '';
                 this.members = 0;
                 this.voteCount = 0;
-                this.activePoker = this.joinPoker;
-                this.socket.pokers.emit('join', {poker: this.activePoker});
             },
             calculateAverage() {
                 if (this.voteCount === 0) {
