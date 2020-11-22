@@ -10,18 +10,26 @@
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://unpkg.com/vue-simple-notify/dist/vue-simple-notify.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
+    <script src="https://kit.fontawesome.com/92b43d9045.js" crossorigin="anonymous"></script>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
 <main id="v-app">
     <section class="chat">
         <h1>Scrum Poker</h1>
-        <button @click.prevent="resetVotes()">New story</button>
+        <button @click.prevent="resetVotes()" :class="['new']">New story</button>
         <p>
-            <span v-for="point of points"><button @click.prevent="castVote(point)" :class="[ 'choice', myVote === point ? 'highlighted' : '' ]">{{ point }}</button></span>
+            <span v-for="point of points"><button @click.prevent="castVote(point)" :class="[ 'choice', myVote === point ? 'highlighted' : '' ]">
+                <i :class="['fas','fa-mug-hot']" v-if="point === 'coffee'"></i>
+                {{ point }}</button></span>
         </p>
 
         <p :class="[ 'results', this.members === this.voteCount ? 'final' : '' ]">
-            <button v-for="vote of showVotes">{{ vote }}</button>
+            <button v-for="vote of votes">
+                <i :class="['fas','fa-mug-hot']" v-if="vote === 'coffee'"></i>
+                {{ vote }}
+            </button>
         </p>
 
         <p>Average: {{ average }}<br/>
@@ -36,7 +44,6 @@
         data: {
             socket: {pokers: null},
             votes: [],
-            showVotes: [],
             activePoker: false,
             members: 0,
             points: {},
@@ -61,8 +68,6 @@
                 if (msg.poker === this.activePoker) {
                     this.votes = msg.votes;
                     this.voteCount = msg.voteCount;
-
-                    this.showVotes = this.votes;
 
                     if ( this.voteCount === 0 ) {
                         this.calculateAverage();
