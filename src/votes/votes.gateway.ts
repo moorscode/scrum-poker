@@ -1,34 +1,46 @@
-import { WebSocketGateway, SubscribeMessage, MessageBody } from '@nestjs/websockets';
+import {
+  WebSocketGateway,
+  SubscribeMessage,
+  WebSocketServer,
+} from '@nestjs/websockets';
+import { Server, Socket } from 'socket.io';
 import { VotesService } from './votes.service';
-import { CreateVoteDto } from './dto/create-vote.dto';
-import { UpdateVoteDto } from './dto/update-vote.dto';
 
-@WebSocketGateway()
+@WebSocketGateway({ namespace: '/pokers' })
 export class VotesGateway {
+  @WebSocketServer() wss: Server;
+
   constructor(private readonly votesService: VotesService) {}
 
-  @SubscribeMessage('createVote')
-  create(@MessageBody() createVoteDto: CreateVoteDto) {
-    return this.votesService.create(createVoteDto);
+  afterInit() {
+    this.wss.on('connection', (socket) => {
+      socket.on('disconnecting', () => {
+        for (const room in socket.rooms) {
+          this.votesService.remove(socket, room);
+          this.wss.to(room).emit('votes', {
+            poker: room,
+            votes: this.votesService.findAll(room),
+          });
+        }
+      });
+    });
   }
 
-  @SubscribeMessage('findAllVotes')
-  findAll() {
-    return this.votesService.findAll();
+  @SubscribeMessage('vote')
+  vote(client: Socket, message: { poker: string; vote: number }) {
+    this.votesService.vote(client, message.poker, message.vote);
+
+    this.wss.to(message.poker).emit('votes', {
+      poker: message.poker,
+      votes: this.votesService.findAll(message.poker),
+    });
   }
 
-  @SubscribeMessage('findOneVote')
-  findOne(@MessageBody() id: number) {
-    return this.votesService.findOne(id);
-  }
-
-  @SubscribeMessage('updateVote')
-  update(@MessageBody() updateVoteDto: UpdateVoteDto) {
-    return this.votesService.update(updateVoteDto.id, updateVoteDto);
-  }
-
-  @SubscribeMessage('removeVote')
-  remove(@MessageBody() id: number) {
-    return this.votesService.remove(id);
+  @SubscribeMessage('getVotes')
+  findAll(client: Socket, message: { poker: string }) {
+    this.wss.to(message.poker).emit('votes', {
+      poker: message.poker,
+      votes: this.votesService.findAll(message.poker),
+    });
   }
 }

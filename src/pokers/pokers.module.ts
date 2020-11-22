@@ -3,6 +3,6 @@ import { PokersService } from './pokers.service';
 import { PokersGateway } from './pokers.gateway';
 
 @Module({
-  providers: [PokersGateway, PokersService]
+  providers: [PokersGateway, PokersService],
 })
 export class PokersModule {}

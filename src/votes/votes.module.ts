@@ -3,6 +3,6 @@ import { VotesService } from './votes.service';
 import { VotesGateway } from './votes.gateway';
 
 @Module({
-  providers: [VotesGateway, VotesService]
+  providers: [VotesGateway, VotesService],
 })
 export class VotesModule {}

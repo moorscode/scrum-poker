@@ -1,34 +1,41 @@
-import { WebSocketGateway, SubscribeMessage, MessageBody } from '@nestjs/websockets';
+import {
+  WebSocketGateway,
+  SubscribeMessage,
+  WebSocketServer,
+} from '@nestjs/websockets';
 import { PokersService } from './pokers.service';
-import { CreatePokerDto } from './dto/create-poker.dto';
-import { UpdatePokerDto } from './dto/update-poker.dto';
+import { Server, Socket } from 'socket.io';
 
-@WebSocketGateway()
+@WebSocketGateway({ namespace: '/pokers' })
 export class PokersGateway {
+  @WebSocketServer() wss: Server;
+
   constructor(private readonly pokersService: PokersService) {}
 
-  @SubscribeMessage('createPoker')
-  create(@MessageBody() createPokerDto: CreatePokerDto) {
-    return this.pokersService.create(createPokerDto);
+  afterInit() {
+    this.wss.on('connection', (socket) => {
+      socket.on('disconnecting', () => {
+        for (const room in socket.rooms) {
+          this.pokersService.leave(socket, room);
+
+          this.wss.to(room).emit('membersUpdated', {
+            poker: room,
+            members: this.pokersService.getMembers(room),
+          });
+        }
+      });
+    });
   }
 
-  @SubscribeMessage('findAllPokers')
-  findAll() {
-    return this.pokersService.findAll();
-  }
+  @SubscribeMessage('join')
+  join(client: Socket, message: { id: string }) {
+    this.pokersService.join(client, message.id);
 
-  @SubscribeMessage('findOnePoker')
-  findOne(@MessageBody() id: number) {
-    return this.pokersService.findOne(id);
-  }
+    this.wss.to(message.id).emit('membersUpdated', {
+      poker: message.id,
+      members: this.pokersService.getMembers(message.id),
+    });
 
-  @SubscribeMessage('updatePoker')
-  update(@MessageBody() updatePokerDto: UpdatePokerDto) {
-    return this.pokersService.update(updatePokerDto.id, updatePokerDto);
-  }
-
-  @SubscribeMessage('removePoker')
-  remove(@MessageBody() id: number) {
-    return this.pokersService.remove(id);
+    client.emit('joined', { poker: message.id });
   }
 }

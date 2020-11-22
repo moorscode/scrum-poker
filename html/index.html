@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Websockets Client</title>
+    <link href="/styles.css" rel="stylesheet">
+    <link href="https://unpkg.com/vue-simple-notify/dist/vue-simple-notify.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/vue-simple-notify/dist/vue-simple-notify.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+<main id="v-app">
+    <section class="chat">
+        <h1>Websockets Tester</h1>
+        <form>
+            <input v-model="vote" type="text"/>
+            <button type="submit" @click.prevent="castVote()">Send</button>
+        </form>
+        <div class="tab-row">
+            <p>Status: {{ activePoker }}</p>
+            <p>Members: {{ members }}</p>
+        </div>
+        <p>
+        <ul>
+            <li v-for="vote of votes">
+                <strong>{{ vote }}</strong>
+            </li>
+        </ul>
+        </p>
+        <!-- /Tabs -->
+    </section>
+</main>
+<script>
+    Vue.component('alerts-component', VueSimpleNotify.VueSimpleNotify);
+    var app = new Vue({
+        el: '#v-app',
+        data: {
+            socket: {pokers: null},
+            vote: '',
+            votes: [],
+            activePoker: false,
+            members: 0,
+        },
+        methods: {
+            castVote() {
+                if (this.activePoker) {
+                    console.log('casting vote');
+                    this.socket.pokers.emit('vote', {poker: this.activePoker, vote: parseInt(this.vote, 10)});
+                    this.vote = "";
+                } else {
+                    alert('You must join the room before voting messages!');
+                }
+            },
+            receiveVote(msg) {
+                if (msg.poker === this.activePoker) {
+                    this.votes = msg.votes;
+                }
+            },
+            clearVotes(msg) {
+                if (msg.poker === this.activePoker) {
+                    this.votes = [];
+                }
+            },
+            membersUpdated(msg) {
+                if (msg.poker === this.activePoker) {
+                    this.members = msg.members;
+                }
+            },
+        },
+        created() {
+            this.activePoker = prompt('Enter your poker room:');
+
+            this.socket.pokers = io('http://localhost:3000/pokers');
+            this.socket.pokers.on('membersUpdated', (msg) => {
+                this.membersUpdated(msg);
+            });
+
+            this.socket.pokers.on('joined', () => {
+                this.socket.pokers.emit('getVotes', {poker: this.activePoker});
+            });
+
+            this.socket.pokers.on('votes', (msg) => {
+                this.receiveVote(msg);
+            });
+
+            this.socket.pokers.on('clearVotes', (msg) => {
+                this.clearVotes(msg);
+            });
+
+            this.socket.pokers.emit('join', {id: this.activePoker});
+        }
+    });
+
+</script>
+</body>
+</html>

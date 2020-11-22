@@ -1,26 +1,30 @@
 import { Injectable } from '@nestjs/common';
-import { CreateVoteDto } from './dto/create-vote.dto';
-import { UpdateVoteDto } from './dto/update-vote.dto';
+import { Socket } from 'socket.io';
 
 @Injectable()
 export class VotesService {
-  create(createVoteDto: CreateVoteDto) {
-    return 'This action adds a new vote';
+  pokers = [];
+
+  vote(client: Socket, poker: string, vote: number) {
+    this.pokers[poker] = this.pokers[poker] || {};
+    this.pokers[poker][client.id] = vote;
+
+    return this.pokers[poker];
   }
 
-  findAll() {
-    return `This action returns all votes`;
+  findAll(poker: string) {
+    const votes = this.pokers[poker] || {};
+
+    const voteList = [];
+    for (const vote in votes) {
+      voteList.push(votes[vote]);
+    }
+
+    return voteList;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} vote`;
-  }
-
-  update(id: number, updateVoteDto: UpdateVoteDto) {
-    return `This action updates a #${id} vote`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} vote`;
+  remove(client: Socket, poker: string) {
+    if (!this.pokers[poker]) return;
+    delete this.pokers[poker][client.id];
   }
 }

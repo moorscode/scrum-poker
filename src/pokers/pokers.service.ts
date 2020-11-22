@@ -1,26 +1,33 @@
 import { Injectable } from '@nestjs/common';
-import { CreatePokerDto } from './dto/create-poker.dto';
-import { UpdatePokerDto } from './dto/update-poker.dto';
+import { Socket } from 'socket.io';
 
 @Injectable()
 export class PokersService {
-  create(createPokerDto: CreatePokerDto) {
-    return 'This action adds a new poker';
+  pokers = [];
+
+  join(client: Socket, poker: string) {
+    this.pokers[poker] = this.pokers[poker] || [];
+
+    if (this.pokers[poker].indexOf(client) !== -1) {
+      return;
+    }
+
+    this.pokers[poker].push(client);
+    client.join(poker);
   }
 
-  findAll() {
-    return `This action returns all pokers`;
+  leave(client: Socket, poker: string) {
+    if (!this.pokers[poker]) {
+      return;
+    }
+
+    const index = this.pokers[poker].indexOf(client);
+    if (index !== -1) {
+      this.pokers[poker].splice(index, 1);
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} poker`;
-  }
-
-  update(id: number, updatePokerDto: UpdatePokerDto) {
-    return `This action updates a #${id} poker`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} poker`;
+  getMembers(poker: string) {
+    return (this.pokers[poker] || []).length;
   }
 }
