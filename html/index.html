@@ -16,7 +16,7 @@
 </head>
 <body>
 <main id="v-app">
-    <section class="chat">
+    <section class="poker">
         <h1>Scrum Poker</h1>
 
         <form class="rooms">
@@ -31,6 +31,7 @@
         <div v-if="activePoker">
             <p>
                 <button @click.prevent="resetVotes()" :class="['new']">New story</button>
+                <span :class="'new'" v-if="voteCount === members">Use the button to start a new story!</span>
             </p>
 
             <p>
@@ -47,10 +48,12 @@
                 </button>
             </p>
 
-            <p v-if="average !== ''">
-                Average: {{ average }}<br/>
-                Average story point: {{ averagePoint }}</p>
-            </p>
+            <section v-if="average !== ''">
+                <p>
+                    Average: {{ average }}<br/>
+                    Average story point: {{ averagePoint }}
+                </p>
+            </section>
         </div>
     </section>
 </main>
@@ -61,6 +64,7 @@
             socket: {pokers: null},
             votes: [],
             activePoker: false,
+            voteCount: 0,
             joinPoker: '',
             members: 0,
             points: {},
@@ -106,10 +110,13 @@
                 this.points = msg.points;
             },
             joinRoom() {
-                if( this.activePoker === this.joinPoker) {
+                if (this.activePoker === this.joinPoker) {
                     return;
                 }
 
+                this.myVote = '';
+                this.members = 0;
+                this.voteCount = 0;
                 this.activePoker = this.joinPoker;
                 this.socket.pokers.emit('join', {poker: this.activePoker});
             },
@@ -186,7 +193,7 @@
                 this.setPoints(msg);
             });
 
-            if ( this.joinPoker ) {
+            if (this.joinPoker) {
                 this.joinRoom();
             }
         }
