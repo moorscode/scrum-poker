@@ -111,6 +111,7 @@
         this.points = msg.points;
       },
       joinRoom() {
+        this.joinPoker = this.joinPoker.toLowerCase();
         if (this.activePoker === this.joinPoker) {
           return;
         }
