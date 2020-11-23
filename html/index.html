@@ -51,7 +51,11 @@
             <section v-if="average !== ''">
                 <p>
                     Average: {{ average }}<br/>
+                    Standard deviation: {{ standardDeviation }}<br/>
                     <strong>Average story point: {{ averagePoint }}</strong>
+                    <p v-if="averageContext">
+                        <strong>{{ averageContext }}</strong>
+                    </p>
                 </p>
             </section>
         </div>
@@ -72,6 +76,8 @@
       myVote: '',
       average: '',
       averagePoint: '',
+      averageContext: '',
+      standardDeviation: '',
     },
     methods: {
       castVote(vote) {
@@ -131,6 +137,9 @@
         this.socket.pokers.emit('join', {poker: this.activePoker});
       },
       calculateAverage() {
+        this.averageContext = '';
+        this.standardDeviation = '';
+
         if (this.voteCount === 0) {
           this.average = '';
           this.averagePoint = '';
@@ -148,6 +157,23 @@
         }
 
         this.average = Math.round((sum / this.votes.length) * 100) / 100;
+
+        // Find the difference between the lowest and the highest votes.
+        const sortedVotes = this.votes.sort();
+
+        const lowestIndex = this.points.indexOf(sortedVotes[0]);
+        const highestIndex = this.points.indexOf(sortedVotes[sortedVotes.length-1]);
+
+        if ( highestIndex - lowestIndex > 2 ) {
+          this.averageContext = `Large gap between lowest and highest vote: ${highestIndex-lowestIndex} points!`;
+        }
+
+        let powers = 0;
+        for (let i = 0; i < this.votes.length; i++) {
+          powers += Math.pow(parseFloat(this.votes[i]) - this.average, 2);
+        }
+
+        this.standardDeviation = Math.round(Math.sqrt(powers / this.votes.length) * 100) / 100;
 
         if (this.points.indexOf(this.average) !== -1) {
           this.averagePoint = this.average;
