@@ -2,11 +2,22 @@ import { Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
 import { PointsService } from '../points/points.service';
 
+interface currentVotes {
+  voteCount: number;
+  votes: string[];
+}
+
 @Injectable()
 export class PokersService {
   pokers = [];
   votes = [];
 
+  /**
+   * Lets a client join a room.
+   *
+   * @param {Socket} client The client.
+   * @param {string} poker The room.
+   */
   join(client: Socket, poker: string) {
     this.pokers[poker] = this.pokers[poker] || [];
 
@@ -18,6 +29,12 @@ export class PokersService {
     client.join(poker);
   }
 
+  /**
+   * Lets a client leave a room.
+   *
+   * @param {Socket} client The client.
+   * @param {string} poker The room.
+   */
   leave(client: Socket, poker: string) {
     if (!this.pokers[poker]) {
       return;
@@ -35,11 +52,25 @@ export class PokersService {
     client.leave(poker);
   }
 
+  /**
+   * Retrieves the number of members in a room.
+   *
+   * @param {string} poker The room.
+   *
+   * @returns {number} Number of members in the room.
+   */
   getMembers(poker: string) {
     return (this.pokers[poker] || []).length;
   }
 
-  vote(client: Socket, poker: string, vote) {
+  /**
+   * Registers a vote for a client in a room.
+   *
+   * @param {Socket} client The client.
+   * @param {string} poker The room.
+   * @param {number|string} vote The vote.
+   */
+  vote(client: Socket, poker: string, vote): void {
     this.votes[poker] = this.votes[poker] || {};
 
     // If everybody has voted, don't allow any changes until reset.
@@ -56,12 +87,20 @@ export class PokersService {
     this.votes[poker][client.id] = vote;
   }
 
-  getVotes(poker: string) {
+  /**
+   * Retrieves the votes for a room.
+   *
+   * @param {string} poker Room.
+   *
+   * @returns currentVotes Votes in that room. Obfuscated if not all votes are in yet.
+   */
+  getVotes(poker: string): currentVotes {
     const votes = this.votes[poker] || {};
 
     const voteCount = Object.keys(votes).length;
     const memberCount = (this.pokers[poker] || []).length;
 
+    // When all votes are in, show the actual votes.
     if (memberCount === voteCount) {
       const voteList = [];
       for (const client in votes) {
@@ -74,6 +113,7 @@ export class PokersService {
       };
     }
 
+    // Otherwise show an X for voted, ? for unvoted.
     return {
       voteCount,
       votes: Array.apply(null, Array(voteCount))
@@ -84,11 +124,22 @@ export class PokersService {
     };
   }
 
-  resetVotes(poker: string) {
+  /**
+   * Resets the votes for a room.
+   *
+   * @param {string} poker Room to reset.
+   */
+  resetVotes(poker: string): void {
     this.votes[poker] = {};
   }
 
-  removeVotes(client: Socket, poker: string) {
+  /**
+   * Removes the vote of a client.
+   *
+   * @param {Socket} client Client.
+   * @param {string} poker Room.
+   */
+  removeVote(client: Socket, poker: string): void {
     if (!this.votes[poker]) return;
     delete this.votes[poker][client.id];
   }
