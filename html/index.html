@@ -193,8 +193,13 @@
       });
 
       this.socket.pokers.on('joined', () => {
-        this.joinPoker = this.activePoker;
         this.socket.pokers.emit('getVotes', {poker: this.activePoker});
+
+        this.joinPoker = this.activePoker;
+
+        const url = new URL(window.location);
+        url.searchParams.set('room', this.activePoker);
+        window.history.pushState({}, '', url);
       });
 
       this.socket.pokers.on('votes', (msg) => {
