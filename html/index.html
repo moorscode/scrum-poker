@@ -187,7 +187,7 @@
         this.pokerFromURL = true;
       }
 
-      this.socket.pokers = io('http://localhost:3000/pokers');
+      this.socket.pokers = io(window.location.protocol + '//' + window.location.hostname + ':' + location.port + window.location.pathname + 'pokers');
       this.socket.pokers.on('membersUpdated', (msg) => {
         this.membersUpdated(msg);
       });
