@@ -44,7 +44,7 @@ button.choice, button.choice:focus {
     border-radius: 4px;
     border-width: 0;
     padding: 10px;
-    margin: 0 4px;
+    margin: 0 4px 8px;
     cursor: pointer;
     outline: 0;
 }
@@ -79,7 +79,7 @@ p.results > button {
     height: 50px;
     border-radius: 4px;
     border-width: 0;
-    margin: 0 4px;
+    margin: 0 4px 8px;
     padding: 0 14px;
     outline: 0;
     box-shadow: none;
