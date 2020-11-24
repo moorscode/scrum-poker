@@ -148,7 +148,7 @@
         }
       },
       setStandardDeviation() {
-        if (this.votes.length <=1 ) {
+        if (this.votes.length <=1 || this.votes.indexOf('coffee') !== -1) {
           this.standardDeviation = 'n/a';
           return;
         }
