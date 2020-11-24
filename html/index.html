@@ -273,10 +273,6 @@
       this.socket.pokers.on('points', (msg) => {
         this.setPoints(msg);
       });
-
-      if (this.joinPoker) {
-        this.joinRoom();
-      }
     }
   });
 
