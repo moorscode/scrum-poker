@@ -51,9 +51,13 @@ button.choice, button.choice:focus {
 button.choice:hover {
     background-color: darkgray;
 }
+button.picked {
+    border: 2px solid #477608;
+}
 
 button.highlighted, button.highlighted:hover, button.highlighted.active {
     background-color: #a4286a;
+    border-color: #a4286a;
     color: white;
 }
 button.highlighted .fas {
