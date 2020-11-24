@@ -248,6 +248,12 @@
       this.baseTitle = document.title;
 
       this.socket.pokers = io(window.location.protocol + '//' + window.location.hostname + ':' + location.port + window.location.pathname + 'pokers');
+      this.socket.pokers.on('connect', () => {
+        if (this.joinPoker) {
+          this.joinRoom();
+        }
+      });
+
       this.socket.pokers.on('membersUpdated', (msg) => {
         this.membersUpdated(msg);
       });
