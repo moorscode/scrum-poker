@@ -24,6 +24,10 @@
             </form>
         </section>
 
+        <form class="rooms">
+        <input type="text" v-model="nickname"/> <input type="submit" @click.prevent="updateNickname" value="update nickname"/>
+        </form>
+
         <label><input type="checkbox" v-model="observer" @change="observerChange()" /> <i :class="['fas','fa-user-secret', !observer ? 'observer' : '']"></i> Observer</label>
 
         <div v-if="!activePoker">
@@ -49,6 +53,23 @@
                     {{ vote }}
                 </button>
             </p>
+
+            <div class="voteMembers" v-if="votedNames.length + unvotedNames.length > 0">
+                <div class="voted">
+                    <strong>Voted:</strong>
+                    <ul>
+                        <li v-for="name of votedNames">{{ name }}</li>
+                    </ul>
+                    <p v-if="votedNames.length === 0">Nobody voted yet.</p>
+                </div>
+                <div class="unvoted">
+                    <strong>Not voted yet:</strong>
+                    <ul>
+                        <li v-for="name of unvotedNames">{{ name }}</li>
+                    </ul>
+                    <p v-if="unvotedNames.length === 0">Everybody voted!</p>
+                </div>
+            </div>
 
             <section v-if="average !== ''">
                 <p>
@@ -82,15 +103,25 @@
       standardDeviation: '',
       observer: false,
       baseTitle: '',
+      nickname: '',
+      votedNames: [],
+      names: [],
     },
     methods: {
-      observerChange: function(e) {
+      observerChange() {
         if ( this.observer) {
           this.socket.pokers.emit('observe', { poker: this.activePoker });
         } else {
           this.activePoker = '';
           this.joinRoom();
+          this.updateNickname();
         }
+      },
+      updateNickname() {
+        if (!this.nickname) return;
+
+        window.localStorage.setItem('nickname', this.nickname);
+        this.socket.pokers.emit('nickname', { name: this.nickname, poker: this.activePoker });
       },
       castVote(vote) {
         if (this.observer) return;
@@ -110,6 +141,8 @@
         if (msg.poker === this.activePoker) {
           this.votes = msg.votes.sort( (a, b) => a - b );
           this.voteCount = msg.voteCount;
+          this.votedNames = msg.votedNames;
+          this.names = msg.names;
 
           if (this.voteCount === 0) {
             this.calculateAverage();
@@ -235,6 +268,11 @@
         this.socket.pokers.emit('resetVotes', {poker: this.activePoker});
       }
     },
+    computed: {
+      unvotedNames() {
+        return this.names.filter( name => this.votedNames.indexOf(name) === -1 );
+      },
+    },
     created() {
       let uri = window.location.search.substring(1);
       let params = new URLSearchParams(uri);
@@ -244,12 +282,14 @@
       }
 
       this.baseTitle = document.title;
+      this.nickname = window.localStorage.getItem('nickname');
 
       this.socket.pokers = io(window.location.protocol + '//' + window.location.hostname + ':' + location.port + window.location.pathname + 'pokers');
       this.socket.pokers.on('connect', () => {
         if (this.joinPoker) {
           this.joinRoom();
         }
+        this.updateNickname();
       });
 
       this.socket.pokers.on('membersUpdated', (msg) => {

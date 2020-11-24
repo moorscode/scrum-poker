@@ -22,7 +22,6 @@ export class PokersGateway {
       socket.on('disconnecting', () => {
         for (const room in socket.rooms) {
           this.pokersService.leave(socket, room);
-          this.pokersService.removeVote(socket, room);
 
           this.updateMembers(room);
           this.sendAllVotes(room);
@@ -52,6 +51,12 @@ export class PokersGateway {
   vote(client: Socket, message: { poker: string; vote }): void {
     this.pokersService.vote(client, message.poker, message.vote);
 
+    this.sendAllVotes(message.poker);
+  }
+
+  @SubscribeMessage('nickname')
+  setNickname(client: Socket, message: { name: string; poker: string }): void {
+    this.pokersService.setName(client, message.name, message.poker);
     this.sendAllVotes(message.poker);
   }
 
@@ -86,6 +91,8 @@ export class PokersGateway {
     this.server.to(poker).emit('votes', {
       poker: poker,
       ...this.pokersService.getVotes(poker),
+      names: this.pokersService.getNames(poker),
+      votedNames: this.pokersService.getVotedNames(poker),
     });
   }
 

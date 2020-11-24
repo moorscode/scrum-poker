@@ -40,6 +40,18 @@ h1 {
     color: black;
 }
 
+div.voteMembers {
+    display: flex;
+}
+
+div.unvoted {
+    flex: 50%;
+}
+
+div.voted {
+    flex: 50%;
+}
+
 button.choice, button.choice:focus {
     font-size: 14px;
     min-width: 40px;

@@ -11,6 +11,7 @@ interface currentVotes {
 export class PokersService {
   pokers = [];
   votes = [];
+  names = {};
 
   /**
    * Lets a client join a room.
@@ -25,6 +26,8 @@ export class PokersService {
       return;
     }
 
+    this.setName(client, 'Unnamed' + Math.floor(Math.random() * 100000), poker);
+
     this.pokers[poker].push(client);
     client.join(poker);
   }
@@ -36,17 +39,20 @@ export class PokersService {
    * @param {string} poker The room.
    */
   leave(client: Socket, poker: string) {
-    if (!this.pokers[poker]) {
-      return;
+    if (this.pokers[poker]) {
+      const index = this.pokers[poker].indexOf(client);
+      if (index !== -1) {
+        this.pokers[poker].splice(index, 1);
+      }
     }
 
-    const index = this.pokers[poker].indexOf(client);
-    if (index !== -1) {
-      this.pokers[poker].splice(index, 1);
-    }
-
-    if (this.votes[poker] && this.votes[poker][client.id]) {
+    if (this.votes[poker]) {
       delete this.votes[poker][client.id];
+    }
+
+    if (this.names[poker]) {
+      console.log(client.id);
+      delete this.names[poker][client.id];
     }
 
     client.leave(poker);
@@ -64,9 +70,43 @@ export class PokersService {
       this.pokers[poker].splice(index, 1);
     }
 
-    if (this.votes[poker] && this.votes[poker][client.id]) {
+    if (this.votes[poker]) {
       delete this.votes[poker][client.id];
     }
+
+    if (this.names[poker]) {
+      delete this.names[poker][client.id];
+    }
+  }
+
+  setName(client: Socket, name: string, poker: string) {
+    this.names[poker] = this.names[poker] || {};
+
+    this.names[poker][client.id] = name;
+  }
+
+  removeName(client: Socket, poker: string) {
+    if (!this.names[poker]) return;
+    delete this.names[poker][client.id];
+  }
+
+  getNames(poker: string) {
+    if (!this.names[poker]) return [];
+
+    return Object.values(this.names[poker]);
+  }
+
+  getVotedNames(poker: string) {
+    if (!this.names[poker]) return [];
+    if (!this.votes[poker]) return [];
+
+    const clientIds = Object.keys(this.votes[poker]);
+    const list = [];
+    for (const clientId of clientIds) {
+      list.push(this.names[poker][clientId]);
+    }
+
+    return list;
   }
 
   /**
