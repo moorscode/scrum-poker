@@ -53,6 +53,23 @@ export class PokersService {
   }
 
   /**
+   * Removes the client from the room and votes lists.
+   *
+   * @param {Socket} client The client.
+   * @param {string} poker The room.
+   */
+  observe(client: Socket, poker: string) {
+    const index = this.pokers[poker].indexOf(client);
+    if (index !== -1) {
+      this.pokers[poker].splice(index, 1);
+    }
+
+    if (this.votes[poker] && this.votes[poker][client.id]) {
+      delete this.votes[poker][client.id];
+    }
+  }
+
+  /**
    * Retrieves the number of members in a room.
    *
    * @param {string} poker The room.

@@ -24,6 +24,8 @@
             </form>
         </section>
 
+        <label><input type="checkbox" v-model="observer" @change="observerChange()" /> Observer</label>
+
         <div v-if="!activePoker">
             Join a scrum room to start voting!
         </div>
@@ -78,9 +80,20 @@
       averagePoint: '',
       averageContext: '',
       standardDeviation: '',
+      observer: false,
     },
     methods: {
+      observerChange: function(e) {
+        if ( this.observer) {
+          this.socket.pokers.emit('observe', { poker: this.activePoker });
+        } else {
+          this.activePoker = '';
+          this.joinRoom();
+        }
+      },
       castVote(vote) {
+        if (this.observer) return;
+
         if (this.activePoker) {
           if (this.voteCount === this.members) {
             return;

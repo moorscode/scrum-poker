@@ -67,6 +67,14 @@ export class PokersGateway {
     this.sendAllVotes(message.poker);
   }
 
+  @SubscribeMessage('observe')
+  observer(client: Socket, message: { poker: string }): void {
+    this.pokersService.observe(client, message.poker);
+
+    this.sendAllVotes(message.poker);
+    this.updateMembers(message.poker);
+  }
+
   /**
    * Sends all votes to a room.
    *
