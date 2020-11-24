@@ -108,7 +108,7 @@
       },
       receiveVote(msg) {
         if (msg.poker === this.activePoker) {
-          this.votes = msg.votes;
+          this.votes = msg.votes.sort( (a, b) => a - b );
           this.voteCount = msg.voteCount;
 
           if (this.voteCount === 0) {
@@ -154,10 +154,8 @@
       },
       setAverageContext: function () {
         // Find the difference between the lowest and the highest votes.
-        const sortedVotes = this.votes.sort()
-
-        const lowestIndex = this.points.indexOf(sortedVotes[0])
-        const highestIndex = this.points.indexOf(sortedVotes[sortedVotes.length - 1])
+        const lowestIndex = this.points.indexOf(this.votes[0])
+        const highestIndex = this.points.indexOf(this.votes[this.votes.length - 1])
 
         if (highestIndex - lowestIndex > 2) {
           this.averageContext = `Large gap between lowest and highest vote: ${highestIndex - lowestIndex} cards!`
