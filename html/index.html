@@ -81,6 +81,7 @@
       averageContext: '',
       standardDeviation: '',
       observer: false,
+      baseTitle: '',
     },
     methods: {
       observerChange: function(e) {
@@ -114,6 +115,8 @@
             this.calculateAverage();
             this.myVote = '';
           }
+
+          document.title = this.baseTitle + ' ' + this.voteCount + '/' + this.members;
 
           if (this.voteCount === this.members) {
             this.calculateAverage();
@@ -241,6 +244,8 @@
         this.joinPoker = params.get('room');
         this.pokerFromURL = true;
       }
+
+      this.baseTitle = document.title;
 
       this.socket.pokers = io(window.location.protocol + '//' + window.location.hostname + ':' + location.port + window.location.pathname + 'pokers');
       this.socket.pokers.on('membersUpdated', (msg) => {

@@ -71,8 +71,8 @@ export class PokersGateway {
   observer(client: Socket, message: { poker: string }): void {
     this.pokersService.observe(client, message.poker);
 
-    this.sendAllVotes(message.poker);
     this.updateMembers(message.poker);
+    this.sendAllVotes(message.poker);
   }
 
   /**
