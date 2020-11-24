@@ -253,8 +253,6 @@
       });
 
       this.socket.pokers.on('joined', () => {
-        this.socket.pokers.emit('getVotes', {poker: this.activePoker});
-
         this.joinPoker = this.activePoker;
 
         const url = new URL(window.location);
