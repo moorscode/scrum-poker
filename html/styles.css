@@ -36,6 +36,9 @@ h1 {
 .fas {
     color: #a4286a;
 }
+.fas.observer {
+    color: black;
+}
 
 button.choice, button.choice:focus {
     font-size: 14px;

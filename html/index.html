@@ -24,7 +24,7 @@
             </form>
         </section>
 
-        <label><input type="checkbox" v-model="observer" @change="observerChange()" /> Observer</label>
+        <label><input type="checkbox" v-model="observer" @change="observerChange()" /> <i :class="['fas','fa-user-secret', !observer ? 'observer' : '']"></i> Observer</label>
 
         <div v-if="!activePoker">
             Join a scrum room to start voting!
