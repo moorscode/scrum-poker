@@ -37,7 +37,7 @@
 
             <div class="observe">
                 <label><i :class="['fas','fa-user-secret', !observer ? 'observer' : '']"></i>
-                    Observe<input
+                    {{ observing }}<input
                             type="checkbox"
                             style="visibility: hidden;"
                             v-model="observer"
@@ -292,6 +292,9 @@
         }
         return result
       },
+      observing() {
+        return this.observer ? 'Observing…' : 'Observe';
+      }
     },
     created () {
       let uri = window.location.search.substring(1)
