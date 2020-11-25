@@ -24,8 +24,9 @@
             </form>
         </section>
 
-        <form class="rooms">
-        <input type="text" v-model="nickname"/> <input type="submit" @click.prevent="updateNickname" value="update nickname"/>
+        <form class="username">
+            <span>Nickname:</span>
+            <input type="text" v-model="nickname"/> <input type="submit" @click.prevent="updateNickname" value="update nickname"/>
         </form>
 
         <label><input type="checkbox" v-model="observer" @change="observerChange()" /> <i :class="['fas','fa-user-secret', !observer ? 'observer' : '']"></i> Observer</label>

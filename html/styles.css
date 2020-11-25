@@ -63,6 +63,7 @@ button.choice, button.choice:focus {
     cursor: pointer;
     outline: 0;
 }
+button.choice:active,
 button.choice:hover {
     background-color: darkgray;
 }
@@ -70,7 +71,9 @@ button.picked {
     border: 2px solid #477608;
 }
 
-button.highlighted, button.highlighted:hover, button.highlighted.active {
+button.highlighted,
+button.highlighted:hover,
+button.highlighted.active {
     background-color: #a4286a;
     border-color: #a4286a;
     color: white;
@@ -84,12 +87,34 @@ span.new {
     position: relative;
     top: 3px;
 }
-button.new, .rooms input[type=submit] {
+button.new, form input[type=submit] {
     padding: 6px;
     cursor: pointer;
     border: 1px solid darkgray;
     border-radius: 2px;
     outline: none;
+}
+
+form.username {
+    margin-bottom: 6px;
+}
+
+.username input[type=submit] {
+    display: none;
+}
+.username:active input[type=submit],
+.username:hover input[type=submit] {
+    display: inline-block;
+}
+.username input[type=text] {
+    border: none;
+    font-size: 16px;
+    padding: 5px 5px 6px;
+}
+.username:active input[type=text],
+.username:hover input[type=text] {
+    border: 1px inset;
+    padding: 4px;
 }
 
 p.results > button {
