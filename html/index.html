@@ -48,7 +48,7 @@
             </p>
 
             <p :class="[ 'results', this.members === this.voteCount ? 'final' : '' ]">
-                <button v-for="vote of votes">
+                <button v-for="vote of displayVotes">
                     <i :class="['fas','fa-mug-hot']" v-if="vote === 'coffee'"></i>
                     {{ vote }}
                 </button>
@@ -90,6 +90,7 @@
     data: {
       socket: {pokers: null},
       votes: [],
+      displayVotes: [],
       activePoker: false,
       pokerFromURL: false,
       voteCount: 0,
@@ -127,10 +128,6 @@
         if (this.observer) return;
 
         if (this.activePoker) {
-          if (this.voteCount === this.members) {
-            return;
-          }
-
           this.socket.pokers.emit('vote', {poker: this.activePoker, vote: vote});
           this.myVote = vote;
         } else {
@@ -140,6 +137,7 @@
       receiveVote(msg) {
         if (msg.poker === this.activePoker) {
           this.votes = msg.votes.sort( (a, b) => a - b );
+          this.displayVotes = msg.displayVotes.sort( (a, b) => a - b );
           this.voteCount = msg.voteCount;
           this.votedNames = msg.votedNames;
           this.names = msg.names;

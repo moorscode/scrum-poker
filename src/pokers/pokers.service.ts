@@ -5,12 +5,14 @@ import { PointsService } from '../points/points.service';
 interface currentVotes {
   voteCount: number;
   votes: string[];
+  displayVotes: string[];
 }
 
 @Injectable()
 export class PokersService {
   pokers = [];
   votes = [];
+  changedVotes = [];
   names = {};
 
   /**
@@ -72,6 +74,7 @@ export class PokersService {
 
     if (this.votes[poker]) {
       delete this.votes[poker][client.id];
+      delete this.changedVotes[poker][client.id];
     }
 
     if (this.names[poker]) {
@@ -125,15 +128,18 @@ export class PokersService {
    */
   vote(client: Socket, poker: string, vote): void {
     this.votes[poker] = this.votes[poker] || {};
+    this.changedVotes[poker] = this.changedVotes[poker] || {};
 
-    // If everybody has voted, don't allow any changes until reset.
-    if (this.pokers[poker].length === Object.keys(this.votes[poker]).length) {
+    // Prevent cheaters from entering bogus point totals.
+    const allowedPoints = PointsService.getPoints();
+
+    if (!allowedPoints.includes(vote)) {
       return;
     }
 
-    // Prevent cheaters from entering bogus point totals.
-    const points = PointsService.getPoints();
-    if (points.indexOf(vote) === -1) {
+    // If everybody has voted, record their change in vote.
+    if (this.pokers[poker].length === Object.keys(this.votes[poker]).length) {
+      this.changedVotes[poker][client.id] = vote;
       return;
     }
 
@@ -149,6 +155,7 @@ export class PokersService {
    */
   getVotes(poker: string): currentVotes {
     const votes = this.votes[poker] || {};
+    const changedVotes = this.changedVotes[poker] || {};
 
     const voteCount = Object.keys(votes).length;
     const memberCount = (this.pokers[poker] || []).length;
@@ -156,13 +163,31 @@ export class PokersService {
     // When all votes are in, show the actual votes.
     if (memberCount === voteCount) {
       const voteList = [];
+      const displayVotes = [];
+
       for (const client in votes) {
-        voteList.push(votes[client]);
+        if (!votes.hasOwnProperty(client)) {
+          continue;
+        }
+
+        const initialVote = votes[client];
+        let voteToCount = initialVote;
+        let voteToDisplay = initialVote;
+        if (
+          changedVotes.hasOwnProperty(client) &&
+          changedVotes[client] !== initialVote
+        ) {
+          voteToDisplay += ' -> ' + changedVotes[client];
+          voteToCount = changedVotes[client];
+        }
+        displayVotes.push(voteToDisplay);
+        voteList.push(voteToCount);
       }
 
       return {
         voteCount: voteList.length,
         votes: voteList,
+        displayVotes: displayVotes,
       };
     }
 
@@ -173,6 +198,7 @@ export class PokersService {
     return {
       voteCount,
       votes: hiddenVotes,
+      displayVotes: hiddenVotes,
     };
   }
 
@@ -183,6 +209,7 @@ export class PokersService {
    */
   resetVotes(poker: string): void {
     this.votes[poker] = {};
+    this.changedVotes[poker] = {};
   }
 
   /**
