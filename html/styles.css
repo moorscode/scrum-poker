@@ -59,6 +59,10 @@ button.new {
 button.new .fas {
     color: black;
 }
+button.new:hover, button.new:hover .fas,
+button.new:active, button.new:active .fas {
+    color: #a4286a;
+}
 
 div.voted {
     flex: 50%;
@@ -80,6 +84,10 @@ button.choice:active,
 button.choice:hover {
     background-color: darkgray;
 }
+button.choice:first-child {
+    margin-left: 0;
+}
+
 button.picked {
     border: 2px solid #477608;
 }
@@ -107,9 +115,23 @@ button.new, form input[type=submit] {
     border-radius: 2px;
     outline: none;
 }
+button.new .fas {
+    margin-right: 3px;
+}
 
 form.username {
     margin-bottom: 6px;
+    margin-left: 6px;
+}
+form.username .fas {
+    color: black;
+}
+
+label.observe {
+    margin-left: 7px;
+}
+label.observe .fas {
+    margin-right: 5px;
 }
 
 .username input[type=submit] {
@@ -130,6 +152,17 @@ form.username {
     padding: 4px;
 }
 
+div.pokerMain {
+    margin-top: 14px;
+}
+hr {
+    padding: 0;
+    width: 100%;
+    height: 0;
+    margin: 16px 0;
+    border: 1px dashed #a4286a;
+}
+
 p.results > button {
     font-size: 16px;
     min-width: 50px;
@@ -140,6 +173,9 @@ p.results > button {
     padding: 0 14px;
     outline: 0;
     box-shadow: none;
+}
+p.results button:first-child {
+    margin-left: 0;
 }
 p.results > button:focus {
     outline: 0;

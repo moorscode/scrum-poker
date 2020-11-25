@@ -25,28 +25,34 @@
         </section>
 
         <form class="username">
-            <span>Nickname:</span>
-            <input type="text" v-model="nickname"/> <input type="submit" @click.prevent="updateNickname" value="update nickname"/>
+            <span><i class="fas fa-signature"></i> Nickname:</span>
+            <input type="text" v-model="nickname"/> <input type="submit" @click.prevent="updateNickname"
+                                                           value="update nickname"/>
         </form>
 
-        <label><i :class="['fas','fa-user-secret', !observer ? 'observer' : '']"></i> Observe<input type="checkbox" style="visibility: hidden;" v-model="observer" @change="observerChange()" /></label>
+        <label class="observe"><i :class="['fas','fa-user-secret', !observer ? 'observer' : '']"></i> Observe<input
+                type="checkbox" style="visibility: hidden;" v-model="observer" @change="observerChange()"/></label>
 
         <div v-if="!activePoker">
             Join a scrum room to start voting!
         </div>
 
-        <div v-if="activePoker">
-            <p>
-                <button @click.prevent="resetVotes()" class="new"><i class="fas fa-eraser"></i> New story</button>
-                <span :class="'new'" v-if="voteCount === members">All votes are in, start a new story!</span>
-            </p>
+        <div class="pokerMain" v-if="activePoker">
 
-            <p>
-            <span v-for="point of points"><button @click.prevent="castVote(point)"
-                                                  :class="[ 'choice', votes.indexOf( point ) !== -1 ? 'picked' : '', myVote === point ? 'highlighted' : '' ]">
+            <button @click.prevent="resetVotes()" class="new"><i class="fas fa-eraser"></i> New story</button>
+            <span :class="'new'" v-if="voteCount === members">All votes are in, start a new story!</span>
+
+            <hr/>
+
+            <button
+                    v-for="point of points"
+                    @click.prevent="castVote(point)"
+                    :class="[ 'choice', votes.indexOf( point ) !== -1 ? 'picked' : '', myVote === point ? 'highlighted' : '' ]">
                 <i :class="['fas','fa-mug-hot']" v-if="point === 'coffee'"></i>
-                {{ point }}</button></span>
-            </p>
+                {{ point }}
+            </button>
+
+            <hr/>
 
             <p :class="[ 'results', this.members === this.voteCount ? 'final' : '' ]">
                 <button v-for="vote of votes">
@@ -55,7 +61,18 @@
                 </button>
             </p>
 
-            <div class="voteMembers" v-if="votedNames.length + unvotedNames.length > 0">
+            <section v-if="average !== ''">
+                <p>
+                    Average: {{ average }}<br/>
+                    Standard deviation: {{ standardDeviation }}<br/>
+                    <strong>Average story point: {{ averagePoint }}</strong>
+                <p v-if="averageContext">
+                    <strong>{{ averageContext }}</strong>
+                </p>
+                </p>
+            </section>
+
+            <div class="voteMembers" v-if="unvotedNames.length > 0">
                 <div class="voted">
                     <strong><i class="far fa-check-circle"></i> Voted:</strong>
                     <ul>
@@ -71,17 +88,6 @@
                     <p v-if="unvotedNames.length === 0">Everybody voted!</p>
                 </div>
             </div>
-
-            <section v-if="average !== ''">
-                <p>
-                    Average: {{ average }}<br/>
-                    Standard deviation: {{ standardDeviation }}<br/>
-                    <strong>Average story point: {{ averagePoint }}</strong>
-                    <p v-if="averageContext">
-                        <strong>{{ averageContext }}</strong>
-                    </p>
-                </p>
-            </section>
         </div>
     </section>
 </main>
@@ -89,7 +95,7 @@
   new Vue({
     el: '#v-app',
     data: {
-      socket: {pokers: null},
+      socket: { pokers: null },
       votes: [],
       activePoker: false,
       pokerFromURL: false,
@@ -109,82 +115,82 @@
       names: [],
     },
     methods: {
-      observerChange() {
-        if ( this.observer) {
-          this.socket.pokers.emit('observe', { poker: this.activePoker });
+      observerChange () {
+        if (this.observer) {
+          this.socket.pokers.emit('observe', { poker: this.activePoker })
         } else {
-          this.activePoker = '';
-          this.joinRoom();
-          this.updateNickname();
+          this.activePoker = ''
+          this.joinRoom()
+          this.updateNickname()
         }
       },
-      updateNickname() {
-        if (!this.nickname) return;
+      updateNickname () {
+        if (!this.nickname) return
 
-        window.localStorage.setItem('nickname', this.nickname);
-        this.socket.pokers.emit('nickname', { name: this.nickname, poker: this.activePoker });
+        window.localStorage.setItem('nickname', this.nickname)
+        this.socket.pokers.emit('nickname', { name: this.nickname, poker: this.activePoker })
       },
-      castVote(vote) {
-        if (this.observer) return;
+      castVote (vote) {
+        if (this.observer) return
 
         if (this.activePoker) {
           if (this.voteCount === this.members) {
-            return;
+            return
           }
 
-          this.socket.pokers.emit('vote', {poker: this.activePoker, vote: vote});
-          this.myVote = vote;
+          this.socket.pokers.emit('vote', { poker: this.activePoker, vote: vote })
+          this.myVote = vote
         } else {
-          alert('You must join a room before voting!');
+          alert('You must join a room before voting!')
         }
       },
-      receiveVote(msg) {
+      receiveVote (msg) {
         if (msg.poker === this.activePoker) {
-          this.votes = msg.votes.sort( (a, b) => a - b );
-          this.voteCount = msg.voteCount;
-          this.votedNames = msg.votedNames;
-          this.names = msg.names;
+          this.votes = msg.votes.sort((a, b) => a - b)
+          this.voteCount = msg.voteCount
+          this.votedNames = msg.votedNames
+          this.names = msg.names
 
           if (this.voteCount === 0) {
-            this.calculateAverage();
-            this.myVote = '';
+            this.calculateAverage()
+            this.myVote = ''
           }
 
-          document.title = this.baseTitle + ' ' + this.voteCount + '/' + this.members;
+          document.title = this.baseTitle + ' ' + this.voteCount + '/' + this.members
 
           if (this.voteCount === this.members) {
-            this.calculateAverage();
-            return;
+            this.calculateAverage()
+            return
           }
         }
       },
-      membersUpdated(msg) {
+      membersUpdated (msg) {
         if (msg.poker === this.activePoker) {
-          this.members = msg.members;
+          this.members = msg.members
         }
       },
-      setPoints(msg) {
-        this.points = msg.points;
+      setPoints (msg) {
+        this.points = msg.points
       },
-      joinRoom(force) {
-        this.joinPoker = this.joinPoker.toLowerCase();
+      joinRoom (force) {
+        this.joinPoker = this.joinPoker.toLowerCase()
         if (!this.joinPoker || (this.activePoker === this.joinPoker && !force)) {
-          return;
+          return
         }
 
-        this.myVote = '';
-        this.members = 0;
-        this.voteCount = 0;
+        this.myVote = ''
+        this.members = 0
+        this.voteCount = 0
 
-        this.socket.pokers.emit('leave', {poker: this.activePoker});
+        this.socket.pokers.emit('leave', { poker: this.activePoker })
 
-        this.activePoker = this.joinPoker;
+        this.activePoker = this.joinPoker
 
         if (this.activePoker === '') {
-          return;
+          return
         }
 
-        this.socket.pokers.emit('join', {poker: this.activePoker, name: this.nickname});
+        this.socket.pokers.emit('join', { poker: this.activePoker, name: this.nickname })
       },
       setAverageContext: function () {
         // Find the difference between the lowest and the highest votes.
@@ -195,10 +201,10 @@
           this.averageContext = `Large gap between lowest and highest vote: ${highestIndex - lowestIndex} cards!`
         }
       },
-      setStandardDeviation() {
-        if (this.votes.length <=1 || this.votes.indexOf('coffee') !== -1) {
-          this.standardDeviation = 'n/a';
-          return;
+      setStandardDeviation () {
+        if (this.votes.length <= 1 || this.votes.indexOf('coffee') !== -1) {
+          this.standardDeviation = 'n/a'
+          return
         }
 
         let powers = 0
@@ -236,41 +242,41 @@
           }
         }
       },
-      setAverage() {
-        let sum = 0;
+      setAverage () {
+        let sum = 0
         for (let i = 0; i < this.votes.length; i++) {
           if (isNaN(this.votes[i])) {
-            this.average = 'Coffee break';
-            this.averagePoint = 'Coffee break';
-            return;
+            this.average = 'Coffee break'
+            this.averagePoint = 'Coffee break'
+            return
           }
-          sum += parseFloat(this.votes[i]); //don't forget to add the base
+          sum += parseFloat(this.votes[i]) //don't forget to add the base
         }
 
-        this.average = Math.round((sum / this.votes.length) * 100) / 100;
+        this.average = Math.round((sum / this.votes.length) * 100) / 100
       },
-      calculateAverage() {
+      calculateAverage () {
         // Reset values.
-        this.averageContext = '';
-        this.standardDeviation = '';
+        this.averageContext = ''
+        this.standardDeviation = ''
 
         if (this.voteCount === 0) {
-          this.average = '';
-          this.averagePoint = '';
-          return;
+          this.average = ''
+          this.averagePoint = ''
+          return
         }
 
-        this.setAverage();
-        this.setAverageContext();
-        this.setStandardDeviation();
-        this.setAveragePoint();
+        this.setAverage()
+        this.setAverageContext()
+        this.setStandardDeviation()
+        this.setAveragePoint()
       },
-      resetVotes() {
-        this.socket.pokers.emit('resetVotes', {poker: this.activePoker});
+      resetVotes () {
+        this.socket.pokers.emit('resetVotes', { poker: this.activePoker })
       }
     },
     computed: {
-      unvotedNames() {
+      unvotedNames () {
         const result = this.names
         for (const name of this.votedNames) {
           const index = result.indexOf(name)
@@ -281,43 +287,43 @@
         return result
       },
     },
-    created() {
-      let uri = window.location.search.substring(1);
-      let params = new URLSearchParams(uri);
+    created () {
+      let uri = window.location.search.substring(1)
+      let params = new URLSearchParams(uri)
       if (params.get('room')) {
-        this.joinPoker = params.get('room');
-        this.pokerFromURL = true;
+        this.joinPoker = params.get('room')
+        this.pokerFromURL = true
       }
 
-      this.baseTitle = document.title;
-      this.nickname = window.localStorage.getItem('nickname');
+      this.baseTitle = document.title
+      this.nickname = window.localStorage.getItem('nickname')
 
-      this.socket.pokers = io(window.location.protocol + '//' + window.location.hostname + ':' + location.port + window.location.pathname + 'pokers');
+      this.socket.pokers = io(window.location.protocol + '//' + window.location.hostname + ':' + location.port + window.location.pathname + 'pokers')
       this.socket.pokers.on('connect', () => {
-        this.joinRoom(true);
-      });
+        this.joinRoom(true)
+      })
 
       this.socket.pokers.on('membersUpdated', (msg) => {
-        this.membersUpdated(msg);
-      });
+        this.membersUpdated(msg)
+      })
 
       this.socket.pokers.on('joined', () => {
-        this.joinPoker = this.activePoker;
+        this.joinPoker = this.activePoker
 
-        const url = new URL(window.location);
-        url.searchParams.set('room', this.activePoker);
-        window.history.pushState({}, '', url);
-      });
+        const url = new URL(window.location)
+        url.searchParams.set('room', this.activePoker)
+        window.history.pushState({}, '', url)
+      })
 
       this.socket.pokers.on('votes', (msg) => {
-        this.receiveVote(msg);
-      });
+        this.receiveVote(msg)
+      })
 
       this.socket.pokers.on('points', (msg) => {
-        this.setPoints(msg);
-      });
+        this.setPoints(msg)
+      })
     }
-  });
+  })
 
 </script>
 </body>
