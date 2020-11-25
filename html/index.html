@@ -165,9 +165,9 @@
       setPoints(msg) {
         this.points = msg.points;
       },
-      joinRoom() {
+      joinRoom(force) {
         this.joinPoker = this.joinPoker.toLowerCase();
-        if (this.activePoker === this.joinPoker) {
+        if (!this.joinPoker || (this.activePoker === this.joinPoker && !force)) {
           return;
         }
 
@@ -286,9 +286,7 @@
 
       this.socket.pokers = io(window.location.protocol + '//' + window.location.hostname + ':' + location.port + window.location.pathname + 'pokers');
       this.socket.pokers.on('connect', () => {
-        if (this.joinPoker) {
-          this.joinRoom();
-        }
+        this.joinRoom(true);
       });
 
       this.socket.pokers.on('membersUpdated', (msg) => {
