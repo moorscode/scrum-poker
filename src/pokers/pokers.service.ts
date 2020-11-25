@@ -167,13 +167,12 @@ export class PokersService {
     }
 
     // Otherwise show an X for voted, ? for unvoted.
+    const hiddenVotes = Array(memberCount)
+      .fill('X', 0, voteCount)
+      .fill('?', voteCount, memberCount);
     return {
       voteCount,
-      votes: Array.apply(null, Array(voteCount))
-        .map((_) => 'X')
-        .concat(
-          Array.apply(null, Array(memberCount - voteCount)).map((_) => '?'),
-        ),
+      votes: hiddenVotes,
     };
   }
 
