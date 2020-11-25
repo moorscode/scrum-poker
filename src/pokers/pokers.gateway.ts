@@ -2,13 +2,14 @@ import {
   WebSocketGateway,
   SubscribeMessage,
   WebSocketServer,
+  OnGatewayInit,
 } from '@nestjs/websockets';
 import { PokersService } from './pokers.service';
 import { Server, Socket } from 'socket.io';
 import { PointsService } from '../points/points.service';
 
 @WebSocketGateway({ namespace: '/pokers' })
-export class PokersGateway {
+export class PokersGateway implements OnGatewayInit {
   @WebSocketServer() server: Server;
 
   constructor(private readonly pokersService: PokersService) {}
