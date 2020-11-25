@@ -41,7 +41,7 @@
             </p>
 
             <p>
-            <span v-for="point of points"><button @click.prevent="castVote(point)"
+            <span v-if="!observer" v-for="point of points"><button @click.prevent="castVote(point)"
                                                   :class="[ 'choice', votes.indexOf( point ) !== -1 ? 'picked' : '', myVote === point ? 'highlighted' : '' ]">
                 <i :class="['fas','fa-mug-hot']" v-if="point === 'coffee'"></i>
                 {{ point }}</button></span>
