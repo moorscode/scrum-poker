@@ -17,27 +17,33 @@
     <section class="poker">
         <h1>Scrum Poker</h1>
 
-        <section v-if="!pokerFromURL">
+        <section v-if="!activePoker">
             <form class="rooms">
-                <input type="text" v-model="joinPoker"/>
+                <i class="fas fa-person-booth"></i> Room: <input type="text" v-model="joinPoker"/>
                 <input type="submit" @click.prevent="joinRoom()" value="join scrum room">
             </form>
         </section>
-
-        <form class="username">
-            <span><i class="fas fa-signature"></i> Nickname:</span>
-            <input type="text" v-model="nickname"/> <input type="submit" @click.prevent="updateNickname"
-                                                           value="update nickname"/>
-        </form>
-
-        <label class="observe"><i :class="['fas','fa-user-secret', !observer ? 'observer' : '']"></i> Observe<input
-                type="checkbox" style="visibility: hidden;" v-model="observer" @change="observerChange()"/></label>
 
         <div v-if="!activePoker">
             Join a scrum room to start voting!
         </div>
 
         <div class="pokerMain" v-if="activePoker">
+            <form class="username">
+                <span><i class="fas fa-signature"></i> Nickname:</span>
+                <input type="text" v-model="nickname"/> <input type="submit" @click.prevent="updateNickname"
+                                                               value="update nickname"/>
+            </form>
+
+            <div class="observe">
+                <label><i :class="['fas','fa-user-secret', !observer ? 'observer' : '']"></i>
+                    Observe<input
+                            type="checkbox"
+                            style="visibility: hidden;"
+                            v-model="observer"
+                            @change="observerChange()"/>
+                </label>
+            </div>
 
             <button @click.prevent="resetVotes()" class="new"><i class="fas fa-eraser"></i> New story</button>
             <span :class="'new'" v-if="voteCount === members">All votes are in, start a new story!</span>

@@ -106,7 +106,7 @@ button.highlighted .fas {
 span.new {
     padding: 6px;
     position: relative;
-    top: 3px;
+    top: 1px;
 }
 button.new, form input[type=submit] {
     padding: 6px;
@@ -127,10 +127,11 @@ form.username .fas {
     color: black;
 }
 
-label.observe {
+div.observe {
     margin-left: 7px;
+    margin-bottom: 14px;
 }
-label.observe .fas {
+div.observe .fas {
     margin-right: 5px;
 }
 
