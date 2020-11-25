@@ -51,7 +51,6 @@ export class PokersService {
     }
 
     if (this.names[poker]) {
-      console.log(client.id);
       delete this.names[poker][client.id];
     }
 
