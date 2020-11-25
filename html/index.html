@@ -183,7 +183,7 @@
           return;
         }
 
-        this.socket.pokers.emit('join', {poker: this.activePoker});
+        this.socket.pokers.emit('join', {poker: this.activePoker, name: this.nickname});
       },
       setAverageContext: function () {
         // Find the difference between the lowest and the highest votes.
@@ -289,7 +289,6 @@
         if (this.joinPoker) {
           this.joinRoom();
         }
-        this.updateNickname();
       });
 
       this.socket.pokers.on('membersUpdated', (msg) => {

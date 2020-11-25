@@ -31,8 +31,10 @@ export class PokersGateway {
   }
 
   @SubscribeMessage('join')
-  join(client: Socket, message: { poker: string }): void {
+  join(client: Socket, message: { poker: string; name?: string }): void {
     this.pokersService.join(client, message.poker);
+    this.pokersService.setName(client, message.name, message.poker);
+
     client.emit('joined', { poker: message.poker });
 
     this.updateMembers(message.poker);

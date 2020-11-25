@@ -80,14 +80,10 @@ export class PokersService {
   }
 
   setName(client: Socket, name: string, poker: string) {
+    if (!name) return;
+
     this.names[poker] = this.names[poker] || {};
-
     this.names[poker][client.id] = name;
-  }
-
-  removeName(client: Socket, poker: string) {
-    if (!this.names[poker]) return;
-    delete this.names[poker][client.id];
   }
 
   getNames(poker: string) {
