@@ -29,7 +29,7 @@
             <input type="text" v-model="nickname"/> <input type="submit" @click.prevent="updateNickname" value="update nickname"/>
         </form>
 
-        <label><input type="checkbox" v-model="observer" @change="observerChange()" /> <i :class="['fas','fa-user-secret', !observer ? 'observer' : '']"></i> Observer</label>
+        <label><i :class="['fas','fa-user-secret', !observer ? 'observer' : '']"></i> Observe<input type="checkbox" style="visibility: hidden;" v-model="observer" @change="observerChange()" /></label>
 
         <div v-if="!activePoker">
             Join a scrum room to start voting!
@@ -37,7 +37,7 @@
 
         <div v-if="activePoker">
             <p>
-                <button @click.prevent="resetVotes()" :class="['new']">New story</button>
+                <button @click.prevent="resetVotes()" class="new"><i class="fas fa-eraser"></i> New story</button>
                 <span :class="'new'" v-if="voteCount === members">All votes are in, start a new story!</span>
             </p>
 
@@ -57,14 +57,14 @@
 
             <div class="voteMembers" v-if="votedNames.length + unvotedNames.length > 0">
                 <div class="voted">
-                    <strong>Voted:</strong>
+                    <strong><i class="far fa-check-circle"></i> Voted:</strong>
                     <ul>
                         <li v-for="name of votedNames">{{ name }}</li>
                     </ul>
                     <p v-if="votedNames.length === 0">Nobody voted yet.</p>
                 </div>
                 <div class="unvoted">
-                    <strong>Not voted yet:</strong>
+                    <strong><i class="far fa-times-circle"></i> Not voted yet:</strong>
                     <ul>
                         <li v-for="name of unvotedNames">{{ name }}</li>
                     </ul>

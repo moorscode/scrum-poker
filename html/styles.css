@@ -40,16 +40,29 @@ h1 {
     color: black;
 }
 
+label {
+    cursor: pointer;
+}
+
 div.voteMembers {
     display: flex;
 }
 
 div.unvoted {
     flex: 50%;
+    color: #a4286a;
+}
+
+button.new {
+    font-size: 16px;
+}
+button.new .fas {
+    color: black;
 }
 
 div.voted {
     flex: 50%;
+    color: #477608;
 }
 
 button.choice, button.choice:focus {
