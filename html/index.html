@@ -278,6 +278,17 @@
         this.setAveragePoint()
       },
       resetVotes () {
+        // No votes, nothing to do...
+        if ( this.voteCount === 0 ) {
+          return;
+        }
+
+        // Confirm when not everybody has voted.
+        if ( this.voteCount !== this.members ) {
+          if ( ! window.confirm( 'Are you sure you want to reset, not all votes are in yet.' ) ) {
+            return;
+          }
+        }
         this.socket.pokers.emit('resetVotes', { poker: this.activePoker })
       }
     },
