@@ -270,7 +270,14 @@
     },
     computed: {
       unvotedNames() {
-        return this.names.filter( name => this.votedNames.indexOf(name) === -1 );
+        const result = this.names
+        for (const name of this.votedNames) {
+          const index = result.indexOf(name)
+          if (index !== -1) {
+            result.splice(index, 1)
+          }
+        }
+        return result
       },
     },
     created() {
