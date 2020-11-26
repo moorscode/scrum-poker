@@ -31,8 +31,8 @@
         <div class="pokerMain" v-if="activePoker">
             <form class="username" :class="[!nickname ? 'hover' : '']">
                 <span><i class="fas fa-signature"></i> Nickname:</span>
-                <input type="text" v-model="nickname"/> <input type="submit" @click.prevent="updateNickname"
-                                                               value="update nickname"/>
+                <input type="text" v-model="nickname"/>
+                <input type="submit" @click.prevent="updateNickname" value="update nickname"/>
             </form>
 
             <div class="observe">
@@ -53,7 +53,7 @@
             <button
                     v-for="point of points"
                     @click.prevent="castVote(point)"
-                    :class="[ 'choice', votes.indexOf( point ) !== -1 ? 'picked' : '', myVote === point ? 'highlighted' : '' ]">
+                    :class="[ 'choice', votes.includes( point ) ? 'picked' : '', myVote === point ? 'highlighted' : '' ]">
                 <i :class="['fas','fa-mug-hot']" v-if="point === 'coffee'"></i>
                 {{ point }}
             </button>
@@ -101,7 +101,7 @@
   new Vue({
     el: '#v-app',
     data: {
-      socket: { pokers: null },
+      socket: null,
       votes: [],
       activePoker: false,
       pokerFromURL: false,
@@ -123,7 +123,7 @@
     methods: {
       observerChange () {
         if (this.observer) {
-          this.socket.pokers.emit('observe', { poker: this.activePoker })
+          this.socket.emit('observe', { poker: this.activePoker })
         } else {
           this.activePoker = ''
           this.joinRoom()
@@ -134,7 +134,10 @@
         if (!this.nickname) return
 
         window.localStorage.setItem('nickname', this.nickname)
-        this.socket.pokers.emit('nickname', { name: this.nickname, poker: this.activePoker })
+        this.socket.emit('nickname', { name: this.nickname, poker: this.activePoker })
+      },
+      setPoints (msg) {
+        this.points = msg.points
       },
       castVote (vote) {
         if (this.observer) return
@@ -144,7 +147,7 @@
             return
           }
 
-          this.socket.pokers.emit('vote', { poker: this.activePoker, vote: vote })
+          this.socket.emit('vote', { poker: this.activePoker, vote: vote })
           this.myVote = vote
         } else {
           alert('You must join a room before voting!')
@@ -170,13 +173,19 @@
           }
         }
       },
-      membersUpdated (msg) {
-        if (msg.poker === this.activePoker) {
-          this.members = msg.members
+      resetVotes () {
+        // No votes, nothing to do...
+        if ( this.voteCount === 0 ) {
+          return;
         }
-      },
-      setPoints (msg) {
-        this.points = msg.points
+
+        // Confirm when not everybody has voted.
+        if ( this.voteCount !== this.members ) {
+          if ( ! window.confirm( 'Are you sure you want to reset, not all votes are in yet.' ) ) {
+            return;
+          }
+        }
+        this.socket.emit('resetVotes', { poker: this.activePoker })
       },
       joinRoom (force) {
         this.joinPoker = this.joinPoker.toLowerCase()
@@ -188,7 +197,7 @@
         this.members = 0
         this.voteCount = 0
 
-        this.socket.pokers.emit('leave', { poker: this.activePoker })
+        this.socket.emit('leave', { poker: this.activePoker })
 
         this.activePoker = this.joinPoker
 
@@ -196,7 +205,28 @@
           return
         }
 
-        this.socket.pokers.emit('join', { poker: this.activePoker, name: this.nickname })
+        this.socket.emit('join', { poker: this.activePoker, name: this.nickname })
+      },
+      membersUpdated (msg) {
+        if (msg.poker === this.activePoker) {
+          this.members = msg.members
+        }
+      },
+      calculateAverage () {
+        // Reset values.
+        this.averageContext = ''
+        this.standardDeviation = ''
+
+        if (this.voteCount === 0) {
+          this.average = ''
+          this.averagePoint = ''
+          return
+        }
+
+        this.setAverage()
+        this.setAverageContext()
+        this.setStandardDeviation()
+        this.setAveragePoint()
       },
       setAverageContext: function () {
         // Find the difference between the lowest and the highest votes.
@@ -261,36 +291,6 @@
 
         this.average = Math.round((sum / this.votes.length) * 100) / 100
       },
-      calculateAverage () {
-        // Reset values.
-        this.averageContext = ''
-        this.standardDeviation = ''
-
-        if (this.voteCount === 0) {
-          this.average = ''
-          this.averagePoint = ''
-          return
-        }
-
-        this.setAverage()
-        this.setAverageContext()
-        this.setStandardDeviation()
-        this.setAveragePoint()
-      },
-      resetVotes () {
-        // No votes, nothing to do...
-        if ( this.voteCount === 0 ) {
-          return;
-        }
-
-        // Confirm when not everybody has voted.
-        if ( this.voteCount !== this.members ) {
-          if ( ! window.confirm( 'Are you sure you want to reset, not all votes are in yet.' ) ) {
-            return;
-          }
-        }
-        this.socket.pokers.emit('resetVotes', { poker: this.activePoker })
-      }
     },
     computed: {
       unvotedNames () {
@@ -318,16 +318,16 @@
       this.baseTitle = document.title
       this.nickname = window.localStorage.getItem('nickname')
 
-      this.socket.pokers = io(window.location.protocol + '//' + window.location.hostname + ':' + location.port + window.location.pathname + 'pokers')
-      this.socket.pokers.on('connect', () => {
+      this.socket = io(window.location.protocol + '//' + window.location.hostname + ':' + location.port + window.location.pathname + 'pokers')
+      this.socket.on('connect', () => {
         this.joinRoom(true)
       })
 
-      this.socket.pokers.on('membersUpdated', (msg) => {
+      this.socket.on('membersUpdated', (msg) => {
         this.membersUpdated(msg)
       })
 
-      this.socket.pokers.on('joined', () => {
+      this.socket.on('joined', () => {
         this.joinPoker = this.activePoker
 
         const url = new URL(window.location)
@@ -335,11 +335,11 @@
         window.history.pushState({}, '', url)
       })
 
-      this.socket.pokers.on('votes', (msg) => {
+      this.socket.on('votes', (msg) => {
         this.receiveVote(msg)
       })
 
-      this.socket.pokers.on('points', (msg) => {
+      this.socket.on('points', (msg) => {
         this.setPoints(msg)
       })
     }
