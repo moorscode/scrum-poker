@@ -199,3 +199,13 @@ p.final > button, p.final > button.active {
     padding: 4px;
     font-size: 14px;
 }
+
+@media only screen and (max-width: 820px) {
+    h1 {
+        font-size: 3em;
+    }
+    form.username input[type=text] {
+        width: 110px;
+        width: 110px;
+    }
+}

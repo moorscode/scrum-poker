@@ -29,7 +29,7 @@
         </div>
 
         <div class="pokerMain" v-if="activePoker">
-            <form class="username" :class="[nickname === '' ? 'hover' : '']">
+            <form class="username" :class="[!nickname ? 'hover' : '']">
                 <span><i class="fas fa-signature"></i> Nickname:</span>
                 <input type="text" v-model="nickname"/> <input type="submit" @click.prevent="updateNickname"
                                                                value="update nickname"/>
