@@ -128,13 +128,9 @@ form.username .fas {
 }
 
 div.observe {
-    margin-left: 7px;
+    margin-left: 5px;
     margin-bottom: 14px;
 }
-div.observe .fas {
-    margin-right: 5px;
-}
-
 .username input[type=submit] {
     display: none;
 }

@@ -36,12 +36,12 @@
             </form>
 
             <div class="observe">
-                <label><i :class="['fas','fa-user-secret', !observer ? 'observer' : '']"></i>
-                    {{ observing }}<input
+                <label>
+                    <input
                             type="checkbox"
-                            style="visibility: hidden;"
                             v-model="observer"
                             @change="observerChange()"/>
+                    {{ observing }}
                 </label>
             </div>
 
