@@ -139,7 +139,8 @@ div.observe .fas {
     display: none;
 }
 .username:active input[type=submit],
-.username:hover input[type=submit] {
+.username:hover input[type=submit],
+.username.hover input[type=submit] {
     display: inline-block;
 }
 .username input[type=text] {
@@ -148,7 +149,8 @@ div.observe .fas {
     padding: 5px 5px 6px;
 }
 .username:active input[type=text],
-.username:hover input[type=text] {
+.username:hover input[type=text],
+.username.hover input[type=text] {
     border: 1px inset;
     padding: 4px;
 }
