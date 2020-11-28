@@ -186,6 +186,7 @@ p.final > button, p.final > button.active {
     border-style: solid;
     color: #a4286a;
     outline: 0;
+    cursor: help;
 }
 
 .rooms {

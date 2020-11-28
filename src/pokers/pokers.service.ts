@@ -6,11 +6,15 @@ import { PokersRoomsService, client } from './pokers-rooms.service';
 interface currentVotes {
   voteCount: number;
   votes: string[];
+  voteNames: {
+    [vote: string]: string[];
+  };
 }
 
 @Injectable()
 export class PokersService {
-  constructor(private readonly pokersData: PokersRoomsService) {}
+  constructor(private readonly pokersData: PokersRoomsService) {
+  }
 
   /**
    * Lets a client join a room.
@@ -125,9 +129,8 @@ export class PokersService {
    * @returns currentVotes Votes in that room. Obfuscated if not all votes are in yet.
    */
   public getVotes(poker: string): currentVotes {
-    const votes = this.pokersData
-      .getVotedClients(poker)
-      .map((client: client) => client.vote);
+    const voted = this.pokersData.getVotedClients(poker);
+    const votes = voted.map((client: client) => client.vote);
 
     const voteCount = votes.length;
     const memberCount = this.getClientCount(poker);
@@ -137,6 +140,11 @@ export class PokersService {
       return {
         voteCount: votes.length,
         votes,
+        voteNames: voted.reduce((accumulator, client: client) => {
+          accumulator[client.vote] = accumulator[client.vote] || [];
+          accumulator[client.vote].push(client.name);
+          return accumulator;
+        }, {}),
       };
     }
 
@@ -146,6 +154,7 @@ export class PokersService {
       votes: Array(memberCount)
         .fill('X', 0, voteCount)
         .fill('?', voteCount, memberCount),
+      voteNames: {},
     };
   }
 

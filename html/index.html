@@ -61,7 +61,7 @@
             <hr/>
 
             <p :class="[ 'results', this.members === this.voteCount ? 'final' : '' ]">
-                <button v-for="vote of votes">
+                <button v-for="vote of votes" :title="voteNames[vote] && voteNames[vote].join( ', ' )">
                     <i :class="['fas','fa-mug-hot']" v-if="vote === 'coffee'"></i>
                     {{ vote }}
                 </button>
@@ -118,6 +118,7 @@
       baseTitle: '',
       nickname: '',
       votedNames: [],
+      voteNames: {},
       names: [],
     },
     methods: {
@@ -154,35 +155,35 @@
         }
       },
       receiveVote (msg) {
-        if (msg.poker === this.activePoker) {
-          this.votes = msg.votes.sort((a, b) => a - b)
-          this.voteCount = msg.voteCount
-          this.votedNames = msg.votedNames
-          this.names = msg.names
 
-          if (this.voteCount === 0) {
-            this.calculateAverage()
-            this.myVote = ''
-          }
+        this.votes = msg.votes.sort((a, b) => a - b)
+        this.voteCount = msg.voteCount
+        this.votedNames = msg.votedNames
+        this.names = msg.names
+        this.voteNames = msg.voteNames;
 
-          document.title = this.baseTitle + ' ' + this.voteCount + '/' + this.members
+        if (this.voteCount === 0) {
+          this.calculateAverage()
+          this.myVote = ''
+        }
 
-          if (this.voteCount === this.members) {
-            this.calculateAverage()
-            return
-          }
+        document.title = this.baseTitle + ' ' + this.voteCount + '/' + this.members
+
+        if (this.voteCount === this.members) {
+          this.calculateAverage()
+          return
         }
       },
       resetVotes () {
         // No votes, nothing to do...
-        if ( this.voteCount === 0 ) {
-          return;
+        if (this.voteCount === 0) {
+          return
         }
 
         // Confirm when not everybody has voted.
-        if ( this.voteCount !== this.members ) {
-          if ( ! window.confirm( 'Are you sure you want to reset, not all votes are in yet.' ) ) {
-            return;
+        if (this.voteCount !== this.members) {
+          if (!window.confirm('Are you sure you want to reset, not all votes are in yet.')) {
+            return
           }
         }
         this.socket.emit('resetVotes', { poker: this.activePoker })
@@ -303,8 +304,8 @@
         }
         return result
       },
-      observing() {
-        return this.observer ? 'Observing…' : 'Observe';
+      observing () {
+        return this.observer ? 'Observing…' : 'Observe'
       }
     },
     created () {
