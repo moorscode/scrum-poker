@@ -77,20 +77,8 @@ export class PokersRoomsService {
    * @private
    */
   public addClientToRoom(poker: string, client: Socket, name: string): void {
-    this.rooms[poker] = this.rooms[poker] || { clients: {} };
+    this.rooms[poker] = this.getRoom(poker);
     this.rooms[poker].clients[client.id] = { id: client.id, name };
-  }
-
-  /**
-   * Determines if a client is in a room.
-   *
-   * @param {string} poker The room to search.
-   * @param {Socket} client Client to find.
-   *
-   * @returns {boolean} True if client is in the room.
-   */
-  public roomHasClient(poker: string, client: Socket): boolean {
-    return !!this.getRoom(poker).clients[client.id];
   }
 
   /**
@@ -178,7 +166,7 @@ export class PokersRoomsService {
    * @private
    */
   public addVote(poker: string, client: Socket, vote: number | string): void {
-    this.rooms[poker].clients[client.id].vote = vote;
+    this.getRoom(poker).clients[client.id].vote = vote;
   }
 
   /**
@@ -226,7 +214,7 @@ export class PokersRoomsService {
       }),
     };
 
-    this.rooms[poker].stories.push(story);
+    this.getRoom(poker).stories.push(story);
   }
 
   /**
@@ -246,7 +234,7 @@ export class PokersRoomsService {
    * @param {string} poker The room.
    */
   public resetHistory(poker: string): void {
-    this.rooms[poker].stories = [];
+    this.getRoom(poker).stories = [];
   }
 
   /**
@@ -257,8 +245,9 @@ export class PokersRoomsService {
    * @private
    */
   public resetVotes(poker: string): void {
-    for (const clientId in this.rooms[poker].clients) {
-      this.rooms[poker].clients[clientId].vote = null;
+    const room = this.getRoom(poker);
+    for (const clientId in room.clients) {
+      room.clients[clientId].vote = null;
     }
   }
 }

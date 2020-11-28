@@ -32,10 +32,6 @@ export class PokersService {
    * @param {string} name Client name.
    */
   public join(client: Socket, poker: string, name: string) {
-    if (this.pokersData.roomHasClient(poker, client)) {
-      return;
-    }
-
     const useName = name || 'Unnamed' + Math.floor(Math.random() * 100000);
     this.pokersData.addClientToRoom(poker, client, useName);
 
