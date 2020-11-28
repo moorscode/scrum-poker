@@ -77,7 +77,12 @@ export class PokersRoomsService {
    * @private
    */
   public addClientToRoom(poker: string, client: Socket, name: string): void {
-    this.getRoom(poker).clients[client.id] = { id: client.id, name, vote: null };
+    this.rooms[poker] = this.getRoom(poker);
+    this.rooms[poker].clients[client.id] = {
+      id: client.id,
+      name,
+      vote: null,
+    };
   }
 
   /**
@@ -103,7 +108,8 @@ export class PokersRoomsService {
    * @private
    */
   public setClientName(poker: string, client: Socket, name: string): void {
-    this.getRoom(poker).clients[client.id].name = name;
+    this.rooms[poker] = this.getRoom(poker);
+    this.rooms[poker].clients[client.id].name = name;
   }
 
   /**
@@ -165,7 +171,8 @@ export class PokersRoomsService {
    * @private
    */
   public addVote(poker: string, client: Socket, vote: number | string): void {
-    this.getRoom(poker).clients[client.id].vote = vote;
+    this.rooms[poker] = this.getRoom(poker);
+    this.rooms[poker].clients[client.id].vote = vote;
   }
 
   /**
@@ -213,7 +220,8 @@ export class PokersRoomsService {
       }),
     };
 
-    this.getRoom(poker).stories.push(story);
+    this.rooms[poker] = this.getRoom(poker);
+    this.rooms[poker].stories.push(story);
   }
 
   /**
@@ -233,7 +241,8 @@ export class PokersRoomsService {
    * @param {string} poker The room.
    */
   public resetHistory(poker: string): void {
-    this.getRoom(poker).stories = [];
+    this.rooms[poker] = this.getRoom(poker);
+    this.rooms[poker].stories = [];
   }
 
   /**
@@ -244,9 +253,9 @@ export class PokersRoomsService {
    * @private
    */
   public resetVotes(poker: string): void {
-    const room = this.getRoom(poker);
-    for (const clientId in room.clients) {
-      room.clients[clientId].vote = null;
+    this.rooms[poker] = this.getRoom(poker);
+    for (const clientId in this.rooms[poker].clients) {
+      this.rooms[poker].clients[clientId].vote = null;
     }
   }
 }
