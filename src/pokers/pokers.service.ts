@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
 import { PointsService } from '../points/points.service';
-import { PokersRoomsService, client, story } from './pokers-rooms.service';
+import { PokerRoom, client, story } from './poker-room';
 
 interface currentVotes {
   voteCount: number;
@@ -11,9 +11,13 @@ interface currentVotes {
   };
 }
 
+export interface rooms {
+  [key: string]: PokerRoom[];
+}
+
 @Injectable()
 export class PokersService {
-  constructor(private readonly pokerRooms: PokersRoomsService) {}
+  private rooms: rooms[] = [];
 
   /**
    * Returns debug information.
@@ -21,7 +25,7 @@ export class PokersService {
    * @returns {any} Debug info.
    */
   public debug() {
-    return this.pokerRooms.debug();
+    return this.rooms;
   }
 
   /**
@@ -33,9 +37,15 @@ export class PokersService {
    */
   public join(client: Socket, poker: string, name: string) {
     const useName = name || 'Unnamed' + Math.floor(Math.random() * 100000);
-    this.pokerRooms.addClient(poker, client, useName);
 
     client.join(poker);
+
+    this.rooms[poker] = this.getRoom(poker);
+    this.rooms[poker].addClient(client, useName);
+  }
+
+  private getRoom(poker: string): PokerRoom {
+    return this.rooms[poker] || new PokerRoom();
   }
 
   /**
@@ -47,6 +57,10 @@ export class PokersService {
   public leave(client: Socket, poker: string) {
     this.observe(client, poker);
 
+    if (this.getRoom(poker).getClients().length === 0) {
+      delete this.rooms[poker];
+    }
+
     client.leave(poker);
   }
 
@@ -57,7 +71,7 @@ export class PokersService {
    * @param {string} poker The room.
    */
   public observe(client: Socket, poker: string) {
-    this.pokerRooms.removeClient(poker, client);
+    this.getRoom(poker).removeClient(client);
   }
 
   /**
@@ -70,7 +84,7 @@ export class PokersService {
   public setName(client: Socket, name: string, poker: string) {
     if (!name) return;
 
-    this.pokerRooms.setClientName(poker, client, name);
+    this.getRoom(poker).setClientName(client, name);
   }
 
   /**
@@ -79,7 +93,7 @@ export class PokersService {
    * @param {string} poker The poker.
    */
   public getNames(poker: string) {
-    return this.pokerRooms.getNames(poker);
+    return this.getRoom(poker).getNames();
   }
 
   /**
@@ -88,8 +102,8 @@ export class PokersService {
    * @param {string} poker The room.
    */
   public getVotedNames(poker: string) {
-    return this.pokerRooms
-      .getVotedClients(poker)
+    return this.getRoom(poker)
+      .getVotedClients()
       .map((client: client) => client.name);
   }
 
@@ -101,7 +115,7 @@ export class PokersService {
    * @returns {number} Number of members in the room.
    */
   public getClientCount(poker: string) {
-    return this.pokerRooms.getClients(poker).length;
+    return this.getRoom(poker).getClients().length;
   }
 
   /**
@@ -113,7 +127,7 @@ export class PokersService {
    */
   public vote(client: Socket, poker: string, vote): void {
     // If everybody has voted, don't allow any changes until reset.
-    if (this.getClientCount(poker) === this.pokerRooms.getVoteCount(poker)) {
+    if (this.getClientCount(poker) === this.getRoom(poker).getVotedClients().length) {
       return;
     }
 
@@ -122,7 +136,7 @@ export class PokersService {
       return;
     }
 
-    this.pokerRooms.addVote(poker, client, vote);
+    this.getRoom(poker).addVote(client, vote);
   }
 
   /**
@@ -133,7 +147,7 @@ export class PokersService {
    * @returns currentVotes Votes in that room. Obfuscated if not all votes are in yet.
    */
   public getVotes(poker: string): currentVotes {
-    const voted = this.pokerRooms.getVotedClients(poker);
+    const voted = this.getRoom(poker).getVotedClients();
     const votes = voted.map((client: client) => client.vote);
 
     const voteCount = votes.length;
@@ -169,7 +183,7 @@ export class PokersService {
    * @param {number} [result] Result of the current story.
    */
   public newStory(poker: string, result?: number): void {
-    this.pokerRooms.newStory(poker, result);
+    this.getRoom(poker).newStory(result);
   }
 
   /**
@@ -180,7 +194,7 @@ export class PokersService {
    * @returns {story[]} All stories.
    */
   public getStories(poker: string): story[] {
-    return this.pokerRooms.getStories(poker);
+    return this.getRoom(poker).getStories();
   }
 
   /**
@@ -189,6 +203,6 @@ export class PokersService {
    * @param {string} poker The room.
    */
   public resetHistory(poker: string): void {
-    this.pokerRooms.resetHistory(poker);
+    this.getRoom(poker).resetHistory();
   }
 }
