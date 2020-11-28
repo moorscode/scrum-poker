@@ -45,7 +45,7 @@
                 </label>
             </div>
 
-            <button @click.prevent="resetVotes()" class="new"><i class="fas fa-eraser"></i> New story</button>
+            <button @click.prevent="newStory()" class="new"><i class="fas fa-eraser"></i> New story</button>
             <span :class="'new'" v-if="voteCount === members">All votes are in, start a new story!</span>
 
             <hr/>
@@ -75,7 +75,6 @@
                 <p v-if="averageContext">
                     <strong>{{ averageContext }}</strong>
                 </p>
-                </p>
             </section>
 
             <div class="voteMembers" v-if="unvotedNames.length > 0">
@@ -94,6 +93,22 @@
                     <p v-if="unvotedNames.length === 0">Everybody voted!</p>
                 </div>
             </div>
+
+            <div :class="['storyHistory', showHistory ? '':'hidden']" v-if="storyHistory">
+                <h3 @click="showHistory = !showHistory">Story history</h3>
+                <section class="story">
+                    <button @click="resetHistory()" v-if="!observer">Reset history</button>
+                    <section v-for="story of storyHistory">
+                        <strong>Story result: {{ story.result }}</strong><br/>
+                        Votes:
+                        <ul>
+                            <li v-for="vote of story.votes">
+                                {{ vote.name }}: {{ vote.vote }}
+                            </li>
+                        </ul>
+                    </section>
+                </section>
+            </div>
         </div>
     </section>
 </main>
@@ -102,6 +117,7 @@
     el: '#v-app',
     data: {
       socket: null,
+      showHistory: false,
       votes: [],
       activePoker: false,
       pokerFromURL: false,
@@ -120,6 +136,7 @@
       votedNames: [],
       voteNames: {},
       names: [],
+      storyHistory: [],
     },
     methods: {
       observerChange () {
@@ -155,12 +172,11 @@
         }
       },
       receiveVote (msg) {
-
         this.votes = msg.votes.sort((a, b) => a - b)
         this.voteCount = msg.voteCount
         this.votedNames = msg.votedNames
         this.names = msg.names
-        this.voteNames = msg.voteNames;
+        this.voteNames = msg.voteNames
 
         if (this.voteCount === 0) {
           this.calculateAverage()
@@ -174,7 +190,7 @@
           return
         }
       },
-      resetVotes () {
+      newStory () {
         // No votes, nothing to do...
         if (this.voteCount === 0) {
           return
@@ -182,11 +198,14 @@
 
         // Confirm when not everybody has voted.
         if (this.voteCount !== this.members) {
-          if (!window.confirm('Are you sure you want to reset, not all votes are in yet.')) {
+          if (!window.confirm('Are you sure you want to start a new story, not all votes are in yet.')) {
             return
           }
         }
-        this.socket.emit('resetVotes', { poker: this.activePoker })
+        this.socket.emit('newStory', { poker: this.activePoker, result: this.averagePoint })
+      },
+      resetHistory () {
+        this.socket.emit('resetHistory', { poker: this.activePoker })
       },
       joinRoom (force) {
         this.joinPoker = this.joinPoker.toLowerCase()
@@ -209,9 +228,7 @@
         this.socket.emit('join', { poker: this.activePoker, name: this.nickname })
       },
       membersUpdated (msg) {
-        if (msg.poker === this.activePoker) {
-          this.members = msg.members
-        }
+        this.members = msg.members
       },
       calculateAverage () {
         // Reset values.
@@ -292,6 +309,9 @@
 
         this.average = Math.round((sum / this.votes.length) * 100) / 100
       },
+      setStoryHistory (msg) {
+        this.storyHistory = (msg.stories || []).reverse()
+      }
     },
     computed: {
       unvotedNames () {
@@ -342,6 +362,10 @@
 
       this.socket.on('points', (msg) => {
         this.setPoints(msg)
+      })
+
+      this.socket.on('stories', (msg) => {
+        this.setStoryHistory(msg)
       })
     }
   })
