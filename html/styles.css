@@ -63,6 +63,9 @@ button.new:hover, button.new:hover .fas,
 button.new:active, button.new:active .fas {
     color: #a4286a;
 }
+button.new[disabled], button.new[disabled] .fas {
+    color: darkgrey;
+}
 
 div.voted {
     flex: 50%;

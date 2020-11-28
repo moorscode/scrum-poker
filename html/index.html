@@ -45,7 +45,7 @@
                 </label>
             </div>
 
-            <button @click.prevent="newStory()" class="new"><i class="fas fa-eraser"></i> New story</button>
+            <button @click.prevent="newStory()" class="new" :disabled="voteCount === 0"><i class="fas fa-eraser"></i> New story</button>
             <span :class="'new'" v-if="voteCount === members && members">All votes are in, start a new story!</span>
 
             <hr/>
@@ -94,10 +94,10 @@
                 </div>
             </div>
 
-            <div :class="['storyHistory', showHistory ? '':'hidden']" v-if="storyHistory">
+            <div :class="['storyHistory', showHistory ? '':'hidden']">
                 <h3 @click="showHistory = !showHistory">Story history</h3>
                 <section class="story">
-                    <button @click="resetHistory()" v-if="!observer">Reset history</button>
+                    <button @click="resetHistory()" v-if="!observer" :disabled="storyHistory.length === 0">Reset history</button>
                     <section v-for="story of storyHistory">
                         <strong>Story result: {{ story.result }}</strong><br/>
                         Votes:
