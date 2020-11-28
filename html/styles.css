@@ -197,6 +197,30 @@ p.final > button, p.final > button.active {
     font-size: 14px;
 }
 
+.storyHistory h3 {
+    color: #a4286a;
+    cursor: pointer;
+}
+.storyHistory.hidden .story {
+    display: none;
+}
+.storyHistory.hidden h3::after {
+    font-family: 'Font Awesome 5 Free';
+    content: '\f338';
+    font-size: 14px;
+    margin-left: 8px;
+}
+
+.story button {
+    font-size: 14px;
+    margin-bottom: 16px;
+    padding: 4px;
+}
+
+.story ul {
+    margin-top: 4px;
+}
+
 @media only screen and (max-width: 820px) {
     h1 {
         font-size: 3em;

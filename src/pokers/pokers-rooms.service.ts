@@ -2,15 +2,25 @@ import { Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
 
 export interface client {
-  vote: any;
+  vote: number | string;
   name: string;
   id: string;
+}
+
+export interface story {
+  result: number;
+  votes: {
+    vote: number | string;
+    name: string;
+  }[];
+  timestamp: number;
 }
 
 export interface room {
   clients: {
     [clientId: string]: client;
   };
+  stories: story[];
 }
 
 export interface rooms {
@@ -85,7 +95,7 @@ export class PokersRoomsService {
    * @private
    */
   public getRoom(poker: string): room {
-    return this.rooms[poker] || { clients: [] };
+    return this.rooms[poker] || { clients: [], stories: [] };
   }
 
   /**
@@ -133,7 +143,7 @@ export class PokersRoomsService {
    */
   public getVotedClients(poker: string): client[] {
     return Object.values(this.getRoom(poker).clients).filter(
-      (client: client) => !!client.vote,
+      (client: client) => client.vote || client.vote === 0,
     );
   }
 
@@ -159,7 +169,7 @@ export class PokersRoomsService {
    *
    * @private
    */
-  public addVote(poker: string, client: Socket, vote): void {
+  public addVote(poker: string, client: Socket, vote: number | string): void {
     this.rooms[poker].clients[client.id].vote = vote;
   }
 
@@ -172,10 +182,65 @@ export class PokersRoomsService {
    *
    * @private
    */
-  public getVotes(poker: string): string[] {
+  public getVotes(poker: string): (number | string)[] {
     return Object.values(this.getRoom(poker).clients)
-      .map((client: client) => client.vote)
-      .filter((vote) => vote);
+      .map((client: client): number | string => client.vote)
+      .filter((vote: number | string) => vote || vote === 0);
+  }
+
+  /**
+   * Starts a new story.
+   *
+   * @param {string} poker The room.
+   * @param {number} [result] Result of the current story.
+   */
+  public newStory(poker: string, result?: number): void {
+    if (result || result === 0) {
+      this.addStory(poker, result);
+    }
+
+    this.resetVotes(poker);
+  }
+
+  /**
+   * Adds a story to the history.
+   *
+   * @param {string} poker The room.
+   * @param {result} result Result of the story.
+   *
+   * @private
+   */
+  private addStory(poker: string, result: number) {
+    const story: story = {
+      result,
+      votes: this.getVotedClients(poker).map((client: client) => {
+        return { name: client.name, vote: client.vote };
+      }),
+      timestamp: new Date().getTime(),
+    };
+
+    this.rooms[poker].stories = this.rooms[poker].stories || [];
+    this.rooms[poker].stories.push(story);
+  }
+
+  /**
+   * Retrieves all stories for the room.
+   *
+   * @param {string} poker The room.
+   *
+   * @returns {story[]} The stories of the room.
+   */
+  public getStories(poker: string): story[] {
+    return this.getRoom(poker).stories;
+  }
+
+  /**
+   * Resets room stories history.
+   *
+   * @param {string} poker The room.
+   */
+  public resetHistory(poker: string): void {
+    this.rooms[poker].stories = [];
   }
 
   /**

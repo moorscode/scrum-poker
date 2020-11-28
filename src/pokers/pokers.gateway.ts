@@ -39,6 +39,7 @@ export class PokersGateway implements OnGatewayInit {
 
     this.updateMembers(message.poker);
     this.sendAllVotes(message.poker);
+    this.sendStories(message.poker);
   }
 
   @SubscribeMessage('leave')
@@ -67,11 +68,19 @@ export class PokersGateway implements OnGatewayInit {
     this.sendAllVotes(message.poker);
   }
 
-  @SubscribeMessage('resetVotes')
-  resetVotes(client: Socket, message: { poker: string }): void {
-    this.pokersService.resetVotes(message.poker);
+  @SubscribeMessage('newStory')
+  newStory(client: Socket, message: { poker: string; result?: number }): void {
+    this.pokersService.newStory(message.poker, message.result);
 
     this.sendAllVotes(message.poker);
+    this.sendStories(message.poker);
+  }
+
+  @SubscribeMessage('resetHistory')
+  resetHistory(client: Socket, message: { poker: string }): void {
+    this.pokersService.resetHistory(message.poker);
+
+    this.sendStories(message.poker);
   }
 
   @SubscribeMessage('observe')
@@ -107,8 +116,20 @@ export class PokersGateway implements OnGatewayInit {
    */
   private updateMembers(room: string): void {
     this.server.to(room).emit('membersUpdated', {
-      poker: room,
       members: this.pokersService.getClientCount(room),
+    });
+  }
+
+  /**
+   * Sends the story-history to all clients in a room.
+   *
+   * @param {string} room The room.
+   *
+   * @private
+   */
+  private sendStories(room: string): void {
+    this.server.to(room).emit('stories', {
+      stories: this.pokersService.getStories(room),
     });
   }
 }

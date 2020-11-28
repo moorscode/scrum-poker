@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
 import { PointsService } from '../points/points.service';
-import { PokersRoomsService, client } from './pokers-rooms.service';
+import { PokersRoomsService, client, story } from './pokers-rooms.service';
 
 interface currentVotes {
   voteCount: number;
-  votes: string[];
+  votes: (number | string)[];
   voteNames: {
     [vote: string]: string[];
   };
@@ -162,8 +162,29 @@ export class PokersService {
    * Resets the votes for a room.
    *
    * @param {string} poker Room to reset.
+   * @param {number} [result] Result of the current story.
    */
-  public resetVotes(poker: string): void {
-    this.pokersData.resetVotes(poker);
+  public newStory(poker: string, result?: number): void {
+    this.pokersData.newStory(poker, result);
+  }
+
+  /**
+   * Retrieves all stories.
+   *
+   * @param {string} poker The room.
+   *
+   * @returns {story[]} All stories.
+   */
+  public getStories(poker: string): story[] {
+    return this.pokersData.getStories(poker);
+  }
+
+  /**
+   * Resets room stories history.
+   *
+   * @param {string} poker The room.
+   */
+  public resetHistory(poker: string): void {
+    this.pokersData.resetHistory(poker);
   }
 }
