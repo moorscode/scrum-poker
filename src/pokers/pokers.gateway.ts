@@ -69,8 +69,8 @@ export class PokersGateway implements OnGatewayInit {
   }
 
   @SubscribeMessage('newStory')
-  newStory(client: Socket, message: { poker: string; result?: number }): void {
-    this.pokersService.newStory(message.poker, message.result);
+  newStory(client: Socket, message: { poker: string; result?: string }): void {
+    this.pokersService.newStory(message.poker, parseFloat(message.result));
 
     this.sendAllVotes(message.poker);
     this.sendStories(message.poker);
