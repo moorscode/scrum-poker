@@ -93,8 +93,8 @@ export class PokersGateway implements OnGatewayInit {
   private sendAllVotes(poker: string): void {
     this.server.to(poker).emit('votes', {
       poker: poker,
-      ...this.pokersService.getVotes(poker),
-      names: this.pokersService.getNames(poker),
+      ...this.pokersService.getPokerVotes(poker),
+      names: this.pokersService.getPokerNames(poker),
       votedNames: this.pokersService.getVotedNames(poker),
     });
   }
@@ -109,7 +109,7 @@ export class PokersGateway implements OnGatewayInit {
   private updateMembers(room: string): void {
     this.server.to(room).emit('membersUpdated', {
       poker: room,
-      members: this.pokersService.getMembers(room),
+      members: this.pokersService.getMemberCount(room),
     });
   }
 }
