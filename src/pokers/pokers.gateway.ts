@@ -33,8 +33,7 @@ export class PokersGateway implements OnGatewayInit {
 
   @SubscribeMessage('join')
   join(client: Socket, message: { poker: string; name?: string }): void {
-    this.pokersService.join(client, message.poker);
-    this.pokersService.setName(client, message.name, message.poker);
+    this.pokersService.join(client, message.poker, message.name);
 
     client.emit('joined', { poker: message.poker });
 

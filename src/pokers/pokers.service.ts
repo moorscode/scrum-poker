@@ -7,26 +7,40 @@ interface currentVotes {
   votes: string[];
 }
 
+interface client {
+  vote: any;
+  name: string;
+  id: string;
+}
+
+interface room {
+  clients: {
+    [clientId: string]: client;
+  };
+}
+
+interface rooms {
+  [key: string]: room[];
+}
+
 @Injectable()
 export class PokersService {
-  pokers = [];
-  votes = [];
-  names = {};
+  rooms: rooms[] = [];
 
   /**
    * Lets a client join a room.
    *
    * @param {Socket} client The client.
    * @param {string} poker The room.
+   * @param {string} name Client name.
    */
-  public join(client: Socket, poker: string) {
-    this.setName(client, 'Unnamed' + Math.floor(Math.random() * 100000), poker);
-
+  public join(client: Socket, poker: string, name: string) {
     if (this.pokerHasClient(poker, client)) {
       return;
     }
 
-    this.addClientToPoker(poker, client);
+    const useName = name || 'Unnamed' + Math.floor(Math.random() * 100000);
+    this.addClientToPoker(poker, client, useName);
 
     client.join(poker);
   }
@@ -51,8 +65,6 @@ export class PokersService {
    */
   public observe(client: Socket, poker: string) {
     this.removeFromPoker(poker, client);
-    this.removeFromVotes(poker, client);
-    this.removeFromNames(poker, client);
   }
 
   /**
@@ -65,7 +77,7 @@ export class PokersService {
   public setName(client: Socket, name: string, poker: string) {
     if (!name) return;
 
-    this.addClientToNames(poker, client, name);
+    this.setClientName(poker, client, name);
   }
 
   /**
@@ -87,12 +99,7 @@ export class PokersService {
       return [];
     }
 
-    const list = [];
-    for (const clientId of this.getPokerClientIds(poker)) {
-      list.push(this.getClientName(poker, clientId));
-    }
-
-    return list;
+    return this.getVotedClients(poker).map((client: client) => client.name);
   }
 
   /**
@@ -135,32 +142,26 @@ export class PokersService {
    * @returns currentVotes Votes in that room. Obfuscated if not all votes are in yet.
    */
   public getPokerVotes(poker: string): currentVotes {
-    const votes = this.getVotes(poker);
+    const votes = this.getVotedClients(poker)
+      .map((client: client) => client.vote);
 
-    const voteCount = this.getVoteCount(poker);
+    const voteCount = votes.length;
     const memberCount = this.getMemberCount(poker);
 
     // When all votes are in, show the actual votes.
     if (memberCount === voteCount) {
-      const voteList = [];
-      for (const client in votes) {
-        voteList.push(votes[client]);
-      }
-
       return {
-        voteCount: voteList.length,
-        votes: voteList,
+        voteCount: votes.length,
+        votes,
       };
     }
 
     // Otherwise show an X for voted, ? for unvoted.
     return {
       voteCount,
-      votes: Array.apply(null, Array(voteCount))
-        .map((_) => 'X')
-        .concat(
-          Array.apply(null, Array(memberCount - voteCount)).map((_) => '?'),
-        ),
+      votes: Array(memberCount)
+        .fill('X', 0, voteCount)
+        .fill('?', voteCount, memberCount),
     };
   }
 
@@ -170,7 +171,7 @@ export class PokersService {
    * @param {string} poker Room to reset.
    */
   public resetVotes(poker: string): void {
-    this.setVotes(poker, {});
+    this.resetRoomVotes(poker);
   }
 
   /**
@@ -183,9 +184,9 @@ export class PokersService {
    * @private
    */
   private getNames(poker: string): string[] {
-    if (!this.names[poker]) return [];
-
-    return Object.values(this.names[poker]);
+    return Object.values(this.getRoom(poker).clients).map(
+      (client: client) => client.name,
+    );
   }
 
   /**
@@ -197,8 +198,8 @@ export class PokersService {
    *
    * @private
    */
-  private getPokerClients(poker: string): Socket[] {
-    return this.pokers[poker] || [];
+  private getPokerClients(poker: string): client[] {
+    return Object.values(this.getRoom(poker).clients);
   }
 
   /**
@@ -206,12 +207,13 @@ export class PokersService {
    *
    * @param {string} poker The room.
    * @param {Socket} client The client.
+   * @param {string} name The name.
    *
    * @private
    */
-  private addClientToPoker(poker: string, client: Socket): void {
-    this.pokers[poker] = this.pokers[poker] || [];
-    this.pokers[poker].push(client);
+  private addClientToPoker(poker: string, client: Socket, name: string): void {
+    this.rooms[poker] = this.rooms[poker] || { clients: {} };
+    this.rooms[poker].clients[client.id] = { id: client.id, name };
   }
 
   /**
@@ -223,11 +225,20 @@ export class PokersService {
    * @returns {boolean} True if client is in the room.
    */
   private pokerHasClient(poker: string, client: Socket): boolean {
-    if (!this.pokers[poker]) {
-      return false;
-    }
+    return !!this.getRoom(poker).clients[client.id];
+  }
 
-    return this.pokers[poker].includes(client);
+  /**
+   * Retrieves a room.
+   *
+   * @param {string} poker Room to retrieve.
+   *
+   * @returns {room} The room.
+   *
+   * @private
+   */
+  private getRoom(poker: string): room {
+    return this.rooms[poker] || { clients: [] };
   }
 
   /**
@@ -239,37 +250,8 @@ export class PokersService {
    *
    * @private
    */
-  private addClientToNames(poker: string, client: Socket, name: string): void {
-    this.names[poker] = this.names[poker] || {};
-    this.names[poker][client.id] = name;
-  }
-
-  /**
-   * Removes a client name.
-   *
-   * @param {string} poker The room.
-   * @param {Socket} client The client.
-   *
-   * @private
-   */
-  private removeFromNames(poker: string, client: Socket): void {
-    if (this.names[poker]) {
-      delete this.names[poker][client.id];
-    }
-  }
-
-  /**
-   * Remove client from votes.
-   *
-   * @param {string} poker The room.
-   * @param {Socket} client The client.
-   *
-   * @private
-   */
-  private removeFromVotes(poker: string, client: Socket): void {
-    if (this.votes[poker]) {
-      delete this.votes[poker][client.id];
-    }
+  private setClientName(poker: string, client: Socket, name: string): void {
+    this.getRoom(poker).clients[client.id].name = name;
   }
 
   /**
@@ -281,42 +263,30 @@ export class PokersService {
    * @private
    */
   private removeFromPoker(poker: string, client: Socket): void {
-    if (this.pokers[poker]) {
-      const index = this.pokers[poker].indexOf(client);
-      if (index !== -1) {
-        this.pokers[poker].splice(index, 1);
-      }
+    if (!this.rooms[poker]) {
+      return;
+    }
+
+    delete this.rooms[poker].clients[client.id];
+
+    // Remove the room if empty.
+    if (this.rooms[poker].clients === {}) {
+      delete this.rooms[poker];
     }
   }
 
   /**
-   * Retrieves the name of the client.
-   *
-   * @param {string} poker The room.
-   * @param {string} clientId The client ID.
-   *
-   * @returns {string} The name of the client.
-   * @private
-   */
-  private getClientName(poker: string, clientId: string): string {
-    return this.names[poker][clientId] || 'Unknown';
-  }
-
-  /**
-   * Retrieves the client IDs of the room clients.
+   * Retrieves the voted clients.
    *
    * @param {string} poker The room.
    *
-   * @returns {string[]} List of client IDs.
+   * @returns {client[]} List of voted clients.
    *
    * @private
    */
-  private getPokerClientIds(poker: string) {
-    if (!this.votes[poker]) {
-      return [];
-    }
-
-    return Object.keys(this.votes[poker]);
+  private getVotedClients(poker: string): client[] {
+    return Object.values(this.getRoom(poker).clients)
+      .filter((client: client) => !!client.vote);
   }
 
   /**
@@ -328,9 +298,8 @@ export class PokersService {
    *
    * @private
    */
-  private getVoteCount(poker: string) {
-    const votes = this.getVotes(poker);
-    return Object.keys(votes).length;
+  private getVoteCount(poker: string): number {
+    return this.getVotedClients(poker).length;
   }
 
   /**
@@ -343,8 +312,7 @@ export class PokersService {
    * @private
    */
   private addPokerVote(poker: string, client: Socket, vote): void {
-    this.votes[poker] = this.votes[poker] || {};
-    this.votes[poker][client.id] = vote;
+    this.rooms[poker].clients[client.id].vote = vote;
   }
 
   /**
@@ -356,19 +324,22 @@ export class PokersService {
    *
    * @private
    */
-  private getVotes(poker: string) {
-    return this.votes[poker] || {};
+  private getVotes(poker: string): string[] {
+    return Object.values(this.getRoom(poker).clients)
+      .map((client: client) => client.vote)
+      .filter((vote) => vote);
   }
 
   /**
    * Sets all votes of a room.
    *
    * @param {string} poker The room.
-   * @param {any} value The votes to set.
    *
    * @private
    */
-  private setVotes(poker: string, value) {
-    this.votes[poker] = value;
+  private resetRoomVotes(poker: string): void {
+    for (const clientId in this.rooms[poker].clients) {
+      this.rooms[poker].clients[clientId].vote = null;
+    }
   }
 }
