@@ -13,7 +13,15 @@ interface currentVotes {
 
 @Injectable()
 export class PokersService {
-  constructor(private readonly pokersData: PokersRoomsService) {
+  constructor(private readonly pokersData: PokersRoomsService) {}
+
+  /**
+   * Returns debug information.
+   *
+   * @returns {any} Debug info.
+   */
+  public debug() {
+    return this.pokersData.debug();
   }
 
   /**

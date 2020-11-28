@@ -32,6 +32,15 @@ export class PokersRoomsService {
   rooms: rooms[] = [];
 
   /**
+   * Returns debug information.
+   *
+   * @returns {any} Debug info.
+   */
+  public debug() {
+    return this.rooms;
+  }
+
+  /**
    * Lists all names in a room.
    *
    * @param {string} poker The room.
