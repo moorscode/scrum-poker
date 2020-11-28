@@ -7,6 +7,7 @@ import {
 import { PokersService } from './pokers.service';
 import { Server, Socket } from 'socket.io';
 import { PointsService } from '../points/points.service';
+import { var_export } from 'locutus/php/var';
 
 @WebSocketGateway({ namespace: '/pokers' })
 export class PokersGateway implements OnGatewayInit {
@@ -89,6 +90,16 @@ export class PokersGateway implements OnGatewayInit {
 
     this.updateMembers(message.poker);
     this.sendAllVotes(message.poker);
+  }
+
+  @SubscribeMessage('debug')
+  getDebug(client: Socket, message: { secret: string }): any {
+    if (
+      process.env.DEBUG_SECRET &&
+      message.secret === process.env.DEBUG_SECRET
+    ) {
+      client.emit('debug', var_export(this.pokersService.debug(), true));
+    }
   }
 
   /**
