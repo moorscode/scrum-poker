@@ -203,6 +203,7 @@ p.final > button, p.final > button.active {
 .storyHistory h3 {
     color: #a4286a;
     cursor: pointer;
+    user-select: none;
 }
 .storyHistory.hidden .story {
     display: none;
