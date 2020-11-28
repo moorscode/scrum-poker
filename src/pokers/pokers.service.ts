@@ -70,7 +70,7 @@ export class PokersService {
    *
    * @param {string} poker The poker.
    */
-  public getPokerNames(poker: string) {
+  public getNames(poker: string) {
     return this.pokersData.getNames(poker);
   }
 
@@ -92,7 +92,7 @@ export class PokersService {
    *
    * @returns {number} Number of members in the room.
    */
-  public getMemberCount(poker: string) {
+  public getClientCount(poker: string) {
     return this.pokersData.getClients(poker).length;
   }
 
@@ -105,7 +105,7 @@ export class PokersService {
    */
   public vote(client: Socket, poker: string, vote): void {
     // If everybody has voted, don't allow any changes until reset.
-    if (this.getMemberCount(poker) === this.pokersData.getVoteCount(poker)) {
+    if (this.getClientCount(poker) === this.pokersData.getVoteCount(poker)) {
       return;
     }
 
@@ -124,13 +124,13 @@ export class PokersService {
    *
    * @returns currentVotes Votes in that room. Obfuscated if not all votes are in yet.
    */
-  public getPokerVotes(poker: string): currentVotes {
+  public getVotes(poker: string): currentVotes {
     const votes = this.pokersData
       .getVotedClients(poker)
       .map((client: client) => client.vote);
 
     const voteCount = votes.length;
-    const memberCount = this.getMemberCount(poker);
+    const memberCount = this.getClientCount(poker);
 
     // When all votes are in, show the actual votes.
     if (memberCount === voteCount) {
