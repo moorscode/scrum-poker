@@ -13,7 +13,7 @@ interface currentVotes {
 
 @Injectable()
 export class PokersService {
-  constructor(private readonly pokersData: PokersRoomsService) {}
+  constructor(private readonly pokerRooms: PokersRoomsService) {}
 
   /**
    * Returns debug information.
@@ -21,7 +21,7 @@ export class PokersService {
    * @returns {any} Debug info.
    */
   public debug() {
-    return this.pokersData.debug();
+    return this.pokerRooms.debug();
   }
 
   /**
@@ -33,7 +33,7 @@ export class PokersService {
    */
   public join(client: Socket, poker: string, name: string) {
     const useName = name || 'Unnamed' + Math.floor(Math.random() * 100000);
-    this.pokersData.addClientToRoom(poker, client, useName);
+    this.pokerRooms.addClient(poker, client, useName);
 
     client.join(poker);
   }
@@ -57,7 +57,7 @@ export class PokersService {
    * @param {string} poker The room.
    */
   public observe(client: Socket, poker: string) {
-    this.pokersData.removeFromRoom(poker, client);
+    this.pokerRooms.removeClient(poker, client);
   }
 
   /**
@@ -70,7 +70,7 @@ export class PokersService {
   public setName(client: Socket, name: string, poker: string) {
     if (!name) return;
 
-    this.pokersData.setClientName(poker, client, name);
+    this.pokerRooms.setClientName(poker, client, name);
   }
 
   /**
@@ -79,7 +79,7 @@ export class PokersService {
    * @param {string} poker The poker.
    */
   public getNames(poker: string) {
-    return this.pokersData.getNames(poker);
+    return this.pokerRooms.getNames(poker);
   }
 
   /**
@@ -88,7 +88,7 @@ export class PokersService {
    * @param {string} poker The room.
    */
   public getVotedNames(poker: string) {
-    return this.pokersData
+    return this.pokerRooms
       .getVotedClients(poker)
       .map((client: client) => client.name);
   }
@@ -101,7 +101,7 @@ export class PokersService {
    * @returns {number} Number of members in the room.
    */
   public getClientCount(poker: string) {
-    return this.pokersData.getClients(poker).length;
+    return this.pokerRooms.getClients(poker).length;
   }
 
   /**
@@ -113,7 +113,7 @@ export class PokersService {
    */
   public vote(client: Socket, poker: string, vote): void {
     // If everybody has voted, don't allow any changes until reset.
-    if (this.getClientCount(poker) === this.pokersData.getVoteCount(poker)) {
+    if (this.getClientCount(poker) === this.pokerRooms.getVoteCount(poker)) {
       return;
     }
 
@@ -122,7 +122,7 @@ export class PokersService {
       return;
     }
 
-    this.pokersData.addVote(poker, client, vote);
+    this.pokerRooms.addVote(poker, client, vote);
   }
 
   /**
@@ -133,7 +133,7 @@ export class PokersService {
    * @returns currentVotes Votes in that room. Obfuscated if not all votes are in yet.
    */
   public getVotes(poker: string): currentVotes {
-    const voted = this.pokersData.getVotedClients(poker);
+    const voted = this.pokerRooms.getVotedClients(poker);
     const votes = voted.map((client: client) => client.vote);
 
     const voteCount = votes.length;
@@ -169,7 +169,7 @@ export class PokersService {
    * @param {number} [result] Result of the current story.
    */
   public newStory(poker: string, result?: number): void {
-    this.pokersData.newStory(poker, result);
+    this.pokerRooms.newStory(poker, result);
   }
 
   /**
@@ -180,7 +180,7 @@ export class PokersService {
    * @returns {story[]} All stories.
    */
   public getStories(poker: string): story[] {
-    return this.pokersData.getStories(poker);
+    return this.pokerRooms.getStories(poker);
   }
 
   /**
@@ -189,6 +189,6 @@ export class PokersService {
    * @param {string} poker The room.
    */
   public resetHistory(poker: string): void {
-    this.pokersData.resetHistory(poker);
+    this.pokerRooms.resetHistory(poker);
   }
 }
