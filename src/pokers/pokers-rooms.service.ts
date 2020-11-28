@@ -13,7 +13,6 @@ export interface story {
     vote: number | string;
     name: string;
   }[];
-  timestamp: number;
 }
 
 export interface room {
@@ -225,10 +224,8 @@ export class PokersRoomsService {
       votes: this.getVotedClients(poker).map((client: client) => {
         return { name: client.name, vote: client.vote };
       }),
-      timestamp: new Date().getTime(),
     };
 
-    this.rooms[poker].stories = this.rooms[poker].stories || [];
     this.rooms[poker].stories.push(story);
   }
 
