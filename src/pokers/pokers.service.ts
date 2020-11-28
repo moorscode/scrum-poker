@@ -126,8 +126,9 @@ export class PokersService {
    * @param {number|string} vote The vote.
    */
   public vote(client: Socket, poker: string, vote): void {
+    const votedCount = this.getRoom(poker).getVotedClients().length;
     // If everybody has voted, don't allow any changes until reset.
-    if (this.getClientCount(poker) === this.getRoom(poker).getVotedClients().length) {
+    if (this.getClientCount(poker) === votedCount) {
       return;
     }
 
