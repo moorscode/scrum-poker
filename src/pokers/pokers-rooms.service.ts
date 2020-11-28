@@ -76,7 +76,7 @@ export class PokersRoomsService {
    *
    * @private
    */
-  public addClientToRoom(poker: string, client: Socket, name: string): void {
+  public addClient(poker: string, client: Socket, name: string): void {
     this.rooms[poker] = this.getRoom(poker);
     this.rooms[poker].clients[client.id] = {
       id: client.id,
@@ -94,7 +94,7 @@ export class PokersRoomsService {
    *
    * @private
    */
-  public getRoom(poker: string): room {
+  private getRoom(poker: string): room {
     return this.rooms[poker] || { clients: [], stories: [] };
   }
 
@@ -120,7 +120,7 @@ export class PokersRoomsService {
    *
    * @private
    */
-  public removeFromRoom(poker: string, client: Socket): void {
+  public removeClient(poker: string, client: Socket): void {
     if (!this.rooms[poker]) {
       return;
     }
