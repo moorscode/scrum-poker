@@ -77,8 +77,7 @@ export class PokersRoomsService {
    * @private
    */
   public addClientToRoom(poker: string, client: Socket, name: string): void {
-    this.rooms[poker] = this.getRoom(poker);
-    this.rooms[poker].clients[client.id] = { id: client.id, name };
+    this.getRoom(poker).clients[client.id] = { id: client.id, name, vote: null };
   }
 
   /**
