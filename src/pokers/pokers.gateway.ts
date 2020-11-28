@@ -7,7 +7,7 @@ import {
 import { PokersService } from './pokers.service';
 import { Server, Socket } from 'socket.io';
 import { PointsService } from '../points/points.service';
-import { var_export } from 'locutus/php/var';
+import var_export from 'locutus/php/var/var_export';
 
 @WebSocketGateway({ namespace: '/pokers' })
 export class PokersGateway implements OnGatewayInit {
