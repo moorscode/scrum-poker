@@ -61,7 +61,7 @@
             <hr/>
 
             <p :class="[ 'results', this.members === this.voteCount ? 'final' : '' ]">
-                <button v-for="vote of votes" :title="voteNames[vote] && voteNames[vote].join( ', ' )">
+                <button v-for="vote of votes" :title="voteNames && voteNames[vote] && voteNames[vote].join( ', ' )">
                     <i :class="['fas','fa-mug-hot']" v-if="vote === 'coffee'"></i>
                     {{ vote }}
                 </button>
@@ -174,9 +174,9 @@
       receiveVote (msg) {
         this.votes = msg.votes.sort((a, b) => a - b)
         this.voteCount = msg.voteCount
-        this.votedNames = msg.votedNames
+        this.votedNames = msg.votedNames || []
         this.names = msg.names
-        this.voteNames = msg.voteNames
+        this.voteNames = msg.voteNames || {}
 
         if (this.voteCount === 0) {
           this.calculateAverage()
