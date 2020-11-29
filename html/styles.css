@@ -3,26 +3,8 @@ html, body {
     font-weight: 400;
 }
 
-.poker {
-    max-width: 800px;
-    margin: 20px auto;
-    padding: 20px;
-    border: 1px solid #a4286a;
-    border-radius: 4px;
-    box-shadow: 0px 4px 20px rgba(0,0,0,0.2);
-}
-
-.tab-row {
-    padding-top: 20px;
-}
-
-.tab-btn.active {
-    background: blue;
-    color: white;
-}
-
-button, .rooms input[type=submit] {
-    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
+h1, h2, h3 {
+    color: #a4286a;
 }
 
 h1 {
@@ -30,12 +12,14 @@ h1 {
     font-weight: 700;
     font-size: 4em;
     margin: 0 0 0.2em 0;
-    color: #a4286a;
 }
 
 h2 {
-    color: #a4286a;
     margin: 0 0 0.2em 0;
+}
+
+label {
+    cursor: pointer;
 }
 
 .fas {
@@ -45,100 +29,53 @@ h2 {
     color: black;
 }
 
-label {
-    cursor: pointer;
-}
-
-div.voteMembers {
-    display: flex;
-}
-
-div.unvoted {
-    flex: 50%;
-    color: #a4286a;
-}
-
-button.new {
-    font-size: 16px;
-}
-button.new .fas {
-    color: black;
-}
-button.new:hover, button.new:hover .fas,
-button.new:active, button.new:active .fas {
-    color: #a4286a;
-}
-button.new[disabled], button.new[disabled] .fas {
-    color: darkgrey;
-}
-
-div.voted {
-    flex: 50%;
-    color: #477608;
-}
-
-button.choice, button.choice:focus {
+button,
+input[type=submit] {
+    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
     font-size: 14px;
-    min-width: 40px;
-    height: 40px;
-    border-radius: 4px;
-    border-width: 0;
-    padding: 10px;
-    margin: 0 4px 8px;
-    cursor: pointer;
-    outline: 0;
-}
-button.choice:active,
-button.choice:hover {
-    background-color: darkgray;
-}
-button.choice:first-child {
-    margin-left: 0;
-}
-
-button.picked {
-    border: 2px solid #477608;
-}
-
-button.highlighted,
-button.highlighted:hover,
-button.highlighted.active {
-    background-color: #a4286a;
-    border-color: #a4286a;
-    color: white;
-}
-button.highlighted .fas {
-    color: white;
-}
-
-span.new {
-    padding: 6px;
-    position: relative;
-    top: 1px;
-}
-button.new, form input[type=submit] {
-    padding: 6px;
+    padding: 5px 7px;
     cursor: pointer;
     border: 1px solid darkgray;
     border-radius: 2px;
     outline: none;
 }
-button.new .fas {
+button .fas {
+    color: black;
     margin-right: 3px;
 }
 
-form.username {
-    margin-bottom: 6px;
-    margin-left: 6px;
+.poker {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #a4286a;
+    border-radius: 4px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
 }
-form.username .fas {
-    color: black;
+
+.rooms {
+    margin-bottom: 1em;
+}
+.rooms input {
+    padding: 4px;
+    font-size: 14px;
 }
 
 div.observe {
     margin-left: 5px;
     margin-bottom: 14px;
 }
+
+/* USERNAME */
+form.username {
+    margin-bottom: 6px;
+    margin-left: 6px;
+    min-height: 30px;
+}
+form.username .fas {
+    color: black;
+}
+
 .username input[type=submit] {
     display: none;
 }
@@ -159,6 +96,102 @@ div.observe {
     padding: 4px;
 }
 
+/* NEW STORY */
+button.newStory:hover,
+button.newStory:hover .fas,
+button.newStory:active,
+button.newStory:active .fas {
+    color: #a4286a;
+}
+button.newStory[disabled],
+button.newStory[disabled] .fas {
+    color: darkgrey;
+}
+
+/* POINTS */
+button.choice .fas {
+    color: #a4286a;
+}
+button.choice,
+button.choice:focus {
+    font-size: 14px;
+    min-width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    border-width: 0;
+    padding: 10px;
+    margin: 0 4px 8px;
+    cursor: pointer;
+    outline: 0;
+    user-select: none;
+}
+button.choice:active,
+button.choice:hover {
+    background-color: darkgray;
+}
+button.choice:first-child {
+    margin-left: 0;
+}
+
+button.picked {
+    border: 2px solid #477608;
+}
+
+button.highlighted,
+button.highlighted:hover,
+button.highlighted:active {
+    background-color: #a4286a;
+    border-color: #a4286a;
+    color: white;
+}
+button.highlighted .fas {
+    color: white;
+}
+
+button.result {
+    font-size: 16px;
+    min-width: 50px;
+    height: 50px;
+    border-radius: 4px;
+    border-width: 0;
+    margin: 0 4px 8px;
+    padding: 0 14px;
+    box-shadow: none;
+}
+button.result:first-child {
+    margin-left: 0;
+}
+button.result:focus {
+    outline: 0;
+}
+p.final > button.result,
+p.final > button.result:active {
+    font-weight: bold;
+    border-color: #a4286a;
+    border-width: 2px;
+    border-style: solid;
+    color: #a4286a;
+    cursor: help;
+}
+
+div.voting {
+    display: flex;
+}
+div.voted {
+    flex: 50%;
+    color: #477608;
+}
+div.unvoted {
+    flex: 50%;
+    color: #a4286a;
+}
+
+span.allVoted {
+    padding: 6px;
+    position: relative;
+    top: 1px;
+}
+
 div.pokerMain {
     margin-top: 14px;
 }
@@ -167,65 +200,35 @@ hr {
     width: 100%;
     height: 0;
     margin: 16px 0;
-    border: 1px dashed #a4286a;
-}
-
-p.results > button {
-    font-size: 16px;
-    min-width: 50px;
-    height: 50px;
-    border-radius: 4px;
-    border-width: 0;
-    margin: 0 4px 8px;
-    padding: 0 14px;
-    outline: 0;
-    box-shadow: none;
-}
-p.results button:first-child {
-    margin-left: 0;
-}
-p.results > button:focus {
-    outline: 0;
-}
-p.final > button, p.final > button.active {
-    font-weight: bold;
-    border-color: #a4286a;
-    border-width: 2px;
-    border-style: solid;
-    color: #a4286a;
-    outline: 0;
-    cursor: help;
-}
-
-.rooms {
-    margin-bottom: 1em;
-}
-.rooms input {
-    padding: 4px;
-    font-size: 14px;
+    border: none;
+    border-top: 1px dashed #a4286a;
 }
 
 .storyHistory h3 {
-    color: #a4286a;
     cursor: pointer;
     user-select: none;
 }
 .storyHistory.hidden .story {
     display: none;
 }
-.storyHistory.hidden h3::after {
+.storyHistory h3::after {
     font-family: 'Font Awesome 5 Free';
-    content: '\f338';
+    content: '\f424';
     font-size: 14px;
     margin-left: 8px;
 }
-
-.story button {
+.storyHistory.hidden h3::after {
+    font-family: 'Font Awesome 5 Free';
+    content: '\f422';
     font-size: 14px;
-    margin-bottom: 16px;
-    padding: 4px;
+    margin-left: 8px;
 }
-
+.story button {
+    margin-bottom: 16px;
+}
+.story button[disabled] .fas {
+    color: darkgrey;
+}
 .story ul {
     margin-top: 4px;
 }
@@ -235,7 +238,6 @@ p.final > button, p.final > button.active {
         font-size: 3em;
     }
     form.username input[type=text] {
-        width: 110px;
         width: 110px;
     }
 }

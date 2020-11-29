@@ -55,11 +55,11 @@
                     </label>
                 </div>
 
-                <button @click.prevent="newStory()" class="new" :disabled="voteCount === 0 || observer"><i
+                <button @click.prevent="newStory()" class="newStory" :disabled="voteCount === 0 || observer"><i
                         class="fas fa-eraser"></i>
                     New story
                 </button>
-                <span class="new" v-if="voteCount === members && members">All votes are in!</span>
+                <span class="allVoted" v-if="voteCount === members && members">All votes are in!</span>
 
                 <hr/>
 
@@ -74,7 +74,8 @@
                 <hr/>
 
                 <p :class="[ 'results', this.members === this.voteCount ? 'final' : '' ]">
-                    <button v-for="vote of votes" :title="voteNames && voteNames[vote] && voteNames[vote].join( ', ' )">
+                    <button v-for="vote of votes" class="result"
+                            :title="voteNames && voteNames[vote] && voteNames[vote].join( ', ' )">
                         <i :class="['fas','fa-mug-hot']" v-if="vote === 'coffee'"></i>
                         {{ vote }}
                     </button>
@@ -90,7 +91,7 @@
                     </p>
                 </section>
 
-                <div class="voteMembers" v-if="unvotedNames.length > 0">
+                <div class="voting" v-if="unvotedNames.length > 0">
                     <div class="voted">
                         <strong><i class="far fa-check-circle"></i> Voted:</strong>
                         <ul>
@@ -110,8 +111,9 @@
                 <div :class="['storyHistory', showHistory ? '':'hidden']">
                     <h3 @click="toggleHistory()">Story history</h3>
                     <section class="story">
-                        <button @click="resetHistory()" v-if="!observer" :disabled="storyHistory.length === 0">Reset
-                            history
+                        <button @click="resetHistory()" v-if="!observer" :disabled="storyHistory.length === 0"><i
+                                class="fas fa-broom"></i>
+                            Reset history
                         </button>
                         <section v-for="story of storyHistory">
                             <strong>Story result: {{ story.result }}</strong><br/>
@@ -252,7 +254,7 @@
         this.socket.emit('leave', { poker: this.activePoker })
 
         if (this.joinPoker === '') {
-          this.activePoker = '';
+          this.activePoker = ''
           return
         }
 
@@ -263,10 +265,10 @@
         window.localStorage.setItem('showHistory', this.showHistory)
       },
       onJoined: function (msg) {
-        const currentPoker = this.activePoker;
+        const currentPoker = this.activePoker
         this.activePoker = this.joinPoker = msg.poker
 
-        if ( currentPoker !== false && currentPoker !== this.activePoker ) {
+        if (currentPoker !== false && currentPoker !== this.activePoker) {
           const url = new URL(window.location)
           url.searchParams.set('room', this.activePoker)
           window.history.pushState({ room: this.activePoker }, '', url)
@@ -294,8 +296,8 @@
       onPoints (msg) {
         this.points = msg.points
       },
-      onPageChange(event) {
-        this.joinPoker = ( event.state && event.state.room ) || '';
+      onPageChange (event) {
+        this.joinPoker = (event.state && event.state.room) || ''
         this.joinRoom()
       }
     },
