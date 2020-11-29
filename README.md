@@ -27,20 +27,7 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
-## Test
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
 ## License
 
-Scrum Poker is [GPL 2.0+](LICENSE).
+Scrum Poker is [GPL 3.0+](LICENSE).
 Uses NestJS.
