@@ -189,7 +189,7 @@
         this.socket.emit('newStory', { poker: this.activePoker, result: this.averagePoint })
       },
       resetHistory () {
-        if (!window.confirm('Are you sure you want to clear the history?')) {
+        if (!window.confirm('Are you sure you want to clear the history?\n\nThis clears the history for all members in this room.')) {
           return
         }
         this.socket.emit('resetHistory', { poker: this.activePoker })
