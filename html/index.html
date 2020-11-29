@@ -34,6 +34,8 @@
                     <input type="submit" @click.prevent="joinRoom()" value="Join room!">
                 </form>
 
+                <em>Suggestion: Prefix the room with your company name to ensure you are not competing for a room.</em>
+
             </section>
 
             <div class="pokerMain" v-if="activePoker">
@@ -200,7 +202,7 @@
         if (this.observer) {
           this.socket.emit('observe', { poker: this.activePoker })
         } else {
-          this.joinRoom(true)
+          this.joinRoom()
           this.updateNickname()
         }
       },
@@ -241,11 +243,8 @@
         }
         this.socket.emit('resetHistory', { poker: this.activePoker })
       },
-      joinRoom (force) {
+      joinRoom () {
         this.joinPoker = this.joinPoker.toLowerCase()
-        if (!this.joinPoker || (this.activePoker === this.joinPoker && !force)) {
-          return
-        }
 
         this.myVote = ''
         this.members = 0
@@ -253,24 +252,26 @@
 
         this.socket.emit('leave', { poker: this.activePoker })
 
-        this.activePoker = this.joinPoker
-
-        if (this.activePoker === '') {
+        if (this.joinPoker === '') {
+          this.activePoker = '';
           return
         }
 
-        this.socket.emit('join', { poker: this.activePoker, name: this.nickname })
+        this.socket.emit('join', { poker: this.joinPoker, name: this.nickname })
       },
       toggleHistory () {
         this.showHistory = !this.showHistory
         window.localStorage.setItem('showHistory', this.showHistory)
       },
       onJoined: function (msg) {
+        const currentPoker = this.activePoker;
         this.activePoker = this.joinPoker = msg.poker
 
-        const url = new URL(window.location)
-        url.searchParams.set('room', this.activePoker)
-        window.history.pushState({}, '', url)
+        if ( currentPoker !== this.activePoker ) {
+          const url = new URL(window.location)
+          url.searchParams.set('room', this.activePoker)
+          window.history.pushState({ room: this.activePoker }, '', url)
+        }
       },
       onMembersUpdated (msg) {
         this.members = msg.members
@@ -294,6 +295,10 @@
       onPoints (msg) {
         this.points = msg.points
       },
+      onPageChange(event) {
+        this.joinPoker = ( event.state && event.state.room ) || '';
+        this.joinRoom()
+      }
     },
     computed: {
       unvotedNames () {
@@ -398,7 +403,7 @@
 
       this.socket = io(window.location.protocol + '//' + window.location.hostname + ':' + location.port + window.location.pathname + 'pokers')
       this.socket.on('connect', () => {
-        this.joinRoom(true)
+        this.joinRoom()
         this.observerChange()
       })
 
@@ -422,6 +427,8 @@
       this.socket.on('stories', (msg) => {
         this.onStoryHistory(msg)
       })
+
+      window.onpopstate = this.onPageChange;
     }
   })
 
