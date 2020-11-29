@@ -53,7 +53,7 @@
                     </label>
                 </div>
 
-                <button @click.prevent="newStory()" class="new" :disabled="voteCount === 0"><i
+                <button @click.prevent="newStory()" class="new" :disabled="voteCount === 0 || observer"><i
                         class="fas fa-eraser"></i>
                     New story
                 </button>
@@ -223,8 +223,7 @@
         this.socket.emit('vote', { poker: this.activePoker, vote: vote })
       },
       newStory () {
-        // No votes, nothing to do...
-        if (this.voteCount === 0) {
+        if (this.voteCount === 0 || this.observer) {
           return
         }
 
