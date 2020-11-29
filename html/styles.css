@@ -128,6 +128,11 @@ button.newStory[disabled] .fas {
     margin-left: 4px;
     color: #477608;
 }
+input[type=text].changed {
+    box-shadow: 0 0 0 2px #477608;
+    transition: box-shadow 250ms ease-in-out;
+    border-radius: 3px;
+}
 
 /* POINTS */
 button.choice .fas {

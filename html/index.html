@@ -64,8 +64,14 @@
                 <hr/>
 
                 <form>
-                    <label>Story name: <input type="text" v-model="story"></label>
-                    <input type="submit" @click.prevent="setStoryName()" value="Update ">
+                    <label>Story name:
+                        <input type="text"
+                               v-model="story"
+                               :class="storyChanged ? 'changed' : ''"
+                               @keydown="storyUpdated = false"
+                               v-on:change="storyUpdated = false"
+                        ></label>
+                    <input type="submit" @click.prevent="setStoryName()" value="Update">
                     <i v-if="storyUpdated" class="fas fa-check-circle story-updated"></i>
                 </form>
                 <br/>
@@ -187,9 +193,9 @@
     </section>
 
     <section class="credits">
-        Build using <a href="https://nestjs.com/" target="_blank">NestJS</a> & <a href="https://vuejs.org/"
-                                                                                  target="_blank">Vue.js</a> - <a
-            href="https://github.com/moorscode/scrum-poker/" target="_blank">source</a> on GPL 3.0+.
+        Build using <a href="https://nestjs.com/" target="_blank">NestJS</a>
+        & <a href="https://vuejs.org/" target="_blank">Vue.js</a>
+        - <a href="https://github.com/moorscode/scrum-poker/" target="_blank">source</a> on GPL 3.0+.
     </section>
 </main>
 
@@ -207,6 +213,7 @@
       observer: false,
       story: '',
       storyUpdated: false,
+      storyChanged: false,
       myVote: '',
       members: 0,
       names: [],
@@ -259,6 +266,8 @@
             return
           }
         }
+
+        this.storyUpdated = false;
         this.socket.emit('newStory', { poker: this.activePoker, result: this.averagePoint })
       },
       resetHistory () {
@@ -330,11 +339,16 @@
         this.joinRoom()
       },
       onStoryName (msg) {
-        this.story = msg.name
+        const changed = (this.story !== msg.name)
 
-        // Show check icon briefly.
-        this.storyUpdated = true
-        setTimeout(() => this.storyUpdated = false, 1400)
+        this.story = msg.name
+        this.storyUpdated = ( this.story !== '' )
+
+        if ( changed ) {
+          this.storyChanged = true;
+          setTimeout(() => this.storyChanged = false, 1400)
+        }
+
       },
     },
     computed: {

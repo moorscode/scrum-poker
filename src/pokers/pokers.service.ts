@@ -207,6 +207,17 @@ export class PokersService {
   }
 
   /**
+   * Gets the story name.
+   *
+   * @param {string} poker The room.
+   *
+   * @returns {string} The story name.
+   */
+  public getStoryName(poker: string): string {
+    return this.getRoom(poker).getStoryName();
+  }
+
+  /**
    * Retrieves all stories.
    *
    * @param {string} poker The room.
