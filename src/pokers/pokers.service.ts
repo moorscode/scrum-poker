@@ -218,6 +218,15 @@ export class PokersService {
   }
 
   /**
+   * Removes the last history item.
+   *
+   * @param {string} poker The room.
+   */
+  public popHistory(poker: string): void {
+    this.getRoom(poker).popHistory();
+  }
+
+  /**
    * Resets room stories history.
    *
    * @param {string} poker The room.

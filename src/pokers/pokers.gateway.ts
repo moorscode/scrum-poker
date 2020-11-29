@@ -80,10 +80,17 @@ export class PokersGateway implements OnGatewayInit {
   }
 
   @SubscribeMessage('story')
-  story(client: Socket, message: { poker: string, name: string }): void {
+  story(client: Socket, message: { poker: string; name: string }): void {
     this.pokersService.setStoryName(message.poker, message.name);
 
     this.server.to(message.poker).emit('story', { name: message.name });
+  }
+
+  @SubscribeMessage('popHistory')
+  popHistory(client: Socket, message: { poker: string }): void {
+    this.pokersService.popHistory(message.poker);
+
+    this.sendStories(message.poker);
   }
 
   @SubscribeMessage('resetHistory')

@@ -56,7 +56,7 @@
                 </div>
 
                 <button @click.prevent="newStory()" class="newStory" :disabled="voteCount === 0 || observer"><i
-                        class="fas fa-eraser"></i>
+                        class="fas fa-plus-square"></i>
                     New story
                 </button>
                 <span class="allVoted" v-if="voteCount === members && members">All votes are in!</span>
@@ -119,11 +119,15 @@
                     <h3 @click="toggleHistory()">Story history</h3>
                     <section class="story">
                         <button @click="resetHistory()" v-if="!observer" :disabled="storyHistory.length === 0"><i
-                                class="fas fa-broom"></i>
+                                class="fas fa-eraser"></i>
                             Reset history
                         </button>
+                        <button @click="popHistory()" v-if="!observer" :disabled="storyHistory.length === 0"><i
+                                class="fas fa-backspace"></i>
+                            Delete last result
+                        </button>
                         <section v-for="story of storyHistory">
-                            <strong>Story {{ story.name }} result: {{ story.result }}</strong><br/>
+                            <strong>Story {{ story.name || 'result' }}: {{ story.result }}</strong><br/>
                             Votes:
                             <ul>
                                 <li v-for="vote of story.votes">
@@ -262,6 +266,12 @@
           return
         }
         this.socket.emit('resetHistory', { poker: this.activePoker })
+      },
+      popHistory() {
+        if (!window.confirm('Are you sure you want to remove the last history item?\n\nThis removes the item for all members in this room.')) {
+          return
+        }
+        this.socket.emit('popHistory', { poker: this.activePoker })
       },
       joinRoom () {
         this.joinPoker = this.joinPoker.toLowerCase()

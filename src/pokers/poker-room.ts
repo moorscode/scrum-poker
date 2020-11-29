@@ -188,6 +188,13 @@ export class PokerRoom {
   }
 
   /**
+   * Removes the last history item.
+   */
+  public popHistory(): void {
+    this.room.stories.pop();
+  }
+
+  /**
    * Sets all votes of a room.
    *
    * @private
