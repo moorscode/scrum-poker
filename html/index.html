@@ -132,7 +132,6 @@
       showHistory: false,
       votes: [],
       activePoker: false,
-      pokerFromURL: false,
       voteCount: 0,
       joinPoker: '',
       members: 0,
@@ -153,8 +152,7 @@
         if (this.observer) {
           this.socket.emit('observe', { poker: this.activePoker })
         } else {
-          this.activePoker = ''
-          this.joinRoom()
+          this.joinRoom(true)
           this.updateNickname()
         }
       },
@@ -164,35 +162,17 @@
         window.localStorage.setItem('nickname', this.nickname)
         this.socket.emit('nickname', { name: this.nickname, poker: this.activePoker })
       },
-      setPoints (msg) {
-        this.points = msg.points
-      },
       castVote (vote) {
-        if (this.observer) return
-
-        if (this.activePoker) {
-          if (this.voteCount === this.members) {
-            return
-          }
-
-          this.socket.emit('vote', { poker: this.activePoker, vote: vote })
-          this.myVote = vote
-        } else {
-          alert('You must join a room before voting!')
-        }
-      },
-      receiveVote (msg) {
-        this.votes = msg.votes.sort((a, b) => a - b)
-        this.voteCount = msg.voteCount
-        this.votedNames = msg.votedNames || []
-        this.names = msg.names
-        this.voteNames = msg.voteNames || {}
-
-        if (this.voteCount === 0) {
-          this.myVote = ''
+        if (this.observer) {
+          return
         }
 
-        document.title = this.baseTitle + ' ' + this.voteCount + '/' + this.members
+        if (this.voteCount === this.members) {
+          return
+        }
+
+        this.myVote = vote
+        this.socket.emit('vote', { poker: this.activePoker, vote: vote })
       },
       newStory () {
         // No votes, nothing to do...
@@ -234,16 +214,39 @@
 
         this.socket.emit('join', { poker: this.activePoker, name: this.nickname })
       },
-      membersUpdated (msg) {
-        this.members = msg.members
-      },
-      setStoryHistory (msg) {
-        this.storyHistory = (msg.stories || []).reverse()
-      },
       toggleHistory () {
         this.showHistory = !this.showHistory
         window.localStorage.setItem('showHistory', this.showHistory)
-      }
+      },
+      onJoined: function (msg) {
+        this.activePoker = this.joinPoker = msg.poker
+
+        const url = new URL(window.location)
+        url.searchParams.set('room', this.activePoker)
+        window.history.pushState({}, '', url)
+      },
+      onMembersUpdated (msg) {
+        this.members = msg.members
+      },
+      onStoryHistory (msg) {
+        this.storyHistory = (msg.stories || []).reverse()
+      },
+      onReceiveVote (msg) {
+        this.votes = msg.votes.sort((a, b) => a - b)
+        this.voteCount = msg.voteCount
+        this.votedNames = msg.votedNames || []
+        this.names = msg.names
+        this.voteNames = msg.voteNames || {}
+
+        if (this.voteCount === 0) {
+          this.myVote = ''
+        }
+
+        document.title = this.baseTitle + ' ' + this.voteCount + '/' + this.members
+      },
+      onPoints (msg) {
+        this.points = msg.points
+      },
     },
     computed: {
       unvotedNames () {
@@ -335,14 +338,11 @@
       },
     },
     created () {
-      let uri = window.location.search.substring(1)
-      let params = new URLSearchParams(uri)
-      if (params.get('room')) {
-        this.joinPoker = params.get('room')
-        this.pokerFromURL = true
-      }
-
       this.baseTitle = document.title
+
+      this.joinPoker = new URLSearchParams(window.location.search.substring(1)).get('room')
+
+      // Retrieve data from local storage.
       this.nickname = window.localStorage.getItem('nickname')
       this.showHistory = window.localStorage.getItem('showHistory') !== 'false'
       if (this.joinPoker) {
@@ -355,29 +355,26 @@
         this.observerChange()
       })
 
-      this.socket.on('membersUpdated', (msg) => {
-        this.membersUpdated(msg)
-      })
-
-      this.socket.on('joined', () => {
-        this.joinPoker = this.activePoker
-
-        const url = new URL(window.location)
-        url.searchParams.set('room', this.activePoker)
-        window.history.pushState({}, '', url)
-      })
-
-      this.socket.on('votes', (msg) => {
-        this.receiveVote(msg)
-      })
-
       this.socket.on('points', (msg) => {
-        this.setPoints(msg)
+        this.onPoints(msg)
         this.loading = false
       })
 
+      this.socket.on('joined', (msg) => {
+        this.onJoined(msg)
+      })
+
+      this.socket.on('members', (msg) => {
+        console.log(msg);
+        this.onMembersUpdated(msg)
+      })
+
+      this.socket.on('votes', (msg) => {
+        this.onReceiveVote(msg)
+      })
+
       this.socket.on('stories', (msg) => {
-        this.setStoryHistory(msg)
+        this.onStoryHistory(msg)
       })
     }
   })

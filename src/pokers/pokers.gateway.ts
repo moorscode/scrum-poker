@@ -126,7 +126,7 @@ export class PokersGateway implements OnGatewayInit {
    * @private
    */
   private updateMembers(room: string): void {
-    this.server.to(room).emit('membersUpdated', {
+    this.server.to(room).emit('members', {
       members: this.pokersService.getClientCount(room),
     });
   }
