@@ -60,7 +60,7 @@ export class PokersGateway implements OnGatewayInit {
 
   @SubscribeMessage('nickname')
   setNickname(client: Socket, message: { name: string; poker: string }): void {
-    this.pokersService.setName(client, message.name, message.poker);
+    this.pokersService.setName(message.poker, client, message.name);
     this.sendAllVotes(message.poker);
   }
 

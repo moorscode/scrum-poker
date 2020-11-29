@@ -77,11 +77,11 @@ export class PokersService {
   /**
    * Set a name for a client.
    *
+   * @param {string} poker The poker.
    * @param {Socket} client The client.
    * @param {string} name The name.
-   * @param {string} poker The poker.
    */
-  public setName(client: Socket, name: string, poker: string) {
+  public setName(poker: string, client: Socket, name: string) {
     if (!name) return;
 
     this.getRoom(poker).setClientName(client, name);
