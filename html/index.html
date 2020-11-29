@@ -352,8 +352,7 @@
       this.socket = io(window.location.protocol + '//' + window.location.hostname + ':' + location.port + window.location.pathname + 'pokers')
       this.socket.on('connect', () => {
         this.joinRoom(true)
-        this.observerChange();
-        this.loading = false
+        this.observerChange()
       })
 
       this.socket.on('membersUpdated', (msg) => {
@@ -374,6 +373,7 @@
 
       this.socket.on('points', (msg) => {
         this.setPoints(msg)
+        this.loading = false
       })
 
       this.socket.on('stories', (msg) => {
