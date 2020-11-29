@@ -56,12 +56,19 @@
                 </div>
 
                 <button @click.prevent="newStory()" class="newStory" :disabled="voteCount === 0 || observer"><i
-                        class="fas fa-eraser"></i>
+                        class="fas fa-plus-square"></i>
                     New story
                 </button>
                 <span class="allVoted" v-if="voteCount === members && members">All votes are in!</span>
 
                 <hr/>
+
+                <form>
+                    <label>Story name: <input type="text" v-model="story"></label>
+                    <input type="submit" @click.prevent="setStoryName()" value="Update ">
+                    <i v-if="storyUpdated" class="fas fa-check-circle story-updated"></i>
+                </form>
+                <br/>
 
                 <button
                         v-for="point of points"
@@ -112,11 +119,15 @@
                     <h3 @click="toggleHistory()">Story history</h3>
                     <section class="story">
                         <button @click="resetHistory()" v-if="!observer" :disabled="storyHistory.length === 0"><i
-                                class="fas fa-broom"></i>
+                                class="fas fa-eraser"></i>
                             Reset history
                         </button>
+                        <button @click="popHistory()" v-if="!observer" :disabled="storyHistory.length === 0"><i
+                                class="fas fa-backspace"></i>
+                            Delete last result
+                        </button>
                         <section v-for="story of storyHistory">
-                            <strong>Story result: {{ story.result }}</strong><br/>
+                            <strong>Story {{ story.name || 'result' }}: {{ story.result }}</strong><br/>
                             Votes:
                             <ul>
                                 <li v-for="vote of story.votes">
@@ -176,7 +187,9 @@
     </section>
 
     <section class="credits">
-        Build using <a href="https://nestjs.com/" target="_blank">NestJS</a> & <a href="https://vuejs.org/" target="_blank">Vue.js</a> - <a href="https://github.com/moorscode/scrum-poker/" target="_blank">source</a> on GPL 3.0+.
+        Build using <a href="https://nestjs.com/" target="_blank">NestJS</a> & <a href="https://vuejs.org/"
+                                                                                  target="_blank">Vue.js</a> - <a
+            href="https://github.com/moorscode/scrum-poker/" target="_blank">source</a> on GPL 3.0+.
     </section>
 </main>
 
@@ -192,6 +205,8 @@
       points: {},
       nickname: '',
       observer: false,
+      story: '',
+      storyUpdated: false,
       myVote: '',
       members: 0,
       names: [],
@@ -230,6 +245,9 @@
         this.myVote = vote
         this.socket.emit('vote', { poker: this.activePoker, vote: vote })
       },
+      setStoryName () {
+        this.socket.emit('story', { poker: this.activePoker, name: this.story })
+      },
       newStory () {
         if (this.voteCount === 0 || this.observer) {
           return
@@ -248,6 +266,12 @@
           return
         }
         this.socket.emit('resetHistory', { poker: this.activePoker })
+      },
+      popHistory() {
+        if (!window.confirm('Are you sure you want to remove the last history item?\n\nThis removes the item for all members in this room.')) {
+          return
+        }
+        this.socket.emit('popHistory', { poker: this.activePoker })
       },
       joinRoom () {
         this.joinPoker = this.joinPoker.toLowerCase()
@@ -304,7 +328,14 @@
       onPageChange (event) {
         this.joinPoker = (event.state && event.state.room) || ''
         this.joinRoom()
-      }
+      },
+      onStoryName (msg) {
+        this.story = msg.name
+
+        // Show check icon briefly.
+        this.storyUpdated = true
+        setTimeout(() => this.storyUpdated = false, 1400)
+      },
     },
     computed: {
       unvotedNames () {
@@ -431,6 +462,10 @@
 
       this.socket.on('stories', (msg) => {
         this.onStoryHistory(msg)
+      })
+
+      this.socket.on('story', (msg) => {
+        this.onStoryName(msg)
       })
 
       window.onpopstate = this.onPageChange

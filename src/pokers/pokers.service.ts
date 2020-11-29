@@ -44,6 +44,15 @@ export class PokersService {
     this.rooms[poker].addClient(client, useName);
   }
 
+  /**
+   * Retrieves the room.
+   *
+   * @param {string} poker Room to get.
+   *
+   * @returns {PokerRoom} The room.
+   *
+   * @private
+   */
   private getRoom(poker: string): PokerRoom {
     return this.rooms[poker] || new PokerRoom();
   }
@@ -188,6 +197,16 @@ export class PokersService {
   }
 
   /**
+   * Sets the story name.
+   *
+   * @param {string} poker Room to set to.
+   * @param {string} name Name of the story.
+   */
+  public setStoryName(poker: string, name: string): void {
+    this.getRoom(poker).setStoryName(name);
+  }
+
+  /**
    * Retrieves all stories.
    *
    * @param {string} poker The room.
@@ -196,6 +215,15 @@ export class PokersService {
    */
   public getStories(poker: string): story[] {
     return this.getRoom(poker).getStories();
+  }
+
+  /**
+   * Removes the last history item.
+   *
+   * @param {string} poker The room.
+   */
+  public popHistory(poker: string): void {
+    this.getRoom(poker).popHistory();
   }
 
   /**

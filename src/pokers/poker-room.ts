@@ -7,6 +7,7 @@ export interface client {
 }
 
 export interface story {
+  name: string;
   result: number;
   votes: {
     vote: number | string;
@@ -19,10 +20,11 @@ export interface room {
     [clientId: string]: client;
   };
   stories: story[];
+  story: string;
 }
 
 export class PokerRoom {
-  private room: room = { clients: {}, stories: [] };
+  private room: room = { clients: {}, stories: [], story: '' };
 
   /**
    * Lists all names in a room.
@@ -135,6 +137,9 @@ export class PokerRoom {
       this.addStory(result);
     }
 
+    // Reset story name.
+    this.room.story = '';
+
     this.resetVotes();
   }
 
@@ -147,6 +152,7 @@ export class PokerRoom {
    */
   private addStory(result: number) {
     const story: story = {
+      name: this.room.story,
       result,
       votes: this.getVotedClients().map((client: client) => {
         return { name: client.name, vote: client.vote };
@@ -154,6 +160,15 @@ export class PokerRoom {
     };
 
     this.room.stories.push(story);
+  }
+
+  /**
+   * Sets the story name.
+   *
+   * @param {string} name The name.
+   */
+  public setStoryName(name: string): void {
+    this.room.story = name;
   }
 
   /**
@@ -170,6 +185,13 @@ export class PokerRoom {
    */
   public resetHistory(): void {
     this.room.stories = [];
+  }
+
+  /**
+   * Removes the last history item.
+   */
+  public popHistory(): void {
+    this.room.stories.pop();
   }
 
   /**
