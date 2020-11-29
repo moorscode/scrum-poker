@@ -44,9 +44,24 @@ button .fas {
     margin-right: 3px;
 }
 
-.poker {
+a {
+    color: #a4286a;
+}
+
+.poker, .credits {
     max-width: 800px;
     margin: 20px auto;
+
+}
+
+.credits {
+    color: #666;
+    font-size: 16px;
+    font-variant: all-small-caps;
+    text-align: center;
+}
+
+.poker {
     padding: 20px;
     border: 1px solid #a4286a;
     border-radius: 4px;
@@ -238,6 +253,6 @@ hr {
         font-size: 3em;
     }
     form.username input[type=text] {
-        width: 110px;
+        width: 120px;
     }
 }

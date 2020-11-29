@@ -42,7 +42,7 @@
                 <form class="username" :class="[!nickname ? 'hover' : '']">
                     <span><i class="fas fa-signature"></i> Nickname:</span>
                     <input type="text" v-model="nickname"/>
-                    <input type="submit" @click.prevent="updateNickname" value="update nickname"/>
+                    <input type="submit" @click.prevent="updateNickname" value="Update"/>
                 </form>
 
                 <div class="observe">
@@ -174,7 +174,12 @@
             button to reset the history it will be gone from the room.
         </p>
     </section>
+
+    <section class="credits">
+        Build using <a href="https://nestjs.com/" target="_blank">NestJS</a> & <a href="https://vuejs.org/" target="_blank">Vue.js</a> - <a href="https://github.com/moorscode/scrum-poker/" target="_blank">source</a> on GPL 3.0+.
+    </section>
 </main>
+
 <script>
   new Vue({
     el: '#v-app',
