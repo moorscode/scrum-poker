@@ -314,7 +314,7 @@
         return this.observer ? 'Observing…' : 'Observe'
       },
       average () {
-        if (this.voteCount === 0) {
+        if (this.voteCount === 0 || this.voteCount < this.members) {
           return ''
         }
 
@@ -329,21 +329,20 @@
         return Math.round((sum / this.votes.length) * 100) / 100
       },
       averageContext () {
-        if (this.voteCount > 0) {
-
-          // Find the difference between the lowest and the highest votes.
-          const lowestIndex = this.points.indexOf(this.votes[0])
-          const highestIndex = this.points.indexOf(this.votes[this.votes.length - 1])
-
-          if (highestIndex - lowestIndex > 2) {
-            return `Large gap between lowest and highest vote: ${highestIndex - lowestIndex} cards!`
-          }
+        if (!this.average) {
+          return ''
         }
 
-        return ''
+        // Find the difference between the lowest and the highest votes.
+        const lowestIndex = this.points.indexOf(this.votes[0])
+        const highestIndex = this.points.indexOf(this.votes[this.votes.length - 1])
+
+        if (highestIndex - lowestIndex > 2) {
+          return `Large gap between lowest and highest vote: ${highestIndex - lowestIndex} cards!`
+        }
       },
       standardDeviation () {
-        if (this.voteCount === 0) {
+        if (!this.average) {
           return ''
         }
 
@@ -359,7 +358,7 @@
         return Math.round(Math.sqrt(powers / this.votes.length) * 100) / 100
       },
       averagePoint () {
-        if (this.voteCount === 0) {
+        if (!this.average) {
           return ''
         }
 
