@@ -39,6 +39,12 @@ input[type=submit] {
     border-radius: 2px;
     outline: none;
 }
+input[type=text] {
+    font-size: 16px;
+    padding: 4px;
+    border: 1px inset;
+}
+
 button .fas {
     color: black;
     margin-right: 3px;
@@ -71,10 +77,6 @@ a {
 .rooms {
     margin-bottom: 1em;
 }
-.rooms input {
-    padding: 4px;
-    font-size: 14px;
-}
 
 div.observe {
     margin-left: 5px;
@@ -100,15 +102,12 @@ form.username .fas {
     display: inline-block;
 }
 .username input[type=text] {
-    border: none;
-    font-size: 16px;
-    padding: 5px 5px 6px;
+    border: 1px solid transparent;
 }
 .username:active input[type=text],
 .username:hover input[type=text],
 .username.hover input[type=text] {
     border: 1px inset;
-    padding: 4px;
 }
 
 /* NEW STORY */
@@ -121,6 +120,13 @@ button.newStory:active .fas {
 button.newStory[disabled],
 button.newStory[disabled] .fas {
     color: darkgrey;
+}
+
+.story-updated {
+    position: relative;
+    top: 3px;
+    margin-left: 4px;
+    color: #477608;
 }
 
 /* POINTS */

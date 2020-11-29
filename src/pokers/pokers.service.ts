@@ -44,6 +44,15 @@ export class PokersService {
     this.rooms[poker].addClient(client, useName);
   }
 
+  /**
+   * Retrieves the room.
+   *
+   * @param {string} poker Room to get.
+   *
+   * @returns {PokerRoom} The room.
+   *
+   * @private
+   */
   private getRoom(poker: string): PokerRoom {
     return this.rooms[poker] || new PokerRoom();
   }
@@ -185,6 +194,16 @@ export class PokersService {
    */
   public newStory(poker: string, result?: number): void {
     this.getRoom(poker).newStory(result);
+  }
+
+  /**
+   * Sets the story name.
+   *
+   * @param {string} poker Room to set to.
+   * @param {string} name Name of the story.
+   */
+  public setStoryName(poker: string, name: string): void {
+    this.getRoom(poker).setStoryName(name);
   }
 
   /**
