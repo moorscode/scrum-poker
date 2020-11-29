@@ -30,4 +30,7 @@ $ npm run start:prod
 ## License
 
 Scrum Poker is [GPL 3.0+](LICENSE).
-Uses NestJS.
+
+Uses:
+- [NestJS](https://github.com/nestjs/) under MIT license.
+- [Vue.js](https://github.com/vuejs/) under MIT license.
