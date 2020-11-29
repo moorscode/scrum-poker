@@ -22,7 +22,7 @@
         </section>
 
         <section v-if="!loading">
-            <section v-if="!activePoker">
+            <section v-if="!activePoker && !joinPoker">
                 <p>Welcome to Pum Scroker!</p>
                 <p>This tool was created for scrum-teams to have a digital place where they can do their refinement.
                     As many teams are working remotely due to the global COVID-19 situation.
@@ -147,7 +147,7 @@
         </section>
     </section>
 
-    <section class="poker" v-if="!activePoker">
+    <section class="poker" v-if="!activePoker && !joinPoker">
         <h2>Features</h2>
         <h3>Voting</h3>
         <p>
