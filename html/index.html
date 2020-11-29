@@ -267,7 +267,7 @@
         const currentPoker = this.activePoker;
         this.activePoker = this.joinPoker = msg.poker
 
-        if ( currentPoker !== this.activePoker ) {
+        if ( currentPoker !== false && currentPoker !== this.activePoker ) {
           const url = new URL(window.location)
           url.searchParams.set('room', this.activePoker)
           window.history.pushState({ room: this.activePoker }, '', url)
