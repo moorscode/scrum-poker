@@ -17,99 +17,110 @@
     <section class="poker">
         <h1>Pum Scroker</h1>
 
-        <section v-if="!activePoker">
-            <form class="rooms">
-                <i class="fas fa-person-booth"></i> Room: <input type="text" v-model="joinPoker"/>
-                <input type="submit" @click.prevent="joinRoom()" value="join scrum room">
-            </form>
+        <section v-if="loading">
+            Connecting to the server...
         </section>
 
-        <div v-if="!activePoker">
-            Join a scrum room to start voting!
-        </div>
-
-        <div class="pokerMain" v-if="activePoker">
-            <form class="username" :class="[!nickname ? 'hover' : '']">
-                <span><i class="fas fa-signature"></i> Nickname:</span>
-                <input type="text" v-model="nickname"/>
-                <input type="submit" @click.prevent="updateNickname" value="update nickname"/>
-            </form>
-
-            <div class="observe">
-                <label>
-                    <input
-                            type="checkbox"
-                            v-model="observer"
-                            @change="observerChange()"/>
-                    {{ observing }}
-                </label>
-            </div>
-
-            <button @click.prevent="newStory()" class="new" :disabled="voteCount === 0"><i class="fas fa-eraser"></i> New story</button>
-            <span :class="'new'" v-if="voteCount === members && members">All votes are in, start a new story!</span>
-
-            <hr/>
-
-            <button
-                    v-for="point of points"
-                    @click.prevent="castVote(point)"
-                    :class="[ 'choice', votes.includes( point ) ? 'picked' : '', myVote === point ? 'highlighted' : '' ]">
-                <i :class="['fas','fa-mug-hot']" v-if="point === 'coffee'"></i>
-                {{ point }}
-            </button>
-
-            <hr/>
-
-            <p :class="[ 'results', this.members === this.voteCount ? 'final' : '' ]">
-                <button v-for="vote of votes" :title="voteNames && voteNames[vote] && voteNames[vote].join( ', ' )">
-                    <i :class="['fas','fa-mug-hot']" v-if="vote === 'coffee'"></i>
-                    {{ vote }}
-                </button>
-            </p>
-
-            <section v-if="average !== ''">
-                <p>
-                    Average: {{ average }}<br/>
-                    Standard deviation: {{ standardDeviation }}<br/>
-                    <strong>Average story point: {{ averagePoint }}</strong>
-                <p v-if="averageContext">
-                    <strong>{{ averageContext }}</strong>
-                </p>
+        <section v-if="!loading">
+            <section v-if="!activePoker">
+                <form class="rooms">
+                    <i class="fas fa-person-booth"></i> Room: <input type="text" v-model="joinPoker"/>
+                    <input type="submit" @click.prevent="joinRoom()" value="join scrum room">
+                </form>
             </section>
 
-            <div class="voteMembers" v-if="unvotedNames.length > 0">
-                <div class="voted">
-                    <strong><i class="far fa-check-circle"></i> Voted:</strong>
-                    <ul>
-                        <li v-for="name of votedNames">{{ name }}</li>
-                    </ul>
-                    <p v-if="votedNames.length === 0">Nobody voted yet.</p>
-                </div>
-                <div class="unvoted">
-                    <strong><i class="far fa-times-circle"></i> Not voted yet:</strong>
-                    <ul>
-                        <li v-for="name of unvotedNames">{{ name }}</li>
-                    </ul>
-                    <p v-if="unvotedNames.length === 0">Everybody voted!</p>
-                </div>
+            <div v-if="!activePoker">
+                Join a scrum room to start voting!
             </div>
 
-            <div :class="['storyHistory', showHistory ? '':'hidden']">
-                <h3 @click="showHistory = !showHistory">Story history</h3>
-                <section class="story">
-                    <button @click="resetHistory()" v-if="!observer" :disabled="storyHistory.length === 0">Reset history</button>
-                    <section v-for="story of storyHistory">
-                        <strong>Story result: {{ story.result }}</strong><br/>
-                        Votes:
-                        <ul>
-                            <li v-for="vote of story.votes">
-                                {{ vote.name }}: {{ vote.vote }}
-                            </li>
-                        </ul>
-                    </section>
+            <div class="pokerMain" v-if="activePoker">
+                <form class="username" :class="[!nickname ? 'hover' : '']">
+                    <span><i class="fas fa-signature"></i> Nickname:</span>
+                    <input type="text" v-model="nickname"/>
+                    <input type="submit" @click.prevent="updateNickname" value="update nickname"/>
+                </form>
+
+                <div class="observe">
+                    <label>
+                        <input
+                                type="checkbox"
+                                v-model="observer"
+                                @change="observerChange()"/>
+                        {{ observing }}
+                    </label>
+                </div>
+
+                <button @click.prevent="newStory()" class="new" :disabled="voteCount === 0"><i
+                        class="fas fa-eraser"></i>
+                    New story
+                </button>
+                <span class="new" v-if="voteCount === members && members">All votes are in!</span>
+
+                <hr/>
+
+                <button
+                        v-for="point of points"
+                        @click.prevent="castVote(point)"
+                        :class="[ 'choice', votes.includes( point ) ? 'picked' : '', myVote === point ? 'highlighted' : '' ]">
+                    <i :class="['fas','fa-mug-hot']" v-if="point === 'coffee'"></i>
+                    {{ point }}
+                </button>
+
+                <hr/>
+
+                <p :class="[ 'results', this.members === this.voteCount ? 'final' : '' ]">
+                    <button v-for="vote of votes" :title="voteNames && voteNames[vote] && voteNames[vote].join( ', ' )">
+                        <i :class="['fas','fa-mug-hot']" v-if="vote === 'coffee'"></i>
+                        {{ vote }}
+                    </button>
+                </p>
+
+                <section v-if="average !== ''">
+                    <p>
+                        Average: {{ average }}<br/>
+                        Standard deviation: {{ standardDeviation }}<br/>
+                        <strong>Average story point: {{ averagePoint }}</strong>
+                    <p v-if="averageContext">
+                        <strong>{{ averageContext }}</strong>
+                    </p>
                 </section>
+
+                <div class="voteMembers" v-if="unvotedNames.length > 0">
+                    <div class="voted">
+                        <strong><i class="far fa-check-circle"></i> Voted:</strong>
+                        <ul>
+                            <li v-for="name of votedNames">{{ name }}</li>
+                        </ul>
+                        <p v-if="votedNames.length === 0">Nobody voted yet.</p>
+                    </div>
+                    <div class="unvoted">
+                        <strong><i class="far fa-times-circle"></i> Not voted yet:</strong>
+                        <ul>
+                            <li v-for="name of unvotedNames">{{ name }}</li>
+                        </ul>
+                        <p v-if="unvotedNames.length === 0">Everybody voted!</p>
+                    </div>
+                </div>
+
+                <div :class="['storyHistory', showHistory ? '':'hidden']">
+                    <h3 @click="toggleHistory()">Story history</h3>
+                    <section class="story">
+                        <button @click="resetHistory()" v-if="!observer" :disabled="storyHistory.length === 0">Reset
+                            history
+                        </button>
+                        <section v-for="story of storyHistory">
+                            <strong>Story result: {{ story.result }}</strong><br/>
+                            Votes:
+                            <ul>
+                                <li v-for="vote of story.votes">
+                                    {{ vote.name }}: {{ vote.vote }}
+                                </li>
+                            </ul>
+                        </section>
+                    </section>
+                </div>
             </div>
-        </div>
+        </section>
     </section>
 </main>
 <script>
@@ -117,6 +128,7 @@
     el: '#v-app',
     data: {
       socket: null,
+      loading: true,
       showHistory: false,
       votes: [],
       activePoker: false,
@@ -126,10 +138,6 @@
       members: 0,
       points: {},
       myVote: '',
-      average: '',
-      averagePoint: '',
-      averageContext: '',
-      standardDeviation: '',
       observer: false,
       baseTitle: '',
       nickname: '',
@@ -140,6 +148,8 @@
     },
     methods: {
       observerChange () {
+        window.localStorage.setItem(this.activePoker + '-observer', this.observer)
+
         if (this.observer) {
           this.socket.emit('observe', { poker: this.activePoker })
         } else {
@@ -179,16 +189,10 @@
         this.voteNames = msg.voteNames || {}
 
         if (this.voteCount === 0) {
-          this.calculateAverage()
           this.myVote = ''
         }
 
         document.title = this.baseTitle + ' ' + this.voteCount + '/' + this.members
-
-        if (this.voteCount === this.members) {
-          this.calculateAverage()
-          return
-        }
       },
       newStory () {
         // No votes, nothing to do...
@@ -233,87 +237,12 @@
       membersUpdated (msg) {
         this.members = msg.members
       },
-      calculateAverage () {
-        // Reset values.
-        this.averageContext = ''
-        this.standardDeviation = ''
-
-        if (this.voteCount === 0) {
-          this.average = ''
-          this.averagePoint = ''
-          return
-        }
-
-        this.setAverage()
-        this.setAverageContext()
-        this.setStandardDeviation()
-        this.setAveragePoint()
-      },
-      setAverageContext: function () {
-        // Find the difference between the lowest and the highest votes.
-        const lowestIndex = this.points.indexOf(this.votes[0])
-        const highestIndex = this.points.indexOf(this.votes[this.votes.length - 1])
-
-        if (highestIndex - lowestIndex > 2) {
-          this.averageContext = `Large gap between lowest and highest vote: ${highestIndex - lowestIndex} cards!`
-        }
-      },
-      setStandardDeviation () {
-        if (this.votes.length <= 1 || this.votes.indexOf('coffee') !== -1) {
-          this.standardDeviation = 'n/a'
-          return
-        }
-
-        let powers = 0
-        for (let i = 0; i < this.votes.length; i++) {
-          powers += Math.pow(parseFloat(this.votes[i]) - this.average, 2)
-        }
-
-        this.standardDeviation = Math.round(Math.sqrt(powers / this.votes.length) * 100) / 100
-      },
-      setAveragePoint: function () {
-        if (this.points.indexOf(this.average) !== -1) {
-          this.averagePoint = this.average
-          return
-        }
-
-        const rounded = Math.round(this.average * 10) / 10
-        if (this.points.indexOf(rounded) !== -1) {
-          this.averagePoint = rounded
-          return
-        }
-
-        // find nearest point.
-        for (let index = 0; index < this.points.length - 1; index++) {
-          if (isNaN(this.points[index + 1])) {
-            this.averagePoint = this.average
-            return
-          }
-          if (this.average - this.points[index] > 0 && this.average - this.points[index + 1] < 0) {
-            if (this.average - this.points[index] < Math.abs(this.average - this.points[index + 1])) {
-              this.averagePoint = this.points[index]
-            } else {
-              this.averagePoint = this.points[index + 1]
-            }
-            return
-          }
-        }
-      },
-      setAverage () {
-        let sum = 0
-        for (let i = 0; i < this.votes.length; i++) {
-          if (isNaN(this.votes[i])) {
-            this.average = 'Coffee break'
-            this.averagePoint = 'Coffee break'
-            return
-          }
-          sum += parseFloat(this.votes[i]) //don't forget to add the base
-        }
-
-        this.average = Math.round((sum / this.votes.length) * 100) / 100
-      },
       setStoryHistory (msg) {
         this.storyHistory = (msg.stories || []).reverse()
+      },
+      toggleHistory () {
+        this.showHistory = !this.showHistory
+        window.localStorage.setItem('showHistory', this.showHistory)
       }
     },
     computed: {
@@ -329,7 +258,81 @@
       },
       observing () {
         return this.observer ? 'Observing…' : 'Observe'
-      }
+      },
+      average () {
+        if (this.voteCount === 0) {
+          return ''
+        }
+
+        let sum = 0
+        for (let i = 0; i < this.votes.length; i++) {
+          if (isNaN(this.votes[i])) {
+            return 'Coffee break'
+          }
+          sum += parseFloat(this.votes[i]) //don't forget to add the base
+        }
+
+        return Math.round((sum / this.votes.length) * 100) / 100
+      },
+      averageContext () {
+        if (this.voteCount > 0) {
+
+          // Find the difference between the lowest and the highest votes.
+          const lowestIndex = this.points.indexOf(this.votes[0])
+          const highestIndex = this.points.indexOf(this.votes[this.votes.length - 1])
+
+          if (highestIndex - lowestIndex > 2) {
+            return `Large gap between lowest and highest vote: ${highestIndex - lowestIndex} cards!`
+          }
+        }
+
+        return ''
+      },
+      standardDeviation () {
+        if (this.voteCount === 0) {
+          return ''
+        }
+
+        if (this.votes.length <= 1 || this.votes.indexOf('coffee') !== -1) {
+          return 'n/a'
+        }
+
+        let powers = 0
+        for (let i = 0; i < this.votes.length; i++) {
+          powers += Math.pow(parseFloat(this.votes[i]) - this.average, 2)
+        }
+
+        return Math.round(Math.sqrt(powers / this.votes.length) * 100) / 100
+      },
+      averagePoint () {
+        if (this.voteCount === 0) {
+          return ''
+        }
+
+        if (this.points.indexOf(this.average) !== -1) {
+          return this.average
+        }
+
+        const rounded = Math.round(this.average * 10) / 10
+        if (this.points.indexOf(rounded) !== -1) {
+          return rounded
+        }
+
+        // find nearest point.
+        for (let index = 0; index < this.points.length - 1; index++) {
+          if (isNaN(this.points[index + 1])) {
+            return this.average
+          }
+          if (this.average - this.points[index] > 0 && this.average - this.points[index + 1] < 0) {
+            if (this.average - this.points[index] < Math.abs(this.average - this.points[index + 1])) {
+              return this.points[index]
+            }
+            return this.points[index + 1]
+          }
+        }
+
+        return ''
+      },
     },
     created () {
       let uri = window.location.search.substring(1)
@@ -341,10 +344,16 @@
 
       this.baseTitle = document.title
       this.nickname = window.localStorage.getItem('nickname')
+      this.showHistory = window.localStorage.getItem('showHistory') !== 'false'
+      if (this.joinPoker) {
+        this.observer = window.localStorage.getItem(this.joinPoker + '-observer') === 'true'
+      }
 
       this.socket = io(window.location.protocol + '//' + window.location.hostname + ':' + location.port + window.location.pathname + 'pokers')
       this.socket.on('connect', () => {
         this.joinRoom(true)
+        this.observerChange();
+        this.loading = false
       })
 
       this.socket.on('membersUpdated', (msg) => {
