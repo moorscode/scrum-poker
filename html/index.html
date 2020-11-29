@@ -27,11 +27,9 @@
                     <i class="fas fa-person-booth"></i> Room: <input type="text" v-model="joinPoker"/>
                     <input type="submit" @click.prevent="joinRoom()" value="join scrum room">
                 </form>
-            </section>
 
-            <div v-if="!activePoker">
-                Join a scrum room to start voting!
-            </div>
+                <p>Join a scrum room to start refining!</p>
+            </section>
 
             <div class="pokerMain" v-if="activePoker">
                 <form class="username" :class="[!nickname ? 'hover' : '']">
@@ -340,7 +338,7 @@
     created () {
       this.baseTitle = document.title
 
-      this.joinPoker = new URLSearchParams(window.location.search.substring(1)).get('room')
+      this.joinPoker = new URLSearchParams(window.location.search.substring(1)).get('room') || ''
 
       // Retrieve data from local storage.
       this.nickname = window.localStorage.getItem('nickname')
