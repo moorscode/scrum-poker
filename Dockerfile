@@ -5,14 +5,11 @@ WORKDIR /usr/src/app
 COPY package.json ./
 COPY yarn.lock ./
 
-RUN yarn install
+RUN yarn install --network-timeout 3600000
 
 COPY . .
 
 RUN npm run build
-
-
-
 
 FROM node:12.13-alpine AS production
 
@@ -24,7 +21,7 @@ WORKDIR /usr/src/app
 COPY package.json ./
 COPY yarn.lock ./
 
-RUN yarn install
+RUN yarn install --network-timeout 3600000
 
 COPY . .
 COPY --from=development /usr/src/app/dist ./dist
