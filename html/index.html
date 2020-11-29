@@ -394,7 +394,7 @@
 
       // Retrieve data from local storage.
       this.nickname = window.localStorage.getItem('nickname')
-      this.showHistory = window.localStorage.getItem('showHistory') !== 'false'
+      this.showHistory = window.localStorage.getItem('showHistory') === 'true'
       if (this.joinPoker) {
         this.observer = window.localStorage.getItem(this.joinPoker + '-observer') === 'true'
       }
@@ -426,7 +426,7 @@
         this.onStoryHistory(msg)
       })
 
-      window.onpopstate = this.onPageChange;
+      window.onpopstate = this.onPageChange
     }
   })
 
