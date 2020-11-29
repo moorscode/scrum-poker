@@ -311,6 +311,10 @@
           url.searchParams.set('room', this.activePoker)
           window.history.pushState({ room: this.activePoker }, '', url)
         }
+
+        if (this.observer) {
+          this.socket.emit('observe', { poker: this.activePoker })
+        }
       },
       onMembersUpdated (msg) {
         this.members = msg.members
@@ -454,7 +458,6 @@
       this.socket = io(window.location.protocol + '//' + window.location.hostname + ':' + location.port + window.location.pathname + 'pokers')
       this.socket.on('connect', () => {
         this.joinRoom()
-        this.observerChange()
       })
 
       this.socket.on('points', (msg) => {
