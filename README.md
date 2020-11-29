@@ -11,7 +11,7 @@ Pull requests and issues are very welcome.
 ## Installation
 
 ```bash
-$ npm install
+$ yarn
 ```
 
 ## Running the app
