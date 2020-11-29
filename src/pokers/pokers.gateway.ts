@@ -13,7 +13,8 @@ import { var_export } from 'locutus/php/var';
 export class PokersGateway implements OnGatewayInit {
   @WebSocketServer() server: Server;
 
-  constructor(private readonly pokersService: PokersService) {}
+  constructor(private readonly pokersService: PokersService) {
+  }
 
   afterInit(): void {
     this.server.on('connection', (socket) => {
@@ -41,6 +42,7 @@ export class PokersGateway implements OnGatewayInit {
     this.updateMembers(message.poker);
     this.sendAllVotes(message.poker);
     this.sendStories(message.poker);
+    this.sendStoryName(message.poker);
   }
 
   @SubscribeMessage('leave')
@@ -75,15 +77,14 @@ export class PokersGateway implements OnGatewayInit {
 
     this.sendAllVotes(message.poker);
     this.sendStories(message.poker);
-
-    this.server.to(message.poker).emit('story', { name: '' });
+    this.sendStoryName(message.poker);
   }
 
   @SubscribeMessage('story')
   story(client: Socket, message: { poker: string; name: string }): void {
     this.pokersService.setStoryName(message.poker, message.name);
 
-    this.server.to(message.poker).emit('story', { name: message.name });
+    this.sendStoryName(message.poker);
   }
 
   @SubscribeMessage('popHistory')
@@ -157,6 +158,19 @@ export class PokersGateway implements OnGatewayInit {
   private sendStories(room: string): void {
     this.server.to(room).emit('stories', {
       stories: this.pokersService.getStories(room),
+    });
+  }
+
+  /**
+   * Sends the story name to all room members.
+   *
+   * @param {string} room The room.
+   *
+   * @private
+   */
+  private sendStoryName(room: string): void {
+    this.server.to(room).emit('story', {
+      name: this.pokersService.getStoryName(room),
     });
   }
 }

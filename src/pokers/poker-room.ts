@@ -172,6 +172,15 @@ export class PokerRoom {
   }
 
   /**
+   * Gets the story name.
+   *
+   * @param {string} name The name.
+   */
+  public getStoryName(): string {
+    return this.room.story;
+  }
+
+  /**
    * Retrieves all stories for the room.
    *
    * @returns {story[]} The stories of the room.
