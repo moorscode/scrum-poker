@@ -23,12 +23,17 @@
 
         <section v-if="!loading">
             <section v-if="!activePoker">
+                <p>Welcome to Pum Scroker!</p>
+                <p>This tool was created for scrum-teams to have a digital place where they can do their refinement.
+                    As many teams are working remotely due to the global COVID-19 situation.
+                </p>
+                <p>Join a room to start refining.</p>
+
                 <form class="rooms">
-                    <i class="fas fa-person-booth"></i> Room: <input type="text" v-model="joinPoker"/>
-                    <input type="submit" @click.prevent="joinRoom()" value="join scrum room">
+                    Room: <input type="text" v-model="joinPoker"/>
+                    <input type="submit" @click.prevent="joinRoom()" value="Join room!">
                 </form>
 
-                <p>Join a scrum room to start refining!</p>
             </section>
 
             <div class="pokerMain" v-if="activePoker">
@@ -363,7 +368,6 @@
       })
 
       this.socket.on('members', (msg) => {
-        console.log(msg);
         this.onMembersUpdated(msg)
       })
 
