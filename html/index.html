@@ -17,12 +17,8 @@
     <section class="poker">
         <h1>Pum Scroker</h1>
 
-        <section v-if="loading">
-            Connecting to the server...
-        </section>
-
         <section v-if="!loading">
-            <section v-if="!activePoker">
+            <section v-if="homepage">
                 <p>Welcome to Pum Scroker!</p>
                 <p>This tool was created for scrum-teams to have a digital place where they can do their refinement.
                     As many teams are working remotely due to the global COVID-19 situation.
@@ -35,10 +31,9 @@
                 </form>
 
                 <p><em>Suggestion: Prefix the room with your company name to ensure you are not competing for a room.</em></p>
-
             </section>
 
-            <div class="pokerMain" v-if="activePoker">
+            <div class="pokerMain" v-if="!homepage">
                 <form class="username" :class="[!nickname ? 'hover' : '']">
                     <span><i class="fas fa-signature"></i> Nickname:</span>
                     <input type="text" v-model="nickname"/>
@@ -149,7 +144,7 @@
         </section>
     </section>
 
-    <section class="poker" v-if="!activePoker">
+    <section class="poker" v-if="homepage">
         <h2>Features</h2>
         <h3>Voting</h3>
         <p>
@@ -364,6 +359,9 @@
       },
     },
     computed: {
+      homepage() {
+        return !this.activePoker && !this.joinPoker
+      },
       unvotedNames () {
         const result = this.names
         for (const name of this.votedNames) {
