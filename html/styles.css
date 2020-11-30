@@ -57,7 +57,6 @@ a {
 .poker, .credits {
     max-width: 800px;
     margin: 20px auto;
-
 }
 
 .credits {
@@ -65,6 +64,7 @@ a {
     font-size: 16px;
     font-variant: all-small-caps;
     text-align: center;
+    padding-bottom: 20px;
 }
 
 .poker {
@@ -260,10 +260,18 @@ hr {
 }
 
 @media only screen and (max-width: 820px) {
+    main .poker:first-child {
+        margin-top: 0;
+    }
+
+    .poker, .credits {
+        padding: 10px 15px;
+    }
+
     h1 {
         font-size: 3em;
     }
-    form.username input[type=text] {
+    input[type=text] {
         width: 120px;
     }
 }
