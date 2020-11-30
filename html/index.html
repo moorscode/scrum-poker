@@ -391,7 +391,7 @@
         return Math.round((sum / this.votes.length) * 100) / 100
       },
       averageContext () {
-        if (!this.average) {
+        if (this.average === '') {
           return ''
         }
 
@@ -404,7 +404,7 @@
         }
       },
       standardDeviation () {
-        if (!this.average) {
+        if (this.average === '') {
           return ''
         }
 
@@ -420,7 +420,7 @@
         return Math.round(Math.sqrt(powers / this.votes.length) * 100) / 100
       },
       averagePoint () {
-        if (!this.average) {
+        if (this.average === '') {
           return ''
         }
 
