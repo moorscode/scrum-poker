@@ -197,7 +197,9 @@ p.final > button.result:active {
     color: #a4286a;
     cursor: help;
 }
-
+button.result > .fas {
+    color: #a4286a;
+}
 button.result > .vote-names {
     position: absolute;
     padding: 10px;
