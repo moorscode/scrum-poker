@@ -34,7 +34,7 @@
                     <input type="submit" @click.prevent="joinRoom()" value="Join room!">
                 </form>
 
-                <em>Suggestion: Prefix the room with your company name to ensure you are not competing for a room.</em>
+                <p><em>Suggestion: Prefix the room with your company name to ensure you are not competing for a room.</em></p>
 
             </section>
 
@@ -87,10 +87,12 @@
                 <hr/>
 
                 <p :class="[ 'results', this.members === this.voteCount ? 'final' : '' ]">
-                    <button v-for="vote of votes" class="result"
-                            :title="voteNames && voteNames[vote] && voteNames[vote].join( ', ' )">
+                    <button v-for="vote of votes" class="result">
                         <i :class="['fas','fa-mug-hot']" v-if="vote === 'coffee'"></i>
                         {{ vote }}
+                        <div class="vote-names" v-if="voteNames && voteNames[vote]">
+                            {{ voteNames && voteNames[vote] && voteNames[vote].join( ', ' ) }}
+                        </div>
                     </button>
                 </p>
 
