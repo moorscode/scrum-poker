@@ -1,5 +1,3 @@
-import { Socket } from 'socket.io';
-
 export interface client {
   vote: number | string;
   name: string;
@@ -24,7 +22,7 @@ export interface room {
 }
 
 export class PokerRoom {
-  private room: room = { clients: {}, stories: [], story: '' };
+  room: room = { clients: {}, stories: [], story: '' };
 
   /**
    * Lists all names in a room.
@@ -42,51 +40,59 @@ export class PokerRoom {
   /**
    * Lists all poker clients.
    *
-   * @returns {Socket[]} Clients.
+   * @returns {number} Number of clients.
    *
    * @private
    */
-  public getClients(): client[] {
-    return Object.values(this.room.clients);
+  public getClientCount(): number {
+    return Object.values(this.room.clients).length;
   }
 
   /**
    * Adds a client to a room.
    *
-   * @param {Socket} client The client.
+   * @param {string} userId The user Id.
    * @param {string} name The name.
    *
    * @private
    */
-  public addClient(client: Socket, name: string): void {
-    this.room.clients[client.id] = {
-      id: client.id,
+  public addClient(userId: string, name: string): void {
+    this.room.clients[userId] = {
+      id: userId,
       name,
-      vote: null,
+      vote: this.getClient(userId).vote,
     };
   }
 
   /**
    * Adds a name to a client.
    *
-   * @param {Socket} client  The client.
+   * @param {string} userId The user Id.
    * @param {string} name The name.
    *
    * @private
    */
-  public setClientName(client: Socket, name: string): void {
-    this.room.clients[client.id].name = name;
+  public setClientName(userId: string, name: string): void {
+    this.room.clients[userId].name = name;
   }
 
   /**
    * Remove client from room.
    *
-   * @param {Socket} client The client.
+   * @param {string} userId The user Id.
    *
    * @private
    */
-  public removeClient(client: Socket): void {
-    delete this.room.clients[client.id];
+  public removeClient(userId: string): void {
+    delete this.room.clients[userId];
+  }
+
+  public getClient(userId: string): client {
+    return this.room.clients[userId] || { id: '', name: '', vote: null };
+  }
+
+  public restoreClient(userId: string, client: client) {
+    this.room.clients[userId] = client;
   }
 
   /**
@@ -105,13 +111,13 @@ export class PokerRoom {
   /**
    * Adds a vote to a room.
    *
-   * @param {Socket} client The client.
+   * @param {string} userId The user Id.
    * @param {string|number} vote The vote.
    *
    * @private
    */
-  public addVote(client: Socket, vote: number | string): void {
-    this.room.clients[client.id].vote = vote;
+  public addVote(userId: string, vote: number | string): void {
+    this.room.clients[userId].vote = vote;
   }
 
   /**
@@ -173,8 +179,6 @@ export class PokerRoom {
 
   /**
    * Gets the story name.
-   *
-   * @param {string} name The name.
    */
   public getStoryName(): string {
     return this.room.story;
