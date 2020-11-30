@@ -59,6 +59,14 @@ export class PokersService {
     }
   }
 
+  /**
+   * Get the vote of a user.
+   *
+   * @param {Socket} client The client.
+   * @param {string} room The room.
+   *
+   * @returns {string|number} The vote of the user.
+   */
   public getVote(client: Socket, room: string) {
     return this.getRoom(room).getClient(this.getUserId(client)).vote;
   }
@@ -78,6 +86,8 @@ export class PokersService {
         delete this.users[socketId];
       }
     }
+
+    delete this.disconnected[userId];
   }
 
   /**
@@ -88,15 +98,17 @@ export class PokersService {
    */
   public disconnect(client: Socket, room: string): void {
     const userId = this.getUserId(client);
+    const user = this.getRoom(room).getClient(userId);
 
-    // Store to restore on reconnect.
-    this.disconnected[userId] = {
-      room,
-      client: this.getRoom(room).getClient(userId),
-    };
+    if (user.vote !== null) {
+      // Store to restore on reconnect.
+      this.disconnected[userId] = {
+        room,
+        client: user,
+      };
+    }
 
-    this.rooms[room] = this.getRoom(room);
-    this.rooms[room].removeClient(userId);
+    this.removeUserFromRooms(userId);
   }
 
   /**
@@ -109,6 +121,13 @@ export class PokersService {
   private removeUserFromRooms(userId: string): void {
     for (const room in this.rooms) {
       this.rooms[room].removeClient(userId);
+
+      // Don't clean up rooms with disconnected people.
+      if (
+        !Object.values(this.disconnected).some((item) => item.room === room)
+      ) {
+        this.cleanUpRoom(room);
+      }
     }
   }
 
@@ -163,11 +182,22 @@ export class PokersService {
   public leave(client: Socket, poker: string): void {
     this.observe(client, poker);
 
-    if (this.getRoom(poker).getClientCount() === 0) {
-      delete this.rooms[poker];
-    }
+    this.cleanUpRoom(poker);
 
     client.leave(poker);
+  }
+
+  /**
+   * Cleans up a room if it's empty.
+   *
+   * @param {string} room The room.
+   *
+   * @private
+   */
+  private cleanUpRoom(room: string): void {
+    if (this.getRoom(room).getClientCount() === 0) {
+      delete this.rooms[room];
+    }
   }
 
   /**
