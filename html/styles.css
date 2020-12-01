@@ -39,6 +39,12 @@ input[type=submit] {
     border-radius: 2px;
     outline: none;
 }
+button:active,
+input[type=submit]:active {
+    position: relative;
+    top: 1px;
+    box-shadow: none;
+}
 input[type=text] {
     font-size: 16px;
     padding: 4px;
@@ -167,6 +173,9 @@ button.highlighted:active {
     background-color: #a4286a;
     border-color: #a4286a;
     color: white;
+    top: 1px;
+    position: relative;
+    box-shadow: none;
 }
 button.highlighted .fas {
     color: white;
@@ -181,6 +190,9 @@ button.result {
     margin: 0 4px 8px;
     padding: 0 14px;
     box-shadow: none;
+}
+button.result:active {
+    top: 0;
 }
 button.result:first-child {
     margin-left: 0;
