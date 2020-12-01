@@ -13,7 +13,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-<main id="v-app">
+
+<main id="v-app" :class="backgroundColor">
     <section class="poker">
         <h1>Pum Scroker</h1>
 
@@ -427,6 +428,26 @@
 
         if (highestIndex - lowestIndex > 2) {
           return `Large gap between lowest and highest vote: ${highestIndex - lowestIndex} cards!`
+        }
+      },
+      pointSpread() {
+        if (this.average === '') {
+          return ''
+        }
+
+        // Find the difference between the lowest and the highest votes.
+        const lowestIndex = this.points.indexOf(this.votes[0])
+        const highestIndex = this.points.indexOf(this.votes[this.votes.length - 1])
+
+        return highestIndex - lowestIndex;
+      },
+      backgroundColor() {
+        switch( true ) {
+          case this.refinementFinished: return 'finished';
+          case this.pointSpread === '': return '';
+          case this.pointSpread === 0: return 'no-spread';
+          case this.pointSpread > 2: return 'high-spread';
+          default: return 'normal-spread';
         }
       },
       standardDeviation () {
