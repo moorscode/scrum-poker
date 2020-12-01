@@ -87,11 +87,24 @@ export class PokerRoom {
     delete this.room.clients[userId];
   }
 
+  /**
+   * Gets the client.
+   *
+   * @param {string} userId User Id.
+   *
+   * @returns {client} The client.
+   */
   public getClient(userId: string): client {
     return this.room.clients[userId] || { id: '', name: '', vote: null };
   }
 
-  public restoreClient(userId: string, client: client) {
+  /**
+   * Sets a client on a room.
+   *
+   * @param {string} userId The user Id.
+   * @param {client} client The client.
+   */
+  public restoreClient(userId: string, client: client): void {
     this.room.clients[userId] = client;
   }
 
