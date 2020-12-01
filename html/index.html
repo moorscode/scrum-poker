@@ -347,6 +347,9 @@
       },
       onPageChange (event) {
         this.joinPoker = (event.state && event.state.room) || ''
+        if (this.joinPoker !== this.activePoker) {
+          this.socket.emit('leave', { poker: this.activePoker })
+        }
         this.joinRoom()
       },
       onStoryName (msg) {
@@ -466,8 +469,8 @@
       }
 
       this.socket = io(window.location.protocol + '//' + window.location.hostname + ':' + location.port + window.location.pathname + 'pokers')
-      //this.socket.on('connect', this.joinRoom)
-      this.socket.on('id', (clientId) => {
+
+      this.socket.on('userId', (clientId) => {
         if (!this.clientId) {
           this.clientId = clientId
         }

@@ -20,12 +20,12 @@ export class PokersGateway implements OnGatewayInit {
     this.server.on('connection', (socket) => {
       // Let the client know the points that can be chosen from.
       socket.emit('points', { points: PointsService.getPoints() });
-      socket.emit('id', this.generateId());
+      socket.emit('userId', this.generateId());
 
       // Clean up after disconnection.
       socket.on('disconnecting', () => {
         for (const room in socket.rooms) {
-          if(!room.includes('/pokers#')) {
+          if (!room.includes('/pokers#')) {
             this.pokersService.disconnect(socket, room);
           }
 
@@ -48,21 +48,15 @@ export class PokersGateway implements OnGatewayInit {
     ).toUpperCase();
   }
 
-  @SubscribeMessage('exit')
-  exit(client: Socket): void {
-    this.pokersService.exit(client);
-
-    // Clean up after exit.
-    for (const room in client.rooms) {
-      this.updateMembers(room);
-      this.sendAllVotes(room);
-    }
-  }
-
   @SubscribeMessage('identify')
   identify(client: Socket, message: { id: string }): void {
     this.pokersService.greet(client, message.id);
     client.emit('welcome');
+  }
+
+  @SubscribeMessage('exit')
+  exit(client: Socket): void {
+    this.pokersService.exit(client);
   }
 
   @SubscribeMessage('join')
