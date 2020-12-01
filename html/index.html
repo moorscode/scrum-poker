@@ -30,7 +30,10 @@
                     <input type="submit" @click.prevent="joinRoom()" value="Join room!">
                 </form>
 
-                <p><em>Suggestion: Prefix the room with your company name to ensure you are not competing for a room.</em></p>
+                <p>
+                    <em>Suggestion: Prefix the room with your company name to ensure you are not
+                        competing for a room.</em>
+                </p>
             </section>
 
             <div class="pokerMain" v-if="!homepage">
@@ -86,7 +89,7 @@
                         <i :class="['fas','fa-mug-hot']" v-if="vote === 'coffee'"></i>
                         {{ vote }}
                         <div class="vote-names" v-if="voteNames && voteNames[vote]">
-                            {{ voteNames && voteNames[vote] && voteNames[vote].join( ', ' ) }}
+                            {{ voteNames && voteNames[vote] && voteNames[vote].join(', ') }}
                         </div>
                     </button>
                 </p>
@@ -161,10 +164,10 @@
         </p>
 
         <p>
-           Naming a story will make the history more usable.
-           It is not required to name a story!
-           Everybody can name or rename a story.
-           A checkmark will show if the current name is the name registered for the story on the server.
+            Naming a story will make the history more usable.
+            It is not required to name a story!
+            Everybody can name or rename a story.
+            A checkmark will show if the current name is the name registered for the story on the server.
         </p>
 
         <h3>Rooms</h3>
@@ -191,7 +194,8 @@
         <h3>Story history</h3>
         <p>
             The story-history will be saved as long as there are members in the room. When a member uses the
-            button to reset the history it will be gone from the room. The same counts when removing the last history item.
+            button to reset the history it will be gone from the room. The same counts when removing the last history
+            item.
         </p>
     </section>
 
@@ -207,6 +211,7 @@
     el: '#v-app',
     data: {
       socket: null,
+      clientId: false,
       loading: true,
       baseTitle: '',
       activePoker: false,
@@ -270,7 +275,7 @@
           }
         }
 
-        this.storyUpdated = false;
+        this.storyUpdated = false
         this.socket.emit('newStory', { poker: this.activePoker, result: this.averagePoint })
       },
       resetHistory () {
@@ -279,7 +284,7 @@
         }
         this.socket.emit('resetHistory', { poker: this.activePoker })
       },
-      popHistory() {
+      popHistory () {
         if (!window.confirm('Are you sure you want to remove the last history item?\n\nThis removes the item for all members in this room.')) {
           return
         }
@@ -291,8 +296,6 @@
         this.myVote = ''
         this.members = 0
         this.voteCount = 0
-
-        this.socket.emit('leave', { poker: this.activePoker })
 
         if (this.joinPoker === '') {
           this.activePoker = ''
@@ -308,6 +311,7 @@
       onJoined: function (msg) {
         const currentPoker = this.activePoker
         this.activePoker = this.joinPoker = msg.poker
+        this.myVote = msg.vote
 
         if (currentPoker !== false && currentPoker !== this.activePoker) {
           const url = new URL(window.location)
@@ -343,23 +347,26 @@
       },
       onPageChange (event) {
         this.joinPoker = (event.state && event.state.room) || ''
+        if (this.joinPoker !== this.activePoker) {
+          this.socket.emit('leave', { poker: this.activePoker })
+        }
         this.joinRoom()
       },
       onStoryName (msg) {
         const changed = (this.story !== msg.name)
 
         this.story = msg.name
-        this.storyUpdated = ( this.story !== '' )
+        this.storyUpdated = (this.story !== '')
 
-        if ( changed ) {
-          this.storyChanged = true;
+        if (changed) {
+          this.storyChanged = true
           setTimeout(() => this.storyChanged = false, 1400)
         }
 
       },
     },
     computed: {
-      homepage() {
+      homepage () {
         return !this.activePoker
       },
       unvotedNames () {
@@ -462,36 +469,31 @@
       }
 
       this.socket = io(window.location.protocol + '//' + window.location.hostname + ':' + location.port + window.location.pathname + 'pokers')
-      this.socket.on('connect', () => {
-        this.joinRoom()
+
+      this.socket.on('userId', (clientId) => {
+        if (!this.clientId) {
+          this.clientId = clientId
+        }
+        this.socket.emit('identify', { id: this.clientId })
       })
+
+      this.socket.on('welcome', this.joinRoom)
 
       this.socket.on('points', (msg) => {
         this.onPoints(msg)
         this.loading = false
       })
 
-      this.socket.on('joined', (msg) => {
-        this.onJoined(msg)
-      })
-
-      this.socket.on('members', (msg) => {
-        this.onMembersUpdated(msg)
-      })
-
-      this.socket.on('votes', (msg) => {
-        this.onReceiveVote(msg)
-      })
-
-      this.socket.on('stories', (msg) => {
-        this.onStoryHistory(msg)
-      })
-
-      this.socket.on('story', (msg) => {
-        this.onStoryName(msg)
-      })
+      this.socket.on('joined', this.onJoined)
+      this.socket.on('members', this.onMembersUpdated)
+      this.socket.on('votes', this.onReceiveVote)
+      this.socket.on('stories', this.onStoryHistory)
+      this.socket.on('story', this.onStoryName)
 
       window.onpopstate = this.onPageChange
+      window.onbeforeunload = () => {
+        this.socket.emit('exit')
+      }
     }
   })
 

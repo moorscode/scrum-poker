@@ -20,11 +20,14 @@ export class PokersGateway implements OnGatewayInit {
     this.server.on('connection', (socket) => {
       // Let the client know the points that can be chosen from.
       socket.emit('points', { points: PointsService.getPoints() });
+      socket.emit('userId', this.generateId());
 
       // Clean up after disconnection.
       socket.on('disconnecting', () => {
         for (const room in socket.rooms) {
-          this.pokersService.leave(socket, room);
+          if (!room.includes('/pokers#')) {
+            this.pokersService.disconnect(socket, room);
+          }
 
           this.updateMembers(room);
           this.sendAllVotes(room);
@@ -33,11 +36,35 @@ export class PokersGateway implements OnGatewayInit {
     });
   }
 
+  /**
+   * Generates a user Id.
+   *
+   * @returns {string} User Id.
+   * @private
+   */
+  private generateId(): string {
+    return (
+      Date.now().toString(36) + Math.random().toString(36).substr(2, 5)
+    ).toUpperCase();
+  }
+
+  @SubscribeMessage('identify')
+  identify(client: Socket, message: { id: string }): void {
+    this.pokersService.greet(client, message.id);
+    client.emit('welcome');
+  }
+
+  @SubscribeMessage('exit')
+  exit(client: Socket): void {
+    this.pokersService.exit(client);
+  }
+
   @SubscribeMessage('join')
   join(client: Socket, message: { poker: string; name?: string }): void {
     this.pokersService.join(client, message.poker, message.name);
+    const vote = this.pokersService.getVote(client, message.poker);
 
-    client.emit('joined', { poker: message.poker });
+    client.emit('joined', { poker: message.poker, vote });
 
     this.updateMembers(message.poker);
     this.sendAllVotes(message.poker);

@@ -12,12 +12,25 @@ interface currentVotes {
 }
 
 export interface rooms {
-  [key: string]: PokerRoom[];
+  [room: string]: PokerRoom;
+}
+
+export interface users {
+  [socketId: string]: string;
+}
+
+export interface disconnected {
+  [userId: string]: {
+    room: string;
+    client: client;
+  };
 }
 
 @Injectable()
 export class PokersService {
-  private rooms: rooms[] = [];
+  private rooms: rooms = {};
+  private users: users = {};
+  private disconnected: disconnected = {};
 
   /**
    * Returns debug information.
@@ -29,19 +42,122 @@ export class PokersService {
   }
 
   /**
+   * Greets a new user.
+   *
+   * @param {Socket} client The client socket.
+   * @param {string} userId The user Id.
+   */
+  public greet(client: Socket, userId: string): void {
+    this.users[client.id] = userId;
+
+    // Try to restore a user.
+    if (this.disconnected[userId]) {
+      const restore = this.disconnected[userId];
+      this.rooms[restore.room].restoreClient(userId, restore.client);
+
+      delete this.disconnected[userId];
+    }
+  }
+
+  /**
+   * Get the vote of a user.
+   *
+   * @param {Socket} client The client.
+   * @param {string} room The room.
+   *
+   * @returns {string|number} The vote of the user.
+   */
+  public getVote(client: Socket, room: string) {
+    return this.getRoom(room).getClient(this.getUserId(client)).vote;
+  }
+
+  /**
+   * Lets the client leave.
+   *
+   * @param {Socket} client The client.
+   */
+  public exit(client: Socket): void {
+    const userId = this.users[client.id];
+
+    this.removeUserFromRooms(userId);
+
+    for (const socketId in this.users) {
+      if (this.users[socketId] === userId) {
+        delete this.users[socketId];
+      }
+    }
+
+    delete this.disconnected[userId];
+  }
+
+  /**
+   * Disconnects a client, stores data for reconnection.
+   *
+   * @param {Socket} client Disconnecting client.
+   * @param {string} room The room of the user.
+   */
+  public disconnect(client: Socket, room: string): void {
+    const userId = this.getUserId(client);
+    const user = this.getRoom(room).getClient(userId);
+
+    if (user.vote !== null) {
+      // Store to restore on reconnect.
+      this.disconnected[userId] = {
+        room,
+        client: user,
+      };
+    }
+
+    this.removeUserFromRooms(userId);
+  }
+
+  /**
+   * Removes a user from their rooms.
+   *
+   * @param {string} userId The user Id.
+   *
+   * @private
+   */
+  private removeUserFromRooms(userId: string): void {
+    for (const room in this.rooms) {
+      this.rooms[room].removeClient(userId);
+
+      // Don't clean up rooms with disconnected people.
+      if (
+        !Object.values(this.disconnected).some((item) => item.room === room)
+      ) {
+        this.cleanUpRoom(room);
+      }
+    }
+  }
+
+  /**
+   * Retrieves a user Id for a client.
+   *
+   * @param {Socket} client The client
+   *
+   * @returns {string} The user Id.
+   *
+   * @private
+   */
+  private getUserId(client: Socket): string {
+    return this.users[client.id];
+  }
+
+  /**
    * Lets a client join a room.
    *
    * @param {Socket} client The client.
    * @param {string} poker The room.
    * @param {string} name Client name.
    */
-  public join(client: Socket, poker: string, name: string) {
+  public join(client: Socket, poker: string, name: string): void {
     const useName = name || 'Unnamed' + Math.floor(Math.random() * 100000);
 
     client.join(poker);
 
     this.rooms[poker] = this.getRoom(poker);
-    this.rooms[poker].addClient(client, useName);
+    this.rooms[poker].addClient(this.getUserId(client), useName);
   }
 
   /**
@@ -63,14 +179,25 @@ export class PokersService {
    * @param {Socket} client The client.
    * @param {string} poker The room.
    */
-  public leave(client: Socket, poker: string) {
+  public leave(client: Socket, poker: string): void {
     this.observe(client, poker);
 
-    if (this.getRoom(poker).getClients().length === 0) {
-      delete this.rooms[poker];
-    }
+    this.cleanUpRoom(poker);
 
     client.leave(poker);
+  }
+
+  /**
+   * Cleans up a room if it's empty.
+   *
+   * @param {string} room The room.
+   *
+   * @private
+   */
+  private cleanUpRoom(room: string): void {
+    if (this.getRoom(room).getClientCount() === 0) {
+      delete this.rooms[room];
+    }
   }
 
   /**
@@ -80,7 +207,7 @@ export class PokersService {
    * @param {string} poker The room.
    */
   public observe(client: Socket, poker: string) {
-    this.getRoom(poker).removeClient(client);
+    this.getRoom(poker).removeClient(this.getUserId(client));
   }
 
   /**
@@ -93,7 +220,7 @@ export class PokersService {
   public setName(poker: string, client: Socket, name: string) {
     if (!name) return;
 
-    this.getRoom(poker).setClientName(client, name);
+    this.getRoom(poker).setClientName(this.getUserId(client), name);
   }
 
   /**
@@ -124,7 +251,7 @@ export class PokersService {
    * @returns {number} Number of members in the room.
    */
   public getClientCount(poker: string) {
-    return this.getRoom(poker).getClients().length;
+    return this.getRoom(poker).getClientCount();
   }
 
   /**
@@ -146,7 +273,7 @@ export class PokersService {
       return;
     }
 
-    this.getRoom(poker).addVote(client, vote);
+    this.getRoom(poker).addVote(this.getUserId(client), vote);
   }
 
   /**
