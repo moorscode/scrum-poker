@@ -17,6 +17,9 @@ h1 {
 h2 {
     margin: 0 0 0.2em 0;
 }
+h1.finished {
+    color: #477608;
+}
 
 label {
     cursor: pointer;
