@@ -117,7 +117,7 @@ a {
     margin-right: 5px;
 }
 
-.hidden {
+.members-list.hidden {
     display: none;
 }
 
