@@ -92,15 +92,29 @@ a {
 .members-list {
     border: 1px solid #a4286a;
     margin-top: 10px;
+    min-width: 150px;
     padding: 10px 10px 0 20px;
     box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
 }
 .members-list ul {
     margin-top: 4px;
+    padding-left: 10px;
 }
 .members-list li {
     list-style: none;
     margin: 0;
+}
+.members-list .fa-person-booth {
+    margin-left: 4px;
+    color: #477608;
+}
+.members-list .fa-user-secret {
+    margin-left: 5px;
+    margin-right: 3px;
+}
+.members-list .fa-plug {
+    margin-left: 5px;
+    margin-right: 5px;
 }
 
 .hidden {

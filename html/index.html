@@ -22,17 +22,17 @@
             <div :class="['members-list', showMembersList ? '' : 'hidden']">
                 <strong>Voters</strong>
                 <ul>
-                    <li v-for="name in members.voters"><i class="fas fa-users"></i> {{ name }}</li>
+                    <li v-for="name in members.voters">{{ name }} <i class="fas fa-person-booth"></i></li>
                     <li v-if="!members.voters.length">None</li>
                 </ul>
                 <strong>Observers</strong>
                 <ul>
-                    <li v-for="name in members.observers"><i class="fas fa-user-secret"></i> {{ name }}</li>
+                    <li v-for="name in members.observers">{{ name }} <i class="fas fa-user-secret"></i></li>
                     <li v-if="!members.observers.length">None</li>
                 </ul>
                 <strong>Disconnected</strong>
                 <ul>
-                    <li v-for="name in members.disconnected"><i class="fas fa-plug disconnected"></i> {{ name }}</li>
+                    <li v-for="name in members.disconnected">{{ name }} <i class="fas fa-plug disconnected"></i></li>
                     <li v-if="!members.disconnected.length">None</li>
                 </ul>
             </div>
