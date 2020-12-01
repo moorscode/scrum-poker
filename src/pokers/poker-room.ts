@@ -14,38 +14,77 @@ export interface story {
 }
 
 export interface room {
-  clients: {
+  voters: {
+    [clientId: string]: client;
+  };
+  observers: {
+    [clientId: string]: client;
+  };
+  disconnected: {
     [clientId: string]: client;
   };
   stories: story[];
-  story: string;
+  storyName: string;
 }
 
 export class PokerRoom {
-  room: room = { clients: {}, stories: [], story: '' };
+  room: room = {
+    voters: {},
+    observers: {},
+    disconnected: {},
+    stories: [],
+    storyName: '',
+  };
 
   /**
-   * Lists all names in a room.
+   * Lists all voter in a room.
    *
    * @returns {string[]} List of names.
    *
    * @private
    */
-  public getNames(): string[] {
-    return Object.values(this.room.clients).map(
-      (client: client) => client.name,
-    );
+  public getClientNames() {
+    return {
+      voters: Object.values(this.room.voters).map(
+        (client: client) => client && client.name,
+      ),
+      observers: Object.values(this.room.observers).map(
+        (client: client) => client && client.name,
+      ),
+      disconnected: Object.values(this.room.disconnected).map(
+        (client: client) => client && client.name,
+      ),
+    };
   }
 
   /**
-   * Lists all poker clients.
+   * Lists all voter in a room.
    *
-   * @returns {number} Number of clients.
+   * @returns {string[]} List of names.
    *
    * @private
    */
+  public getVoterNames(): string[] {
+    return Object.values(this.room.voters).map((client: client) => client.name);
+  }
+
+  /**
+   * Lists all poker voters.
+   *
+   * @returns {number} Number of voters.
+   *
+   * @private
+   */
+  public getVotersCount(): number {
+    return Object.values(this.room.voters).length;
+  }
+
   public getClientCount(): number {
-    return Object.values(this.room.clients).length;
+    return (
+      Object.values(this.room.voters).length +
+      Object.values(this.room.observers).length +
+      Object.values(this.room.disconnected).length
+    );
   }
 
   /**
@@ -57,7 +96,16 @@ export class PokerRoom {
    * @private
    */
   public addClient(userId: string, name: string): void {
-    this.room.clients[userId] = {
+    if (this.room.observers[userId]) {
+      delete this.room.observers[userId];
+    }
+
+    if (this.room.disconnected[userId]) {
+      this.room.voters[userId] = this.room.disconnected[userId];
+      delete this.room.disconnected[userId];
+    }
+
+    this.room.voters[userId] = {
       id: userId,
       name,
       vote: this.getClient(userId).vote,
@@ -73,7 +121,12 @@ export class PokerRoom {
    * @private
    */
   public setClientName(userId: string, name: string): void {
-    this.room.clients[userId].name = name;
+    if (this.room.voters[userId]) {
+      this.room.voters[userId].name = name;
+    }
+    if (this.room.observers[userId]) {
+      this.room.observers[userId].name = name;
+    }
   }
 
   /**
@@ -84,7 +137,40 @@ export class PokerRoom {
    * @private
    */
   public removeClient(userId: string): void {
-    delete this.room.clients[userId];
+    delete this.room.voters[userId];
+    delete this.room.disconnected[userId];
+    delete this.room.observers[userId];
+  }
+
+  /**
+   * Sets a user as an observer.
+   *
+   * @param {string} userId The user.
+   */
+  public setObserver(userId: string): void {
+    if (this.room.voters[userId]) {
+      this.room.observers[userId] = this.room.voters[userId];
+      delete this.room.voters[userId];
+    }
+
+    delete this.room.disconnected[userId];
+  }
+
+  /**
+   * Sets a user as an observer.
+   *
+   * @param {string} userId The user.
+   */
+  public setDisconnected(userId: string): void {
+    if (this.room.voters[userId]) {
+      this.room.disconnected[userId] = this.room.voters[userId];
+      delete this.room.voters[userId];
+    }
+
+    if (this.room.observers[userId]) {
+      this.room.disconnected[userId] = this.room.observers[userId];
+      delete this.room.observers[userId];
+    }
   }
 
   /**
@@ -95,28 +181,18 @@ export class PokerRoom {
    * @returns {client} The client.
    */
   public getClient(userId: string): client {
-    return this.room.clients[userId] || { id: '', name: '', vote: null };
+    return this.room.voters[userId] || { id: '', name: '', vote: null };
   }
 
   /**
-   * Sets a client on a room.
+   * Retrieves the voted voters.
    *
-   * @param {string} userId The user Id.
-   * @param {client} client The client.
-   */
-  public restoreClient(userId: string, client: client): void {
-    this.room.clients[userId] = client;
-  }
-
-  /**
-   * Retrieves the voted clients.
-   *
-   * @returns {client[]} List of voted clients.
+   * @returns {client[]} List of voted voters.
    *
    * @private
    */
   public getVotedClients(): client[] {
-    return Object.values(this.room.clients).filter(
+    return Object.values(this.room.voters).filter(
       (client: client) => client.vote || client.vote === 0,
     );
   }
@@ -130,7 +206,7 @@ export class PokerRoom {
    * @private
    */
   public addVote(userId: string, vote: number | string): void {
-    this.room.clients[userId].vote = vote;
+    this.room.voters[userId].vote = vote;
   }
 
   /**
@@ -141,37 +217,37 @@ export class PokerRoom {
    * @private
    */
   public getVotes(): (number | string)[] {
-    return Object.values(this.room.clients)
+    return Object.values(this.room.voters)
       .map((client: client): number | string => client.vote)
       .filter((vote: number | string) => vote || vote === 0);
   }
 
   /**
-   * Starts a new story.
+   * Starts a new storyName.
    *
-   * @param {number} [result] Result of the current story.
+   * @param {number} [result] Result of the current storyName.
    */
   public newStory(result?: number): void {
     if (result || result === 0) {
       this.addStory(result);
     }
 
-    // Reset story name.
-    this.room.story = '';
+    // Reset storyName name.
+    this.room.storyName = '';
 
     this.resetVotes();
   }
 
   /**
-   * Adds a story to the history.
+   * Adds a storyName to the history.
    *
-   * @param {result} result Result of the story.
+   * @param {result} result Result of the storyName.
    *
    * @private
    */
   private addStory(result: number) {
     const story: story = {
-      name: this.room.story,
+      name: this.room.storyName,
       result,
       votes: this.getVotedClients().map((client: client) => {
         return { name: client.name, vote: client.vote };
@@ -182,19 +258,19 @@ export class PokerRoom {
   }
 
   /**
-   * Sets the story name.
+   * Sets the storyName name.
    *
    * @param {string} name The name.
    */
   public setStoryName(name: string): void {
-    this.room.story = name;
+    this.room.storyName = name;
   }
 
   /**
-   * Gets the story name.
+   * Gets the storyName name.
    */
   public getStoryName(): string {
-    return this.room.story;
+    return this.room.storyName;
   }
 
   /**
@@ -226,8 +302,8 @@ export class PokerRoom {
    * @private
    */
   public resetVotes(): void {
-    for (const clientId in this.room.clients) {
-      this.room.clients[clientId].vote = null;
+    for (const clientId in this.room.voters) {
+      this.room.voters[clientId].vote = null;
     }
   }
 }

@@ -57,6 +57,7 @@ a {
 .poker, .credits {
     max-width: 800px;
     margin: 20px auto;
+    position: relative;
 }
 
 .credits {
@@ -72,6 +73,38 @@ a {
     border: 1px solid #a4286a;
     border-radius: 4px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+.members-list-container {
+    position: absolute;
+    right: 20px;
+    display: flex;
+    align-items: flex-end;
+    flex-direction: column;
+    text-align: right;
+    background-color: rgba(255,255,255,0.75);
+}
+.members-list-container .pressed {
+    box-shadow: none;
+    margin-top: 1px;
+    margin-bottom: -1px;
+}
+.members-list {
+    border: 1px solid #a4286a;
+    margin-top: 10px;
+    padding: 10px 10px 0 20px;
+    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
+}
+.members-list ul {
+    margin-top: 4px;
+}
+.members-list li {
+    list-style: none;
+    margin: 0;
+}
+
+.hidden {
+    display: none;
 }
 
 .rooms {
@@ -282,6 +315,10 @@ hr {
 }
 
 @media only screen and (max-width: 820px) {
+    .members-list-container {
+        display: none;
+    }
+
     main .poker:first-child {
         margin-top: 0;
     }

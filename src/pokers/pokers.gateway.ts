@@ -29,8 +29,8 @@ export class PokersGateway implements OnGatewayInit {
             this.pokersService.disconnect(socket, room);
           }
 
-          this.updateMembers(room);
           this.sendAllVotes(room);
+          this.listMembers(room);
         }
       });
     });
@@ -66,17 +66,17 @@ export class PokersGateway implements OnGatewayInit {
 
     client.emit('joined', { poker: message.poker, vote });
 
-    this.updateMembers(message.poker);
     this.sendAllVotes(message.poker);
     this.sendStories(message.poker);
     this.sendStoryName(message.poker);
+    this.listMembers(message.poker);
   }
 
   @SubscribeMessage('leave')
   leave(client: Socket, message: { poker: string }): void {
     this.pokersService.leave(client, message.poker);
 
-    this.updateMembers(message.poker);
+    this.listMembers(message.poker);
     this.sendAllVotes(message.poker);
   }
 
@@ -90,6 +90,8 @@ export class PokersGateway implements OnGatewayInit {
   @SubscribeMessage('nickname')
   setNickname(client: Socket, message: { name: string; poker: string }): void {
     this.pokersService.setName(message.poker, client, message.name);
+
+    this.listMembers(message.poker);
     this.sendAllVotes(message.poker);
   }
 
@@ -132,7 +134,7 @@ export class PokersGateway implements OnGatewayInit {
   observer(client: Socket, message: { poker: string }): void {
     this.pokersService.observe(client, message.poker);
 
-    this.updateMembers(message.poker);
+    this.listMembers(message.poker);
     this.sendAllVotes(message.poker);
   }
 
@@ -146,6 +148,12 @@ export class PokersGateway implements OnGatewayInit {
     }
   }
 
+  private listMembers(poker: string): void {
+    this.server.to(poker).emit('member-list', {
+      ...this.pokersService.getClientNames(poker),
+    });
+  }
+
   /**
    * Sends all votes to a room.
    *
@@ -157,21 +165,8 @@ export class PokersGateway implements OnGatewayInit {
     this.server.to(poker).emit('votes', {
       poker: poker,
       ...this.pokersService.getVotes(poker),
-      names: this.pokersService.getNames(poker),
+      names: this.pokersService.getVoterNames(poker),
       votedNames: this.pokersService.getVotedNames(poker),
-    });
-  }
-
-  /**
-   * Sends an actual members count to a room.
-   *
-   * @param {string} room The room.
-   *
-   * @private
-   */
-  private updateMembers(room: string): void {
-    this.server.to(room).emit('members', {
-      members: this.pokersService.getClientCount(room),
     });
   }
 

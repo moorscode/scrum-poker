@@ -30,7 +30,6 @@ export interface disconnected {
 export class PokersService {
   private rooms: rooms = {};
   private users: users = {};
-  private disconnected: disconnected = {};
 
   /**
    * Returns debug information.
@@ -49,14 +48,6 @@ export class PokersService {
    */
   public greet(client: Socket, userId: string): void {
     this.users[client.id] = userId;
-
-    // Try to restore a user.
-    if (this.disconnected[userId]) {
-      const restore = this.disconnected[userId];
-      this.rooms[restore.room].restoreClient(userId, restore.client);
-
-      delete this.disconnected[userId];
-    }
   }
 
   /**
@@ -86,8 +77,6 @@ export class PokersService {
         delete this.users[socketId];
       }
     }
-
-    delete this.disconnected[userId];
   }
 
   /**
@@ -97,18 +86,7 @@ export class PokersService {
    * @param {string} room The room of the user.
    */
   public disconnect(client: Socket, room: string): void {
-    const userId = this.getUserId(client);
-    const user = this.getRoom(room).getClient(userId);
-
-    if (user.vote !== null) {
-      // Store to restore on reconnect.
-      this.disconnected[userId] = {
-        room,
-        client: user,
-      };
-    }
-
-    this.removeUserFromRooms(userId);
+    this.getRoom(room).setDisconnected(this.getUserId(client));
   }
 
   /**
@@ -121,13 +99,7 @@ export class PokersService {
   private removeUserFromRooms(userId: string): void {
     for (const room in this.rooms) {
       this.rooms[room].removeClient(userId);
-
-      // Don't clean up rooms with disconnected people.
-      if (
-        !Object.values(this.disconnected).some((item) => item.room === room)
-      ) {
-        this.cleanUpRoom(room);
-      }
+      this.cleanUpRoom(room);
     }
   }
 
@@ -180,7 +152,7 @@ export class PokersService {
    * @param {string} poker The room.
    */
   public leave(client: Socket, poker: string): void {
-    this.observe(client, poker);
+    this.getRoom(poker).removeClient(this.getUserId(client));
 
     this.cleanUpRoom(poker);
 
@@ -207,7 +179,7 @@ export class PokersService {
    * @param {string} poker The room.
    */
   public observe(client: Socket, poker: string) {
-    this.getRoom(poker).removeClient(this.getUserId(client));
+    this.getRoom(poker).setObserver(this.getUserId(client));
   }
 
   /**
@@ -224,16 +196,25 @@ export class PokersService {
   }
 
   /**
-   * Retrieves the names of all clients for a room.
+   * Retrieves all member names.
    *
    * @param {string} poker The poker.
    */
-  public getNames(poker: string) {
-    return this.getRoom(poker).getNames();
+  public getClientNames(poker: string) {
+    return this.getRoom(poker).getClientNames();
   }
 
   /**
-   * Retrieves all names of voted clients.
+   * Retrieves the names of all voters for a room.
+   *
+   * @param {string} poker The poker.
+   */
+  public getVoterNames(poker: string) {
+    return this.getRoom(poker).getVoterNames();
+  }
+
+  /**
+   * Retrieves all names of voted voters.
    *
    * @param {string} poker The room.
    */
@@ -251,7 +232,7 @@ export class PokersService {
    * @returns {number} Number of members in the room.
    */
   public getClientCount(poker: string) {
-    return this.getRoom(poker).getClientCount();
+    return this.getRoom(poker).getVotersCount();
   }
 
   /**

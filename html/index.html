@@ -17,8 +17,29 @@
     <section class="poker">
         <h1>Pum Scroker</h1>
 
+        <div class="members-list-container" v-if="!loading && this.activePoker">
+            <button @click="showMembersList = !showMembersList" :class="showMembersList ? 'pressed' : ''"><i class="fas fa-clipboard-list"></i> Users ({{ members.voters.length }}/{{ members.observers.length }}/{{ members.disconnected.length }})</button>
+            <div :class="['members-list', showMembersList ? '' : 'hidden']">
+                <strong>Voters</strong>
+                <ul>
+                    <li v-for="name in members.voters"><i class="fas fa-users"></i> {{ name }}</li>
+                    <li v-if="!members.voters.length">None</li>
+                </ul>
+                <strong>Observers</strong>
+                <ul>
+                    <li v-for="name in members.observers"><i class="fas fa-user-secret"></i> {{ name }}</li>
+                    <li v-if="!members.observers.length">None</li>
+                </ul>
+                <strong>Disconnected</strong>
+                <ul>
+                    <li v-for="name in members.disconnected"><i class="fas fa-plug disconnected"></i> {{ name }}</li>
+                    <li v-if="!members.disconnected.length">None</li>
+                </ul>
+            </div>
+        </div>
+
         <section v-if="!loading">
-            <section v-if="homepage">
+            <section v-if="!this.activePoker">
                 <p>Welcome to Pum Scroker!</p>
                 <p>This tool was created for scrum-teams to have a digital place where they can do their refinement.
                     As many teams are working remotely due to the global COVID-19 situation.
@@ -36,7 +57,7 @@
                 </p>
             </section>
 
-            <div class="pokerMain" v-if="!homepage">
+            <div class="pokerMain" v-if="this.activePoker">
                 <form class="username" :class="[!nickname ? 'hover' : '']">
                     <span><i class="fas fa-signature"></i> Nickname:</span>
                     <input type="text" v-model="nickname"/>
@@ -57,7 +78,7 @@
                         class="fas fa-plus-square"></i>
                     New story
                 </button>
-                <span class="allVoted" v-if="voteCount === members && members">All votes are in!</span>
+                <span class="allVoted" v-if="voteCount === members.voters.length && members.voters.length">All votes are in!</span>
 
                 <hr/>
 
@@ -84,7 +105,7 @@
 
                 <hr/>
 
-                <p :class="[ 'results', this.members === this.voteCount ? 'final' : '' ]">
+                <p :class="[ 'results', this.members.voters.length === this.voteCount ? 'final' : '' ]">
                     <button v-for="vote of votes" class="result">
                         <i :class="['fas','fa-mug-hot']" v-if="vote === 'coffee'"></i>
                         {{ vote }}
@@ -147,7 +168,7 @@
         </section>
     </section>
 
-    <section class="poker" v-if="homepage">
+    <section class="poker" v-if="!this.activePoker">
         <h2>Features</h2>
         <h3>Voting</h3>
         <p>
@@ -216,6 +237,7 @@
       clientId: false,
       loading: true,
       baseTitle: '',
+      showMembersList: false,
       activePoker: false,
       joinPoker: '',
       points: {},
@@ -225,7 +247,7 @@
       storyUpdated: false,
       storyChanged: false,
       myVote: '',
-      members: 0,
+      members: { voters: [], observers: [], disconnected: [] },
       names: [],
       votes: [],
       voteCount: 0,
@@ -255,7 +277,7 @@
           return
         }
 
-        if (this.voteCount === this.members) {
+        if (this.voteCount === this.members.voters.length) {
           return
         }
 
@@ -271,7 +293,7 @@
         }
 
         // Confirm when not everybody has voted.
-        if (this.voteCount !== this.members) {
+        if (this.voteCount !== this.members.voters.length) {
           if (!window.confirm('Are you sure you want to start a new story, not all votes are in yet.')) {
             return
           }
@@ -296,7 +318,7 @@
         this.joinPoker = this.joinPoker.toLowerCase()
 
         this.myVote = ''
-        this.members = 0
+        this.members.voters.length = 0
         this.voteCount = 0
 
         if (this.joinPoker === '') {
@@ -325,9 +347,6 @@
           this.socket.emit('observe', { poker: this.activePoker })
         }
       },
-      onMembersUpdated (msg) {
-        this.members = msg.members
-      },
       onStoryHistory (msg) {
         this.storyHistory = (msg.stories || []).reverse()
       },
@@ -342,7 +361,7 @@
           this.myVote = ''
         }
 
-        document.title = this.baseTitle + ' ' + this.voteCount + '/' + this.members
+        document.title = this.baseTitle + ' ' + this.voteCount + '/' + this.members.voters.length
       },
       onPoints (msg) {
         this.points = msg.points
@@ -364,13 +383,12 @@
           this.storyChanged = true
           setTimeout(() => this.storyChanged = false, 1400)
         }
-
       },
+      onMemberList (msg) {
+        this.members = msg
+      }
     },
     computed: {
-      homepage () {
-        return !this.activePoker
-      },
       unvotedNames () {
         const result = this.names
         for (const name of this.votedNames) {
@@ -385,7 +403,7 @@
         return this.observer ? 'Observing…' : 'Observe'
       },
       average () {
-        if (this.voteCount === 0 || this.voteCount < this.members) {
+        if (this.voteCount === 0 || this.voteCount < this.members.voters.length) {
           return ''
         }
 
@@ -487,10 +505,10 @@
       })
 
       this.socket.on('joined', this.onJoined)
-      this.socket.on('members', this.onMembersUpdated)
       this.socket.on('votes', this.onReceiveVote)
       this.socket.on('stories', this.onStoryHistory)
       this.socket.on('story', this.onStoryName)
+      this.socket.on('member-list', this.onMemberList)
 
       window.onpopstate = this.onPageChange
       window.onbeforeunload = () => {
