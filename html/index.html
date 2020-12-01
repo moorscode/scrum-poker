@@ -13,7 +13,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-<main id="v-app">
+
+<main id="v-app" :class="backgroundColor">
     <section class="poker">
         <h1>Pum Scroker</h1>
 
@@ -37,89 +38,99 @@
             </section>
 
             <div class="pokerMain" v-if="!homepage">
-                <form class="username" :class="[!nickname ? 'hover' : '']">
-                    <span><i class="fas fa-signature"></i> Nickname:</span>
-                    <input type="text" v-model="nickname"/>
-                    <input type="submit" @click.prevent="updateNickname" value="Update"/>
-                </form>
-
-                <div class="observe">
-                    <label>
-                        <input
-                                type="checkbox"
-                                v-model="observer"
-                                @change="observerChange()"/>
-                        {{ observing }}
-                    </label>
-                </div>
-
-                <button @click.prevent="newStory()" class="newStory" :disabled="voteCount === 0 || observer"><i
-                        class="fas fa-plus-square"></i>
-                    New story
-                </button>
-                <span class="allVoted" v-if="voteCount === members && members">All votes are in!</span>
-
-                <hr/>
-
-                <form>
-                    <label>Story name:
-                        <input type="text"
-                               v-model="story"
-                               :class="storyChanged ? 'changed' : ''"
-                               @keydown="storyUpdated = false"
-                               v-on:change="storyUpdated = false"
-                        ></label>
-                    <input type="submit" @click.prevent="setStoryName()" value="Update">
-                    <i v-if="storyUpdated" class="fas fa-check-circle story-updated"></i>
-                </form>
-                <br/>
-
-                <button
-                        v-for="point of points"
-                        @click.prevent="castVote(point)"
-                        :class="[ 'choice', votes.includes( point ) ? 'picked' : '', myVote === point ? 'highlighted' : '' ]">
-                    <i :class="['fas','fa-mug-hot']" v-if="point === 'coffee'"></i>
-                    {{ point }}
-                </button>
-
-                <hr/>
-
-                <p :class="[ 'results', this.members === this.voteCount ? 'final' : '' ]">
-                    <button v-for="vote of votes" class="result">
-                        <i :class="['fas','fa-mug-hot']" v-if="vote === 'coffee'"></i>
-                        {{ vote }}
-                        <div class="vote-names" v-if="voteNames && voteNames[vote]">
-                            {{ voteNames && voteNames[vote] && voteNames[vote].join(', ') }}
-                        </div>
-                    </button>
-                </p>
-
-                <section v-if="average !== ''">
-                    <p>
-                        Average: {{ average }}<br/>
-                        Standard deviation: {{ standardDeviation }}<br/>
-                        <strong>Average story point: {{ averagePoint }}</strong>
-                    <p v-if="averageContext">
-                        <strong>{{ averageContext }}</strong>
-                    </p>
+                <section v-if="refinementFinished">
+                    <h1 class="finished">Refinement done! 📣 🙌 🎉</h1>
                 </section>
 
-                <div class="voting" v-if="unvotedNames.length > 0">
-                    <div class="voted">
-                        <strong><i class="far fa-check-circle"></i> Voted:</strong>
-                        <ul>
-                            <li v-for="name of votedNames">{{ name }}</li>
-                        </ul>
-                        <p v-if="votedNames.length === 0">Nobody voted yet.</p>
+                <section v-if="!refinementFinished">
+
+                    <form class="username" :class="[!nickname ? 'hover' : '']">
+                        <span><i class="fas fa-signature"></i> Nickname:</span>
+                        <input type="text" v-model="nickname"/>
+                        <input type="submit" @click.prevent="updateNickname" value="Update"/>
+                    </form>
+
+                    <div class="observe">
+                        <label>
+                            <input
+                                    type="checkbox"
+                                    v-model="observer"
+                                    @change="observerChange()"/>
+                            {{ observing }}
+                        </label>
                     </div>
-                    <div class="unvoted">
-                        <strong><i class="far fa-times-circle"></i> Not voted yet:</strong>
-                        <ul>
-                            <li v-for="name of unvotedNames">{{ name }}</li>
-                        </ul>
-                        <p v-if="unvotedNames.length === 0">Everybody voted!</p>
+
+                    <button @click="newStory()" class="newStory" :disabled="voteCount === 0 || observer"><i
+                            class="fas fa-plus-square"></i>
+                        New story
+                    </button>
+                    <span class="allVoted" v-if="voteCount === members && members">All votes are in!</span>
+                    <button @click="refinementDone()" class="refinement-done"><i class="fas fa-clipboard-check"></i>
+                        Finish refinement
+                    </button>
+
+                    <hr/>
+
+                    <form>
+                        <label>Story name:
+                            <input type="text"
+                                   v-model="story"
+                                   :class="storyChanged ? 'changed' : ''"
+                                   @keydown="storyUpdated = false"
+                                   v-on:change="storyUpdated = false"
+                            ></label>
+                        <input type="submit" @click.prevent="setStoryName()" value="Update">
+                        <i v-if="storyUpdated" class="fas fa-check-circle story-updated"></i>
+                    </form>
+                    <br/>
+
+                    <button
+                            v-for="point of points"
+                            @click.prevent="castVote(point)"
+                            :class="[ 'choice', votes.includes( point ) ? 'picked' : '', myVote === point ? 'highlighted' : '' ]">
+                        <i :class="['fas','fa-mug-hot']" v-if="point === 'coffee'"></i>
+                        {{ point }}
+                    </button>
+
+                    <hr/>
+
+                    <p :class="[ 'results', this.members === this.voteCount ? 'final' : '' ]">
+                        <button v-for="vote of votes" class="result">
+                            <i :class="['fas','fa-mug-hot']" v-if="vote === 'coffee'"></i>
+                            {{ vote }}
+                            <div class="vote-names" v-if="voteNames && voteNames[vote]">
+                                {{ voteNames && voteNames[vote] && voteNames[vote].join(', ') }}
+                            </div>
+                        </button>
+                    </p>
+
+                    <section v-if="average !== ''">
+                        <p>
+                            Average: {{ average }}<br/>
+                            Standard deviation: {{ standardDeviation }}<br/>
+                            <strong>Average story point: {{ averagePoint }}</strong>
+                        <p v-if="averageContext">
+                            <strong>{{ averageContext }}</strong>
+                        </p>
+                    </section>
+
+                    <div class="voting" v-if="unvotedNames.length > 0">
+                        <div class="voted">
+                            <strong><i class="far fa-check-circle"></i> Voted:</strong>
+                            <ul>
+                                <li v-for="name of votedNames">{{ name }}</li>
+                            </ul>
+                            <p v-if="votedNames.length === 0">Nobody voted yet.</p>
+                        </div>
+                        <div class="unvoted">
+                            <strong><i class="far fa-times-circle"></i> Not voted yet:</strong>
+                            <ul>
+                                <li v-for="name of unvotedNames">{{ name }}</li>
+                            </ul>
+                            <p v-if="unvotedNames.length === 0">Everybody voted!</p>
+                        </div>
                     </div>
-                </div>
+                </section>
 
                 <div :class="['storyHistory', showHistory ? '':'hidden']">
                     <h3 @click="toggleHistory()">Story history</h3>
@@ -215,6 +226,7 @@
       socket: null,
       clientId: false,
       loading: true,
+      refinementFinished: false,
       baseTitle: '',
       activePoker: false,
       joinPoker: '',
@@ -235,6 +247,12 @@
       storyHistory: [],
     },
     methods: {
+      refinementDone () {
+        this.socket.emit('finish', { poker: this.activePoker })
+      },
+      onRefinementDone () {
+        this.refinementFinished = true
+      },
       observerChange () {
         window.localStorage.setItem(this.activePoker + '-observer', this.observer)
 
@@ -412,6 +430,26 @@
           return `Large gap between lowest and highest vote: ${highestIndex - lowestIndex} cards!`
         }
       },
+      pointSpread() {
+        if (this.average === '') {
+          return ''
+        }
+
+        // Find the difference between the lowest and the highest votes.
+        const lowestIndex = this.points.indexOf(this.votes[0])
+        const highestIndex = this.points.indexOf(this.votes[this.votes.length - 1])
+
+        return highestIndex - lowestIndex;
+      },
+      backgroundColor() {
+        switch( true ) {
+          case this.refinementFinished: return 'finished';
+          case this.pointSpread === '': return '';
+          case this.pointSpread === 0: return 'no-spread';
+          case this.pointSpread > 2: return 'high-spread';
+          default: return 'normal-spread';
+        }
+      },
       standardDeviation () {
         if (this.average === '') {
           return ''
@@ -491,6 +529,7 @@
       this.socket.on('votes', this.onReceiveVote)
       this.socket.on('stories', this.onStoryHistory)
       this.socket.on('story', this.onStoryName)
+      this.socket.on('finished', this.onRefinementDone)
 
       window.onpopstate = this.onPageChange
       window.onbeforeunload = () => {
