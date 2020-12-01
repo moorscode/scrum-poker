@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
 import { PointsService } from '../points/points.service';
-import { PokerRoom, client, story } from './poker-room';
+import { PokerRoom, client, story, memberList } from './poker-room';
 
 interface currentVotes {
   voteCount: number;
@@ -200,7 +200,7 @@ export class PokersService {
    *
    * @param {string} poker The poker.
    */
-  public getClientNames(poker: string) {
+  public getClientNames(poker: string): memberList {
     return this.getRoom(poker).getClientNames();
   }
 

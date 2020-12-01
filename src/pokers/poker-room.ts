@@ -27,6 +27,12 @@ export interface room {
   storyName: string;
 }
 
+export interface memberList {
+  voters: string[];
+  observers: string[];
+  disconnected: string[];
+}
+
 export class PokerRoom {
   room: room = {
     voters: {},
@@ -37,13 +43,13 @@ export class PokerRoom {
   };
 
   /**
-   * Lists all voter in a room.
+   * Lists all members in a room.
    *
-   * @returns {string[]} List of names.
+   * @returns {memberList} List of names.
    *
    * @private
    */
-  public getClientNames() {
+  public getClientNames(): memberList {
     return {
       voters: Object.values(this.room.voters).map(
         (client: client) => client && client.name,
@@ -58,7 +64,7 @@ export class PokerRoom {
   }
 
   /**
-   * Lists all voter in a room.
+   * Lists all voters in a room.
    *
    * @returns {string[]} List of names.
    *

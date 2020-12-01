@@ -148,6 +148,13 @@ export class PokersGateway implements OnGatewayInit {
     }
   }
 
+  /**
+   * Sends the members list to the requested room.
+   *
+   * @param {string} poker The room.
+   *
+   * @private
+   */
   private listMembers(poker: string): void {
     this.server.to(poker).emit('member-list', {
       ...this.pokersService.getClientNames(poker),
