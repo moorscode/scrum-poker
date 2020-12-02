@@ -1,9 +1,5 @@
 import { Injectable } from '@nestjs/common';
 
-interface points {
-  [index: number]: number | string;
-}
-
 @Injectable()
 export class PointsService {
   public static getPoints(): any[] {
