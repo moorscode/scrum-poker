@@ -104,6 +104,32 @@ export class PokersService {
   }
 
   /**
+   * Retrieves all sockets a client has connected with.
+   *
+   * @param {Socket} client The client.
+   *
+   * @returns {string[]} List of socket Ids.
+   */
+  public getClientSockets(client: Socket): string[] {
+    const sockets = [];
+    const userId = this.users[client.id];
+
+    if (!userId) {
+      return sockets;
+    }
+
+    for (const clientId in this.users) {
+      if (client.id === clientId) {
+        continue;
+      }
+      if (this.users[clientId] === userId) {
+        sockets.push(clientId);
+      }
+    }
+    return sockets;
+  }
+
+  /**
    * Retrieves a user Id for a client.
    *
    * @param {Socket} client The client
@@ -112,7 +138,7 @@ export class PokersService {
    *
    * @private
    */
-  private getUserId(client: Socket): string {
+  public getUserId(client: Socket): string {
     return this.users[client.id];
   }
 

@@ -40,7 +40,10 @@
             <div class="pokerMain" v-if="this.activePoker">
 
                 <div class="members-list-container" v-if="!refinementFinished">
-                    <button @click="showMembersList = !showMembersList" :class="showMembersList ? 'pressed' : ''"><i class="fas fa-clipboard-list"></i> Users ({{ members.voters.length }}/{{ members.observers.length }}/{{ members.disconnected.length }})</button>
+                    <button @click="showMembersList = !showMembersList" :class="showMembersList ? 'pressed' : ''"><i
+                            class="fas fa-clipboard-list"></i> Users ({{ members.voters.length
+                        }}/{{ members.observers.length }}/{{ members.disconnected.length }})
+                    </button>
                     <div :class="['members-list', showMembersList ? '' : 'hidden']">
                         <strong>Voters</strong>
                         <ul>
@@ -54,7 +57,8 @@
                         </ul>
                         <strong>Disconnected</strong>
                         <ul>
-                            <li v-for="name in members.disconnected">{{ name }} <i class="fas fa-plug disconnected"></i></li>
+                            <li v-for="name in members.disconnected">{{ name }} <i class="fas fa-plug disconnected"></i>
+                            </li>
                             <li v-if="!members.disconnected.length">None</li>
                         </ul>
                     </div>
@@ -404,7 +408,10 @@
       },
       onMemberList (msg) {
         this.members = msg
-      }
+      },
+      getFromURL (key) {
+        return new URLSearchParams(window.location.search.substring(1)).get(key)
+      },
     },
     computed: {
       unvotedNames () {
@@ -448,7 +455,7 @@
           return `Large gap between lowest and highest vote: ${highestIndex - lowestIndex} cards!`
         }
       },
-      pointSpread() {
+      pointSpread () {
         if (this.average === '') {
           return ''
         }
@@ -457,15 +464,20 @@
         const lowestIndex = this.points.indexOf(this.votes[0])
         const highestIndex = this.points.indexOf(this.votes[this.votes.length - 1])
 
-        return highestIndex - lowestIndex;
+        return highestIndex - lowestIndex
       },
-      backgroundColor() {
-        switch( true ) {
-          case this.refinementFinished: return 'finished';
-          case this.pointSpread === '': return '';
-          case this.pointSpread === 0: return 'no-spread';
-          case this.pointSpread > 2: return 'high-spread';
-          default: return 'normal-spread';
+      backgroundColor () {
+        switch (true) {
+          case this.refinementFinished:
+            return 'finished'
+          case this.pointSpread === '':
+            return ''
+          case this.pointSpread === 0:
+            return 'no-spread'
+          case this.pointSpread > 2:
+            return 'high-spread'
+          default:
+            return 'normal-spread'
         }
       },
       standardDeviation () {
@@ -517,7 +529,7 @@
     created () {
       this.baseTitle = document.title
 
-      this.joinPoker = new URLSearchParams(window.location.search.substring(1)).get('room') || ''
+      this.joinPoker = this.getFromURL('room') || ''
 
       // Retrieve data from local storage.
       this.nickname = window.localStorage.getItem('nickname')
@@ -526,16 +538,25 @@
         this.observer = window.localStorage.getItem(this.joinPoker + '-observer') === 'true'
       }
 
+      const clientId = window.localStorage.getItem('clientId')
+      if (clientId && clientId !== '' && !this.getFromURL('new-client')) {
+        this.clientId = clientId
+      }
+
       this.socket = io(window.location.protocol + '//' + window.location.hostname + ':' + location.port + window.location.pathname + 'pokers')
 
       this.socket.on('userId', (clientId) => {
         if (!this.clientId) {
           this.clientId = clientId
         }
+        window.localStorage.setItem('clientId', this.clientId)
         this.socket.emit('identify', { id: this.clientId })
       })
 
       this.socket.on('welcome', this.joinRoom)
+      this.socket.on('reconnect', () => {
+        this.socket.emit('identify', { id: this.clientId })
+      })
 
       this.socket.on('points', (msg) => {
         this.onPoints(msg)
