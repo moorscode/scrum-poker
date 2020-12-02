@@ -39,36 +39,36 @@
 
             <div class="pokerMain" v-if="this.activePoker">
 
-                <div class="members-list-container" v-if="!refinementFinished">
-                    <button @click="showMembersList = !showMembersList" :class="showMembersList ? 'pressed' : ''"><i
-                            class="fas fa-clipboard-list"></i> Users ({{ members.voters.length
-                        }}/{{ members.observers.length }}/{{ members.disconnected.length }})
-                    </button>
-                    <div :class="['members-list', showMembersList ? '' : 'hidden']">
-                        <strong>Voters</strong>
-                        <ul>
-                            <li v-for="name in members.voters">{{ name }} <i class="fas fa-person-booth"></i></li>
-                            <li v-if="!members.voters.length">None</li>
-                        </ul>
-                        <strong>Observers</strong>
-                        <ul>
-                            <li v-for="name in members.observers">{{ name }} <i class="fas fa-user-secret"></i></li>
-                            <li v-if="!members.observers.length">None</li>
-                        </ul>
-                        <strong>Disconnected</strong>
-                        <ul>
-                            <li v-for="name in members.disconnected">{{ name }} <i class="fas fa-plug disconnected"></i>
-                            </li>
-                            <li v-if="!members.disconnected.length">None</li>
-                        </ul>
-                    </div>
-                </div>
-
                 <section v-if="refinementFinished">
                     <h1 class="finished">Refinement done! 📣 🙌 🎉</h1>
                 </section>
 
                 <section v-if="!refinementFinished">
+
+                    <div class="members-list-container">
+                        <button @click="showMembersList = !showMembersList" :class="showMembersList ? 'pressed' : ''"><i
+                                class="fas fa-clipboard-list"></i> Users ({{ members.voters.length
+                            }}/{{ members.observers.length }}/{{ members.disconnected.length }})
+                        </button>
+                        <div :class="['members-list', showMembersList ? '' : 'hidden']">
+                            <strong>Voters</strong>
+                            <ul>
+                                <li v-for="name in members.voters">{{ name }} <i class="fas fa-person-booth"></i></li>
+                                <li v-if="!members.voters.length">None</li>
+                            </ul>
+                            <strong>Observers</strong>
+                            <ul>
+                                <li v-for="name in members.observers">{{ name }} <i class="fas fa-user-secret"></i></li>
+                                <li v-if="!members.observers.length">None</li>
+                            </ul>
+                            <strong>Disconnected</strong>
+                            <ul>
+                                <li v-for="name in members.disconnected">{{ name }} <i class="fas fa-plug disconnected"></i>
+                                </li>
+                                <li v-if="!members.disconnected.length">None</li>
+                            </ul>
+                        </div>
+                    </div>
 
                     <form class="username" :class="[!nickname ? 'hover' : '']">
                         <span><i class="fas fa-signature"></i> Nickname:</span>
