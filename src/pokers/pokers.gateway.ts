@@ -24,12 +24,19 @@ export class PokersGateway implements OnGatewayInit {
 
       // Clean up after disconnection.
       socket.on('disconnecting', () => {
+        const sockets = this.pokersService.getClientSockets(socket);
+
         for (const room in socket.rooms) {
           if (!room.includes('/pokers#')) {
             this.pokersService.disconnect(socket, room);
           }
 
-          this.updateMembers(room);
+          sockets.forEach((socketId: string) => {
+            this.server.sockets[socketId] &&
+              this.server.sockets[socketId].emit('reconnect');
+          });
+
+          this.listMembers(room);
           this.sendAllVotes(room);
         }
       });
@@ -56,7 +63,14 @@ export class PokersGateway implements OnGatewayInit {
 
   @SubscribeMessage('exit')
   exit(client: Socket): void {
+    const sockets = this.pokersService.getClientSockets(client);
+
     this.pokersService.exit(client);
+
+    sockets.forEach((socketId: string) => {
+      this.server.sockets[socketId] &&
+        this.server.sockets[socketId].emit('reconnect');
+    });
   }
 
   @SubscribeMessage('join')
@@ -66,17 +80,24 @@ export class PokersGateway implements OnGatewayInit {
 
     client.emit('joined', { poker: message.poker, vote });
 
-    this.updateMembers(message.poker);
-    this.sendAllVotes(message.poker);
+    this.listMembers(message.poker);
     this.sendStories(message.poker);
     this.sendStoryName(message.poker);
+    this.sendAllVotes(message.poker);
   }
 
   @SubscribeMessage('leave')
   leave(client: Socket, message: { poker: string }): void {
+    const sockets = this.pokersService.getClientSockets(client);
+
     this.pokersService.leave(client, message.poker);
 
-    this.updateMembers(message.poker);
+    sockets.forEach((socketId: string) => {
+      this.server.sockets[socketId] &&
+        this.server.sockets[socketId].emit('reconnect');
+    });
+
+    this.listMembers(message.poker);
     this.sendAllVotes(message.poker);
   }
 
@@ -95,6 +116,8 @@ export class PokersGateway implements OnGatewayInit {
   @SubscribeMessage('nickname')
   setNickname(client: Socket, message: { name: string; poker: string }): void {
     this.pokersService.setName(message.poker, client, message.name);
+
+    this.listMembers(message.poker);
     this.sendAllVotes(message.poker);
   }
 
@@ -137,7 +160,7 @@ export class PokersGateway implements OnGatewayInit {
   observer(client: Socket, message: { poker: string }): void {
     this.pokersService.observe(client, message.poker);
 
-    this.updateMembers(message.poker);
+    this.listMembers(message.poker);
     this.sendAllVotes(message.poker);
   }
 
@@ -152,6 +175,19 @@ export class PokersGateway implements OnGatewayInit {
   }
 
   /**
+   * Sends the members list to the requested room.
+   *
+   * @param {string} poker The room.
+   *
+   * @private
+   */
+  private listMembers(poker: string): void {
+    this.server.to(poker).emit('member-list', {
+      ...this.pokersService.getClientNames(poker),
+    });
+  }
+
+  /**
    * Sends all votes to a room.
    *
    * @param {string} poker Room to send the votes for.
@@ -162,21 +198,8 @@ export class PokersGateway implements OnGatewayInit {
     this.server.to(poker).emit('votes', {
       poker: poker,
       ...this.pokersService.getVotes(poker),
-      names: this.pokersService.getNames(poker),
+      names: this.pokersService.getVoterNames(poker),
       votedNames: this.pokersService.getVotedNames(poker),
-    });
-  }
-
-  /**
-   * Sends an actual members count to a room.
-   *
-   * @param {string} room The room.
-   *
-   * @private
-   */
-  private updateMembers(room: string): void {
-    this.server.to(room).emit('members', {
-      members: this.pokersService.getClientCount(room),
     });
   }
 
