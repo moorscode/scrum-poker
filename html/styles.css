@@ -1,6 +1,36 @@
 html, body {
     font-family: 'Roboto', sans-serif;
     font-weight: 400;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+main {
+    transition: background-color 750ms ease-in-out;
+    background-color: #efefef;
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+}
+
+main.no-spread {
+    background-color: #e3fbc4;
+}
+main.high-spread {
+    background-color: #f68787;
+}
+main.normal-spread {
+    background-color: #ddd;
+}
+
+main.finished {
+    background: linear-gradient(124deg, #ff2400, #e81d1d, #e8b71d, #e3e81d, #1de840, #1ddde8, #2b1de8, #dd00f3, #dd00f3);
+    background-size: 1800% 1800%;
+
+    -webkit-animation: rainbow 18s ease infinite;
+    -o-animation: rainbow 18s ease infinite;
+    animation: rainbow 18s ease infinite;
 }
 
 h1, h2, h3 {
@@ -16,6 +46,9 @@ h1 {
 
 h2 {
     margin: 0 0 0.2em 0;
+}
+h1.finished {
+    color: #477608;
 }
 
 label {
@@ -39,6 +72,12 @@ input[type=submit] {
     border-radius: 2px;
     outline: none;
 }
+button:active,
+input[type=submit]:active {
+    position: relative;
+    top: 1px;
+    box-shadow: none;
+}
 input[type=text] {
     font-size: 16px;
     padding: 4px;
@@ -56,7 +95,7 @@ a {
 
 .poker, .credits {
     max-width: 800px;
-    margin: 20px auto;
+    margin: 0 auto 20px;
     position: relative;
 }
 
@@ -67,11 +106,20 @@ a {
     text-align: center;
     padding-bottom: 20px;
 }
+main.finished .credits,
+main.finished .credits a,
+main.no-spread .credits,
+main.no-spread .credits a,
+main.high-spread .credits,
+main.high-spread .credits a {
+    color: black;
+}
 
 .poker {
     padding: 20px;
     border: 1px solid #a4286a;
     border-radius: 4px;
+    background-color: white;
     box-shadow: 0 4px 20px rgba(0,0,0,0.2);
 }
 
@@ -214,6 +262,9 @@ button.highlighted:active {
     background-color: #a4286a;
     border-color: #a4286a;
     color: white;
+    top: 1px;
+    position: relative;
+    box-shadow: none;
 }
 button.highlighted .fas {
     color: white;
@@ -228,6 +279,9 @@ button.result {
     margin: 0 4px 8px;
     padding: 0 14px;
     box-shadow: none;
+}
+button.result:active {
+    top: 0;
 }
 button.result:first-child {
     margin-left: 0;
@@ -347,4 +401,25 @@ hr {
     input[type=text] {
         width: 120px;
     }
+}
+
+@-webkit-keyframes rainbow {
+    0%{background-position:0 82%}
+    50%{background-position:100% 19%}
+    100%{background-position:0 82%}
+}
+@-moz-keyframes rainbow {
+    0%{background-position:0 82%}
+    50%{background-position:100% 19%}
+    100%{background-position:0 82%}
+}
+@-o-keyframes rainbow {
+    0%{background-position:0 82%}
+    50%{background-position:100% 19%}
+    100%{background-position:0 82%}
+}
+@keyframes rainbow {
+    0%{background-position:0 82%}
+    50%{background-position:100% 19%}
+    100%{background-position:0 82%}
 }

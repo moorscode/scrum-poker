@@ -87,6 +87,11 @@ export class PokersGateway implements OnGatewayInit {
     this.sendAllVotes(message.poker);
   }
 
+  @SubscribeMessage('finish')
+  finish(client: Socket, message: { poker: string }): void {
+    this.server.to(message.poker).emit('finished');
+  }
+
   @SubscribeMessage('nickname')
   setNickname(client: Socket, message: { name: string; poker: string }): void {
     this.pokersService.setName(message.poker, client, message.name);
