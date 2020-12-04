@@ -297,3 +297,7 @@ hr {
         width: 120px;
     }
 }
+
+.initialVote{
+    text-decoration: line-through;
+}
