@@ -1,55 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Pum Scroker!</title>
-    <link href="/styles.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.min.js"></script>
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="https://kit.fontawesome.com/92b43d9045.js" crossorigin="anonymous"></script>
-    <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Pum Scroker!</title>
+	<link href="/styles.css" rel="stylesheet">
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.min.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="https://kit.fontawesome.com/92b43d9045.js" crossorigin="anonymous"></script>
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
 <main id="v-app">
-    <h1>Pum Scroker - debug</h1>
-    <form autocomplete="off">
-        <input v-model="secret" type="password" autocomplete="new-password">
-        <input type="submit" @click.prevent="refresh()" value="Refresh">
-    </form>
+	<h1>Pum Scroker - debug</h1>
+	<form autocomplete="off">
+		<input v-model="secret" type="password" autocomplete="new-password">
+		<input type="submit" @click.prevent="refresh()" value="Refresh">
+	</form>
 
-    <code>
-        {{ debug }}
-    </code>
+	<code>
+		{{ debug }}
+	</code>
 
 </main>
 <script>
-  new Vue({
-    el: '#v-app',
-    data: {
-      socket: null,
-      secret: "",
-      debug: {},
-    },
-    methods: {
-      refresh () {
-        this.socket.emit('debug', { secret: this.secret });
-      },
-      onDebug( msg ) {
-        this.debug = msg;
-      },
-      getSocketPath() {
-        const path = window.location.protocol + '//' + window.location.hostname + ':' + location.port + window.location.pathname;
-        return path.replace( 'debug.html', '' );
-      },
-    },
-    created () {
-      this.socket = io(this.getSocketPath() + 'pokers')
-      this.socket.on('debug', this.onDebug )
-    }
-  })
+	new Vue({
+		el: '#v-app',
+		data: {
+			socket: null,
+			secret: "",
+			debug: {},
+		},
+		methods: {
+			refresh() {
+				this.socket.emit('debug', {secret: this.secret});
+			},
+			onDebug(msg) {
+				this.debug = msg;
+			},
+			getSocketPath() {
+				const path = window.location.protocol + '//' + window.location.hostname + ':' + location.port + window.location.pathname;
+				return path.replace('debug.html', '');
+			},
+		},
+		created() {
+			this.socket = io(this.getSocketPath() + 'pokers')
+			this.socket.on('debug', this.onDebug)
+		}
+	})
 
 </script>
 </body>
