@@ -1,20 +1,44 @@
 import {
-  WebSocketGateway,
-  SubscribeMessage,
-  WebSocketServer,
   OnGatewayInit,
+  SubscribeMessage,
+  WebSocketGateway,
+  WebSocketServer,
 } from '@nestjs/websockets';
-import { PokersService } from './pokers.service';
+import { var_export } from 'locutus/php/var';
 import { Server, Socket } from 'socket.io';
 import { PointsService } from '../points/points.service';
-import { var_export } from 'locutus/php/var';
+import { Client, MemberList, Story, Vote, VoteValue } from './poker-room';
+import { PokersService } from './pokers.service';
+
+interface StoryResponse {
+  name: string;
+  voteAverage?: number | string;
+  nearestPointAverage?: VoteValue;
+  votes: VoteResponse[];
+}
+
+interface VoteResponse {
+  voterName: string;
+  currentValue: VoteValue;
+  initialValue: VoteValue;
+}
+
+interface MembersResponse {
+  voters: ClientResponse[];
+  observers: ClientResponse[];
+  disconnected: ClientResponse[];
+}
+
+interface ClientResponse {
+  name: string;
+  id: string;
+}
 
 @WebSocketGateway({ namespace: '/pokers' })
 export class PokersGateway implements OnGatewayInit {
   @WebSocketServer() server: Server;
 
-  constructor(private readonly pokersService: PokersService) {
-  }
+  constructor(private readonly pokersService: PokersService) {}
 
   afterInit(): void {
     this.server.on('connection', (socket) => {
@@ -36,8 +60,8 @@ export class PokersGateway implements OnGatewayInit {
               this.server.sockets[socketId].emit('reconnect');
           });
 
-          this.listMembers(room);
-          this.sendAllVotes(room);
+          this.sendMembers(room);
+          this.sendVotes(room);
         }
       });
     });
@@ -76,14 +100,22 @@ export class PokersGateway implements OnGatewayInit {
   @SubscribeMessage('join')
   join(client: Socket, message: { poker: string; name?: string }): void {
     this.pokersService.join(client, message.poker, message.name);
-    const vote = this.pokersService.getVote(client, message.poker);
 
+    const voteObject: Vote | null = this.pokersService.getVote(
+      client,
+      message.poker,
+    );
+
+    let vote: VoteResponse | null = null;
+    if (voteObject) {
+      vote = this.formatVoteResponse(voteObject);
+    }
     client.emit('joined', { poker: message.poker, vote });
 
-    this.listMembers(message.poker);
-    this.sendStories(message.poker);
-    this.sendStoryName(message.poker);
-    this.sendAllVotes(message.poker);
+    this.sendMembers(message.poker);
+    this.sendVotes(message.poker);
+    this.sendHistory(message.poker);
+    this.sendCurrentStory(message.poker);
   }
 
   @SubscribeMessage('leave')
@@ -97,15 +129,17 @@ export class PokersGateway implements OnGatewayInit {
         this.server.sockets[socketId].emit('reconnect');
     });
 
-    this.listMembers(message.poker);
-    this.sendAllVotes(message.poker);
+    this.sendMembers(message.poker);
+    this.sendVotes(message.poker);
+    this.sendCurrentStory(message.poker);
   }
 
   @SubscribeMessage('vote')
   vote(client: Socket, message: { poker: string; vote }): void {
     this.pokersService.vote(client, message.poker, message.vote);
 
-    this.sendAllVotes(message.poker);
+    this.sendVotes(message.poker);
+    this.sendCurrentStory(message.poker);
   }
 
   @SubscribeMessage('finish')
@@ -117,51 +151,47 @@ export class PokersGateway implements OnGatewayInit {
   setNickname(client: Socket, message: { name: string; poker: string }): void {
     this.pokersService.setName(message.poker, client, message.name);
 
-    this.listMembers(message.poker);
-    this.sendAllVotes(message.poker);
-  }
-
-  @SubscribeMessage('getVotes')
-  findAllVotes(client: Socket, message: { poker: string }): void {
-    this.sendAllVotes(message.poker);
+    this.sendMembers(message.poker);
+    this.sendVotes(message.poker);
   }
 
   @SubscribeMessage('newStory')
-  newStory(client: Socket, message: { poker: string; result?: string }): void {
-    this.pokersService.newStory(message.poker, parseFloat(message.result));
+  newStory(client: Socket, message: { poker: string }): void {
+    this.pokersService.newStory(message.poker);
 
-    this.sendAllVotes(message.poker);
-    this.sendStories(message.poker);
-    this.sendStoryName(message.poker);
+    this.sendVotes(message.poker);
+    this.sendCurrentStory(message.poker);
+    this.sendHistory(message.poker);
   }
 
-  @SubscribeMessage('story')
+  @SubscribeMessage('changeStoryName')
   story(client: Socket, message: { poker: string; name: string }): void {
     this.pokersService.setStoryName(message.poker, message.name);
 
-    this.sendStoryName(message.poker);
+    this.sendCurrentStory(message.poker);
   }
 
   @SubscribeMessage('popHistory')
   popHistory(client: Socket, message: { poker: string }): void {
     this.pokersService.popHistory(message.poker);
 
-    this.sendStories(message.poker);
+    this.sendHistory(message.poker);
   }
 
   @SubscribeMessage('resetHistory')
   resetHistory(client: Socket, message: { poker: string }): void {
     this.pokersService.resetHistory(message.poker);
 
-    this.sendStories(message.poker);
+    this.sendHistory(message.poker);
   }
 
   @SubscribeMessage('observe')
   observer(client: Socket, message: { poker: string }): void {
     this.pokersService.observe(client, message.poker);
 
-    this.listMembers(message.poker);
-    this.sendAllVotes(message.poker);
+    this.sendMembers(message.poker);
+    this.sendVotes(message.poker);
+    this.sendCurrentStory(message.poker);
   }
 
   @SubscribeMessage('debug')
@@ -175,32 +205,37 @@ export class PokersGateway implements OnGatewayInit {
   }
 
   /**
-   * Sends the members list to the requested room.
-   *
-   * @param {string} poker The room.
-   *
-   * @private
-   */
-  private listMembers(poker: string): void {
-    this.server.to(poker).emit('member-list', {
-      ...this.pokersService.getClientNames(poker),
-    });
-  }
-
-  /**
    * Sends all votes to a room.
    *
    * @param {string} poker Room to send the votes for.
    *
    * @private
    */
-  private sendAllVotes(poker: string): void {
+  private sendVotes(poker: string): void {
+    const { voteCount, votes, groupedVoterNames } = this.pokersService.getVotes(
+      poker,
+    );
+
     this.server.to(poker).emit('votes', {
-      poker: poker,
-      ...this.pokersService.getVotes(poker),
-      names: this.pokersService.getVoterNames(poker),
+      votes: this.formatVoteResponseList(votes),
+      voteCount: voteCount,
+      groupedVoterNames: groupedVoterNames,
       votedNames: this.pokersService.getVotedNames(poker),
     });
+  }
+
+  /**
+   * Sends an actual members count to a room.
+   *
+   * @param {string} room The room.
+   *
+   * @private
+   */
+  private sendMembers(room: string): void {
+    const clients: MemberList = this.pokersService.getClients(room);
+    this.server
+      .to(room)
+      .emit('member-list', this.formatMembersResponse(clients));
   }
 
   /**
@@ -210,9 +245,10 @@ export class PokersGateway implements OnGatewayInit {
    *
    * @private
    */
-  private sendStories(room: string): void {
-    this.server.to(room).emit('stories', {
-      stories: this.pokersService.getStories(room),
+  private sendHistory(room: string): void {
+    const stories = this.pokersService.getHistory(room);
+    this.server.to(room).emit('history', {
+      stories: this.formatStoryResponseList(stories),
     });
   }
 
@@ -223,9 +259,95 @@ export class PokersGateway implements OnGatewayInit {
    *
    * @private
    */
-  private sendStoryName(room: string): void {
-    this.server.to(room).emit('story', {
-      name: this.pokersService.getStoryName(room),
+  private sendCurrentStory(room: string): void {
+    this.server.to(room).emit('storyUpdated', {
+      currentStory: this.formatStoryResponse(
+        this.pokersService.getCurrentStory(room),
+      ),
     });
+  }
+
+  /**
+   * Formats the votes for the response.
+   *
+   * @param {Vote[]} votes The votes to format.
+   *
+   * @returns {VoteResponse[]} Formatted votes.
+   */
+  private formatVoteResponseList(votes: Vote[]): VoteResponse[] {
+    return votes.map(this.formatVoteResponse);
+  }
+
+  /**
+   * Formats a vote for the response.
+   *
+   * @param {Vote} vote The vote.
+   *
+   * @returns {VoteResponse} The formatted vote.
+   */
+  private formatVoteResponse(vote: Vote): VoteResponse {
+    return {
+      currentValue: vote.currentValue,
+      initialValue: vote.initialValue,
+      voterName: vote.voter.name,
+    };
+  }
+
+  /**
+   * Formats stories for response.
+   *
+   * @param {Story[]} stories The stories to format.
+   *
+   * @returns {StoryResponse[]} The formatted list.
+   */
+  private formatStoryResponseList(stories: Story[]): StoryResponse[] {
+    return stories.map(this.formatStoryResponse.bind(this));
+  }
+
+  /**
+   * Formats a story for response.
+   *
+   * @param {Story} story The story to format.
+   *
+   * @returns {StoryResponse} The formatted story.
+   */
+  private formatStoryResponse(story: Story): StoryResponse {
+    return {
+      name: story.name,
+      voteAverage: story.voteAverage,
+      nearestPointAverage: story.nearestPointAverage,
+      votes: this.formatVoteResponseList(story.votes),
+    };
+  }
+
+  /**
+   * Formats a memberlist for response.
+   *
+   * @param {MemberList} memberList The memberlist.
+   *
+   * @returns {MembersResponse} The formatted list.
+   */
+  private formatMembersResponse(memberList: MemberList): MembersResponse {
+    const mapCallback = this.formatClientResponse;
+
+    return {
+      voters: Object.values(memberList.voters).map(mapCallback),
+      observers: Object.values(memberList.observers).map(mapCallback),
+      disconnected: Object.values(memberList.disconnected).map(mapCallback),
+    };
+  }
+
+  /**
+   * Formats a client for response.
+   *
+   * @param {Client} client The client to format.
+   *
+   * @returns {ClientResponse} The formatted client.
+   */
+  private formatClientResponse(client: Client): ClientResponse {
+    return {
+      id: client.id,
+      name: client.name,
+    };
   }
 }

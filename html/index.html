@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Pum Scroker!</title>
     <link href="/styles.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://kit.fontawesome.com/92b43d9045.js" crossorigin="anonymous"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -53,17 +53,17 @@
                         <div :class="['members-list', showMembersList ? '' : 'hidden']">
                             <strong>Voters</strong>
                             <ul>
-                                <li v-for="name in members.voters">{{ name }} <i class="fas fa-person-booth"></i></li>
+                                <li v-for="voter in members.voters">{{ voter.name }} <i class="fas fa-person-booth"></i></li>
                                 <li v-if="!members.voters.length">None</li>
                             </ul>
                             <strong>Observers</strong>
                             <ul>
-                                <li v-for="name in members.observers">{{ name }} <i class="fas fa-user-secret"></i></li>
+                                <li v-for="observer in members.observers">{{ observer.name }} <i class="fas fa-user-secret"></i></li>
                                 <li v-if="!members.observers.length">None</li>
                             </ul>
                             <strong>Disconnected</strong>
                             <ul>
-                                <li v-for="name in members.disconnected">{{ name }} <i class="fas fa-plug disconnected"></i>
+                                <li v-for="disconnected in members.disconnected">{{ disconnected.name }} <i class="fas fa-plug disconnected"></i>
                                 </li>
                                 <li v-if="!members.disconnected.length">None</li>
                             </ul>
@@ -90,7 +90,7 @@
                             class="fas fa-plus-square"></i>
                         New story
                     </button>
-                    <span class="allVoted" v-if="voteCount === members.voters.length && members.voters.length">All votes are in!</span>
+                    <span class="allVoted" v-if="allVoted">All votes are in!</span>
                     <button @click="refinementDone()" class="refinement-done"><i class="fas fa-clipboard-check"></i>
                         Finish refinement
                     </button>
@@ -100,34 +100,46 @@
                     <form>
                         <label>Story name:
                             <input type="text"
-                                   v-model="story"
-                                   :class="storyChanged ? 'changed' : ''"
-                                   @keydown="storyUpdated = false"
-                                   v-on:change="storyUpdated = false"
+                                   v-model="storyName"
+                                   :class="storyNameUpdated ? 'changed' : ''"
+                                   @keydown="storyNameUpdated = false"
+                                   v-on:change="storyNameUpdated = false"
                             ></label>
                         <input type="submit" @click.prevent="setStoryName()" value="Update">
-                        <i v-if="storyUpdated" class="fas fa-check-circle story-updated"></i>
+                        <i v-if="storyNameUpdated" class="fas fa-check-circle story-updated"></i>
                     </form>
                     <br/>
 
                     <button
                             v-for="point of points"
-                            @click.prevent="castVote(point)"
-                            :class="[ 'choice', votes.includes( point ) ? 'picked' : '', myVote === point ? 'highlighted' : '' ]">
+                            @click="castVote(point)"
+                            :class="[
+                            'choice',
+                            votes.map( vote=>vote.currentValue ).includes( point ) ? 'picked' : '',
+                            myVote === point ? 'highlighted' : '',
+                            myInitialVote === point ? 'initial' : '',
+                            ]">
                         <i :class="['fas','fa-mug-hot']" v-if="point === 'coffee'"></i>
                         {{ point }}
                     </button>
 
                     <hr/>
 
-                    <p :class="[ 'results', this.members.voters.length === this.voteCount ? 'final' : '' ]">
-                        <button v-for="vote of votes" class="result">
-                            <i :class="['fas','fa-mug-hot']" v-if="vote === 'coffee'"></i>
-                            {{ vote }}
-                            <div class="vote-names" v-if="voteNames && voteNames[vote]">
-                                {{ voteNames && voteNames[vote] && voteNames[vote].join(', ') }}
+                    <p :class="[ 'results', this.members.length === this.voteCount ? 'final' : '' ]">
+                        <span class="resultContainer" v-if="votes.length" v-for="vote of votes">
+                            <button class="result initialVote" v-if="vote.initialValue !== vote.currentValue">
+                                <i :class="['fas','fa-mug-hot']" v-if="vote.initialValue === 'coffee'"></i>
+                                {{ vote.initialValue }}
+                            </button>
+                            <button class="result">
+                                <i :class="['fas','fa-mug-hot']" v-if="vote.currentValue === 'coffee'"></i>
+                                {{ vote.currentValue }}
+                                <div class="vote-names" v-if="groupedVoterNames && groupedVoterNames[vote.currentValue]">
+                                {{ groupedVoterNames[vote.currentValue] && groupedVoterNames[vote.currentValue].join(', ') }}
                             </div>
-                        </button>
+                            </button>
+
+                        </span>
                     </p>
 
                     <section v-if="average !== ''">
@@ -170,11 +182,14 @@
                             Delete last result
                         </button>
                         <section v-for="story of storyHistory">
-                            <strong>Story {{ story.name || 'result' }}: {{ story.result }}</strong><br/>
+                            <strong>Story {{ story.name || 'result' }}: {{ story.nearestPointAverage }}</strong><br/>
                             Votes:
                             <ul>
                                 <li v-for="vote of story.votes">
-                                    {{ vote.name }}: {{ vote.vote }}
+                                    {{ vote.voterName }}:
+                                    <span class="initialVote" v-if="vote.initialValue !== vote.currentValue">{{ vote.initialValue }}</span>
+                                    <i v-if="vote.initialValue !== vote.currentValue" :class="['fas','fa-arrow-right']"></i>
+                                    {{ vote.currentValue }}
                                 </li>
                             </ul>
                         </section>
@@ -257,19 +272,20 @@
       showMembersList: false,
       activePoker: false,
       joinPoker: '',
+      currentStory: { name: '', nearestPointAverage: '', voteAverage: '' },
       points: {},
       nickname: '',
       observer: false,
-      story: '',
-      storyUpdated: false,
-      storyChanged: false,
+      storyName: '',
+      storyNameUpdated: false,
       myVote: '',
+      myInitialVote: '',
       members: { voters: [], observers: [], disconnected: [] },
-      names: [],
       votes: [],
       voteCount: 0,
       voteNames: {},
       votedNames: [],
+      groupedVoterNames: [],
       showHistory: false,
       storyHistory: [],
     },
@@ -300,15 +316,14 @@
           return
         }
 
-        if (this.voteCount === this.members.voters.length) {
-          return
+        if ( this.allVoted && ! this.myInitialVote ) {
+            this.myInitialVote = this.myVote;
         }
-
         this.myVote = vote
         this.socket.emit('vote', { poker: this.activePoker, vote: vote })
       },
       setStoryName () {
-        this.socket.emit('story', { poker: this.activePoker, name: this.story })
+        this.socket.emit('changeStoryName', { poker: this.activePoker, name: this.storyName })
       },
       newStory () {
         if (this.voteCount === 0 || this.observer) {
@@ -322,8 +337,8 @@
           }
         }
 
-        this.storyUpdated = false
-        this.socket.emit('newStory', { poker: this.activePoker, result: this.averagePoint })
+        this.storyNameUpdated = false
+        this.socket.emit('newStory', { poker: this.activePoker })
       },
       resetHistory () {
         if (!window.confirm('Are you sure you want to clear the history?\n\nThis clears the history for all members in this room.')) {
@@ -341,6 +356,7 @@
         this.joinPoker = this.joinPoker.toLowerCase()
 
         this.myVote = ''
+        this.myInitialVote = ''
         this.voteCount = 0
 
         if (this.joinPoker === '') {
@@ -357,7 +373,8 @@
       onJoined: function (msg) {
         const currentPoker = this.activePoker
         this.activePoker = this.joinPoker = msg.poker
-        this.myVote = msg.vote
+        this.myVote = (msg.vote && msg.vote.currentValue) || ''
+        this.myInitialVote = ''
 
         if (currentPoker !== false && currentPoker !== this.activePoker) {
           const url = new URL(window.location)
@@ -373,12 +390,12 @@
         this.storyHistory = (msg.stories || []).reverse()
       },
       onReceiveVote (msg) {
-        this.votes = msg.votes.sort((a, b) => a - b)
+        this.votes = msg.votes.sort((a, b) => a.currentValue - b.currentValue)
         this.voteCount = msg.voteCount
         this.votedNames = msg.votedNames || []
-        this.names = msg.names
-        this.voteNames = msg.voteNames || {}
+        this.groupedVoterNames = msg.groupedVoterNames || {}
 
+        // Reset myVote when a new story is started.
         if (this.voteCount === 0) {
           this.myVote = ''
         }
@@ -395,15 +412,14 @@
         }
         this.joinRoom()
       },
-      onStoryName (msg) {
-        const changed = (this.story !== msg.name)
+      onStoryUpdated (msg) {
+        const nameChanged = (this.currentStory.name !== msg.currentStory.name)
+        this.currentStory = msg.currentStory;
+        this.storyName = this.currentStory.name;
 
-        this.story = msg.name
-        this.storyUpdated = (this.story !== '')
-
-        if (changed) {
-          this.storyChanged = true
-          setTimeout(() => this.storyChanged = false, 1400)
+        if (nameChanged) {
+          this.storyNameUpdated = true;
+          setTimeout(() => this.storyNameUpdated = false, 1400)
         }
       },
       onMemberList (msg) {
@@ -415,7 +431,7 @@
     },
     computed: {
       unvotedNames () {
-        const result = this.names
+        const result = this.members.voters.map( member => member.name )
         for (const name of this.votedNames) {
           const index = result.indexOf(name)
           if (index !== -1) {
@@ -432,15 +448,11 @@
           return ''
         }
 
-        let sum = 0
-        for (let i = 0; i < this.votes.length; i++) {
-          if (isNaN(this.votes[i])) {
+        if (this.currentStory.voteAverage === 'coffee') {
             return 'Coffee break'
-          }
-          sum += parseFloat(this.votes[i]) //don't forget to add the base
         }
 
-        return Math.round((sum / this.votes.length) * 100) / 100
+        return this.currentStory.voteAverage;
       },
       averageContext () {
         if (this.average === '') {
@@ -448,8 +460,9 @@
         }
 
         // Find the difference between the lowest and the highest votes.
-        const lowestIndex = this.points.indexOf(this.votes[0])
-        const highestIndex = this.points.indexOf(this.votes[this.votes.length - 1])
+        const lowestIndex = this.points.indexOf(this.votes[0].currentValue);
+        const highestIndex = this.points.indexOf(this.votes[this.votes.length - 1].currentValue);
+        console.log(this.votes[0], highestIndex);
 
         if (highestIndex - lowestIndex > 2) {
           return `Large gap between lowest and highest vote: ${highestIndex - lowestIndex} cards!`
@@ -461,8 +474,8 @@
         }
 
         // Find the difference between the lowest and the highest votes.
-        const lowestIndex = this.points.indexOf(this.votes[0])
-        const highestIndex = this.points.indexOf(this.votes[this.votes.length - 1])
+        const lowestIndex = this.points.indexOf(this.votes[0].currentValue)
+        const highestIndex = this.points.indexOf(this.votes[this.votes.length - 1].currentValue)
 
         return highestIndex - lowestIndex
       },
@@ -485,13 +498,13 @@
           return ''
         }
 
-        if (this.votes.length <= 1 || this.votes.indexOf('coffee') !== -1) {
+        if (this.votes.length <= 1 || this.votes.map(vote=>vote.currentValue).indexOf('coffee') !== -1) {
           return 'n/a'
         }
 
         let powers = 0
         for (let i = 0; i < this.votes.length; i++) {
-          powers += Math.pow(parseFloat(this.votes[i]) - this.average, 2)
+          powers += Math.pow(parseFloat(this.votes.map(vote=>vote.currentValue)[i]) - this.average, 2)
         }
 
         return Math.round(Math.sqrt(powers / this.votes.length) * 100) / 100
@@ -501,30 +514,11 @@
           return ''
         }
 
-        if (this.points.indexOf(this.average) !== -1) {
-          return this.average
-        }
-
-        const rounded = Math.round(this.average * 10) / 10
-        if (this.points.indexOf(rounded) !== -1) {
-          return rounded
-        }
-
-        // find nearest point.
-        for (let index = 0; index < this.points.length - 1; index++) {
-          if (isNaN(this.points[index + 1])) {
-            return this.average
-          }
-          if (this.average - this.points[index] > 0 && this.average - this.points[index + 1] < 0) {
-            if (this.average - this.points[index] < Math.abs(this.average - this.points[index + 1])) {
-              return this.points[index]
-            }
-            return this.points[index + 1]
-          }
-        }
-
-        return ''
+        return this.currentStory.nearestPointAverage;
       },
+      allVoted () {
+        return this.members.voters.length && this.voteCount === this.members.voters.length;
+      }
     },
     created () {
       this.baseTitle = document.title
@@ -565,8 +559,8 @@
 
       this.socket.on('joined', this.onJoined)
       this.socket.on('votes', this.onReceiveVote)
-      this.socket.on('stories', this.onStoryHistory)
-      this.socket.on('story', this.onStoryName)
+      this.socket.on('history', this.onStoryHistory)
+      this.socket.on('storyUpdated', this.onStoryUpdated)
       this.socket.on('member-list', this.onMemberList)
       this.socket.on('finished', this.onRefinementDone)
 

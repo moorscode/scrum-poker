@@ -257,6 +257,14 @@ button.picked {
     border: 2px solid #477608;
 }
 
+button.initial {
+    background-color: darkgray;
+    border-color: white;
+    top: 1px;
+    position: relative;
+    box-shadow: none;
+}
+
 button.highlighted,
 button.highlighted:hover,
 button.highlighted:active {
@@ -271,15 +279,21 @@ button.highlighted .fas {
     color: white;
 }
 
+p.results {
+    margin-bottom: 2.2em;
+}
+
 button.result {
     font-size: 16px;
-    min-width: 50px;
+    min-width: 55px;
     height: 50px;
     border-radius: 4px;
-    border-width: 0;
-    margin: 0 4px 8px;
+    border: 1px solid transparent;
     padding: 0 14px;
     box-shadow: none;
+    z-index: 10;
+    position: relative;
+    transition: transform 250ms ease-out;
 }
 button.result:active {
     top: 0;
@@ -305,16 +319,41 @@ button.result > .fas {
 button.result > .vote-names {
     position: absolute;
     padding: 10px;
+    margin-top: 24px;
     border-radius: 3px;
     border: 1px solid #a4286a;
     display: none;
     background: white;
     box-shadow: 3px 3px 0 -1px #a4286a;
+    z-index: 1000;
 }
 
 button.result:active > .vote-names,
 button.result:hover > .vote-names {
     display: block;
+}
+
+span.resultContainer {
+    margin: 0 4px 8px;
+    position: relative;
+    display: inline-block;
+}
+
+button.result.initialVote {
+    z-index: 1;
+    position: absolute;
+}
+
+button.result.initialVote:hover + button.result,
+button.result.initialVote:active + button.result,
+button.result.initialVote:focus + button.result {
+    transform: translateY(25px);
+}
+button.result.initialVote + button.result {
+    left: 0;
+    top: 14px;
+    border: 1px solid #999;
+    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
 }
 
 div.voting {
