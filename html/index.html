@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Pum Scroker!</title>
     <link href="/styles.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://kit.fontawesome.com/92b43d9045.js" crossorigin="anonymous"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -86,56 +86,61 @@
                         </label>
                     </div>
 
-                <button @click="newStory()" class="newStory" :disabled="voteCount === 0 || observer"><i
-                        class="fas fa-plus-square"></i>
-                    New story
-                </button>
-                <span class="allVoted" v-if="allVoted">All votes are in!</span>
-                <button @click="refinementDone()" class="refinement-done"><i class="fas fa-clipboard-check"></i>
-                    Finish refinement
-                </button>
-
-                <hr/>
-
-                <form>
-                    <label>Story name:
-                        <input type="text"
-                               v-model="storyName"
-                               :class="storyNameUpdated ? 'changed' : ''"
-                               @keydown="storyNameUpdated = false"
-                               v-on:change="storyNameUpdated = false"
-                        ></label>
-                    <input type="submit" @click.prevent="setStoryName()" value="Update">
-                    <i v-if="storyNameUpdated" class="fas fa-check-circle story-updated"></i>
-                </form>
-                <br/>
-
-                <button
-                        v-for="point of points"
-                        @click="castVote(point)"
-                        :class="[
-                        'choice',
-                        votes.map( vote=>vote.currentVote ).includes( point ) ? 'picked' : '',
-                        myVote === point ? 'highlighted' : '',
-                        myInitialVote === point ? 'initial' : '',
-                        ]">
-                    <i :class="['fas','fa-mug-hot']" v-if="point === 'coffee'"></i>
-                    {{ point }}
-                </button>
+                    <button @click="newStory()" class="newStory" :disabled="voteCount === 0 || observer"><i
+                            class="fas fa-plus-square"></i>
+                        New story
+                    </button>
+                    <span class="allVoted" v-if="allVoted">All votes are in!</span>
+                    <button @click="refinementDone()" class="refinement-done"><i class="fas fa-clipboard-check"></i>
+                        Finish refinement
+                    </button>
 
                     <hr/>
 
-                <p :class="[ 'results', this.members.length === this.voteCount ? 'final' : '' ]">
-                    <button v-for="vote of votes" class="result">
-                        <i :class="['fas','fa-mug-hot']" v-if="vote.currentValue === 'coffee'"></i>
-                        <span class="initialVote" v-if="vote.initialValue !== vote.currentValue">{{ vote.initialValue }}</span>
-                        <i v-if="vote.initialValue !== vote.currentValue" :class="['fas','fa-arrow-right']"></i>
-                        {{ vote.currentValue }}
-                        <div class="vote-names" v-if="groupedVoterNames && groupedVoterNames[vote.currentValue]">
-                            {{ groupedVoterNames[vote.currentValue] && groupedVoterNames[vote.currentValue].join(', ') }}
-                        </div>
+                    <form>
+                        <label>Story name:
+                            <input type="text"
+                                   v-model="storyName"
+                                   :class="storyNameUpdated ? 'changed' : ''"
+                                   @keydown="storyNameUpdated = false"
+                                   v-on:change="storyNameUpdated = false"
+                            ></label>
+                        <input type="submit" @click.prevent="setStoryName()" value="Update">
+                        <i v-if="storyNameUpdated" class="fas fa-check-circle story-updated"></i>
+                    </form>
+                    <br/>
+
+                    <button
+                            v-for="point of points"
+                            @click="castVote(point)"
+                            :class="[
+                            'choice',
+                            votes.map( vote=>vote.currentValue ).includes( point ) ? 'picked' : '',
+                            myVote === point ? 'highlighted' : '',
+                            myInitialVote === point ? 'initial' : '',
+                            ]">
+                        <i :class="['fas','fa-mug-hot']" v-if="point === 'coffee'"></i>
+                        {{ point }}
                     </button>
-                </p>
+
+                    <hr/>
+
+                    <p :class="[ 'results', this.members.length === this.voteCount ? 'final' : '' ]">
+                        <span class="resultContainer" v-if="votes.length" v-for="vote of votes">
+                            <button class="result initialVote" v-if="vote.initialValue !== vote.currentValue">
+                                <i :class="['fas','fa-mug-hot']" v-if="vote.initialValue === 'coffee'"></i>
+                                {{ vote.initialValue }}
+                            </button>
+                            <button class="result">
+                                <i :class="['fas','fa-mug-hot']" v-if="vote.currentValue === 'coffee'"></i>
+                                {{ vote.currentValue }}
+                                <div class="vote-names" v-if="groupedVoterNames && groupedVoterNames[vote.currentValue]">
+                                {{ groupedVoterNames[vote.currentValue] && groupedVoterNames[vote.currentValue].join(', ') }}
+                            </div>
+                            </button>
+
+                        </span>
+                    </p>
 
                     <section v-if="average !== ''">
                         <p>
@@ -280,6 +285,7 @@
       voteCount: 0,
       voteNames: {},
       votedNames: [],
+      groupedVoterNames: [],
       showHistory: false,
       storyHistory: [],
     },
@@ -454,8 +460,9 @@
         }
 
         // Find the difference between the lowest and the highest votes.
-        const lowestIndex = this.points.indexOf(this.votes[0]).currentValue;
-        const highestIndex = this.points.indexOf(this.votes[this.votes.length - 1]).currentValue;
+        const lowestIndex = this.points.indexOf(this.votes[0].currentValue);
+        const highestIndex = this.points.indexOf(this.votes[this.votes.length - 1].currentValue);
+        console.log(this.votes[0], highestIndex);
 
         if (highestIndex - lowestIndex > 2) {
           return `Large gap between lowest and highest vote: ${highestIndex - lowestIndex} cards!`
@@ -467,8 +474,8 @@
         }
 
         // Find the difference between the lowest and the highest votes.
-        const lowestIndex = this.points.indexOf(this.votes[0])
-        const highestIndex = this.points.indexOf(this.votes[this.votes.length - 1])
+        const lowestIndex = this.points.indexOf(this.votes[0].currentValue)
+        const highestIndex = this.points.indexOf(this.votes[this.votes.length - 1].currentValue)
 
         return highestIndex - lowestIndex
       },
