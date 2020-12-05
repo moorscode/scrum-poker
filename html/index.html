@@ -126,6 +126,7 @@
                     <button v-for="vote of votes" class="result">
                         <i :class="['fas','fa-mug-hot']" v-if="vote.currentValue === 'coffee'"></i>
 	                    <span class="initialVote" v-if="vote.initialValue !== vote.currentValue">{{ vote.initialValue }}</span>
+	                    <i v-if="vote.initialValue !== vote.currentValue" :class="['fas','fa-arrow-right']"></i>
                         {{ vote.currentValue }}
                         <div class="vote-names" v-if="groupedVoterNames && groupedVoterNames[vote.currentValue]">
                             {{ groupedVoterNames[vote.currentValue] && groupedVoterNames[vote.currentValue].join(', ') }}
@@ -177,9 +178,10 @@
                             Votes:
                             <ul>
                                 <li v-for="vote of story.votes">
-	                                {{ vote.voterName }}:
-	                                <span class="initialVote" v-if="vote.initialValue !== vote.currentValue">{{ vote.initialValue }}</span>
-	                                {{ vote.currentValue }}
+                                    {{ vote.voterName }}:
+                                    <span class="initialVote" v-if="vote.initialValue !== vote.currentValue">{{ vote.initialValue }}</span>
+                                    <i v-if="vote.initialValue !== vote.currentValue" :class="['fas','fa-arrow-right']"></i>
+                                    {{ vote.currentValue }}
                                 </li>
                             </ul>
                         </section>
