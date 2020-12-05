@@ -1,4 +1,4 @@
-import { PointsService } from '../points/points.service';
+import { PointsService, PointValue } from '../points/points.service';
 
 export interface Client {
   votes: Vote[];
@@ -37,19 +37,7 @@ export interface HiddenVote extends Vote {
   initialValue: HiddenVoteValue;
 }
 
-export type VoteValue =
-  | 0
-  | 0.5
-  | 1
-  | 2
-  | 3
-  | 5
-  | 8
-  | 13
-  | 21
-  | 100
-  | 'coffee'
-  | HiddenVoteValue;
+export type VoteValue = PointValue | HiddenVoteValue;
 
 export type HiddenVoteValue = '?' | 'X';
 
@@ -154,6 +142,7 @@ export class PokerRoom {
     );
     this.setStoryAverage(this.currentStory);
   }
+
   /**
    * Sets a user as an observer.
    *
@@ -239,14 +228,19 @@ export class PokerRoom {
    * @param {VoteValue} vote The vote.
    */
   private changeVote(userId: string, vote: VoteValue): void {
-    if (!this.everybodyVoted(this.currentStory)) {
+    if (!this.hasEverybodyVoted(this.currentStory)) {
       this.getCurrentVote(userId).initialValue = vote;
     }
     this.getCurrentVote(userId).currentValue = vote;
     this.setStoryAverage(this.currentStory);
   }
 
-  private everybodyVoted(story: Story): boolean {
+  /**
+   * Checks if everybody has voted.
+   *
+   * @param {Story} story The story.
+   */
+  private hasEverybodyVoted(story: Story): boolean {
     return story.votes.length === this.getVotersCount();
   }
 
@@ -272,7 +266,12 @@ export class PokerRoom {
     return this.currentStory.votes;
   }
 
-  public getHiddenVotes(): Vote[] {
+  /**
+   * Retrieves the obscured votes.
+   *
+   * @returns {Vote[]} List of obscured votes.
+   */
+  public getObscuredVotes(): Vote[] {
     return Object.values(this.clients.voters).map(
       (client: Client): HiddenVote => {
         const hasVoted: boolean = this.getCurrentVote(client.id) !== undefined;
@@ -288,6 +287,11 @@ export class PokerRoom {
     );
   }
 
+  /**
+   * Calculates and sets the story average value.
+   *
+   * @param {Story} story The story.
+   */
   public setStoryAverage(story: Story): void {
     if (story.votes.length === 0) {
       delete story.voteAverage;
@@ -304,7 +308,7 @@ export class PokerRoom {
     );
     if (valueIsHidden) {
       story.voteAverage = 'unknown';
-      story.voteAverage = '?';
+      story.nearestPointAverage = '?';
       return;
     }
 
@@ -314,10 +318,11 @@ export class PokerRoom {
       0,
     );
     story.voteAverage = Math.fround(pointTotal / story.votes.length);
+
     // Find the nearest available point. Always round up.
-    for (const availablePoint of PointsService.getPoints()) {
+    for (const availablePoint of PointsService.getNumericPoints()) {
       if (story.voteAverage - availablePoint <= 0) {
-        story.nearestPointAverage = availablePoint;
+        story.nearestPointAverage = availablePoint as PointValue;
         break;
       }
     }

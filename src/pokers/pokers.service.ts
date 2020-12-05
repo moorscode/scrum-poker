@@ -90,7 +90,7 @@ export class PokersService {
   private removeUserFromRooms(userId: string): void {
     for (const room of Object.keys(this.rooms)) {
       this.rooms[room].removeClient(userId);
-      this.cleanUpRoom(room);
+      this.cleanRoom(room);
     }
   }
 
@@ -174,7 +174,7 @@ export class PokersService {
   public leave(client: Socket, poker: string): void {
     this.getRoom(poker).removeClient(this.getUserId(client));
 
-    this.cleanUpRoom(poker);
+    this.cleanRoom(poker);
 
     client.leave(poker);
   }
@@ -186,7 +186,7 @@ export class PokersService {
    *
    * @private
    */
-  private cleanUpRoom(room: string): void {
+  private cleanRoom(room: string): void {
     if (this.getRoom(room).getClientCount() === 0) {
       delete this.rooms[room];
     }
@@ -295,7 +295,7 @@ export class PokersService {
     // Otherwise show an X for voted, ? for unvoted.
     return {
       voteCount: votes.length,
-      votes: this.getRoom(poker).getHiddenVotes(),
+      votes: this.getRoom(poker).getObscuredVotes(),
       groupedVoterNames: {},
     };
   }
