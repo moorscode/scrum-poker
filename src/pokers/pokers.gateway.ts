@@ -7,7 +7,7 @@ import {
 import { var_export } from 'locutus/php/var';
 import { Server, Socket } from 'socket.io';
 import { PointsService } from '../points/points.service';
-import { Client, Story, Vote, VoteValue } from './poker-room';
+import { Client, MemberList, Story, Vote, VoteValue } from './poker-room';
 import { PokersService } from './pokers.service';
 
 interface StoryResponse {
@@ -20,6 +20,12 @@ interface VoteResponse {
   voterName: string;
   currentValue: VoteValue;
   initialValue: VoteValue;
+}
+
+interface MembersResponse {
+  voters: ClientResponse[];
+  observers: ClientResponse[];
+  disconnected: ClientResponse[];
 }
 
 interface ClientResponse {
@@ -41,10 +47,17 @@ export class PokersGateway implements OnGatewayInit {
 
       // Clean up after disconnection.
       socket.on('disconnecting', () => {
+        const sockets = this.pokersService.getClientSockets(socket);
+
         for (const room in socket.rooms) {
           if (!room.includes('/pokers#')) {
             this.pokersService.disconnect(socket, room);
           }
+
+          sockets.forEach((socketId: string) => {
+            this.server.sockets[socketId] &&
+              this.server.sockets[socketId].emit('reconnect');
+          });
 
           this.sendMembers(room);
           this.sendAllVotes(room);
@@ -73,7 +86,14 @@ export class PokersGateway implements OnGatewayInit {
 
   @SubscribeMessage('exit')
   exit(client: Socket): void {
+    const sockets = this.pokersService.getClientSockets(client);
+
     this.pokersService.exit(client);
+
+    sockets.forEach((socketId: string) => {
+      this.server.sockets[socketId] &&
+        this.server.sockets[socketId].emit('reconnect');
+    });
   }
 
   @SubscribeMessage('join')
@@ -98,7 +118,14 @@ export class PokersGateway implements OnGatewayInit {
 
   @SubscribeMessage('leave')
   leave(client: Socket, message: { poker: string }): void {
+    const sockets = this.pokersService.getClientSockets(client);
+
     this.pokersService.leave(client, message.poker);
+
+    sockets.forEach((socketId: string) => {
+      this.server.sockets[socketId] &&
+        this.server.sockets[socketId].emit('reconnect');
+    });
 
     this.sendMembers(message.poker);
     this.sendAllVotes(message.poker);
@@ -113,9 +140,16 @@ export class PokersGateway implements OnGatewayInit {
     this.sendCurrentStory(message.poker);
   }
 
+  @SubscribeMessage('finish')
+  finish(client: Socket, message: { poker: string }): void {
+    this.server.to(message.poker).emit('finished');
+  }
+
   @SubscribeMessage('nickname')
   setNickname(client: Socket, message: { name: string; poker: string }): void {
     this.pokersService.setName(message.poker, client, message.name);
+
+    this.sendMembers(message.poker);
     this.sendAllVotes(message.poker);
     this.sendMembers(message.poker);
   }
@@ -187,11 +221,6 @@ export class PokersGateway implements OnGatewayInit {
       groupedVoterNames: groupedVoterNames,
       votedNames: this.pokersService.getVotedNames(poker),
     });
-    console.log('emit votes:', {
-      votes: this.getVotesForResponse(votes),
-      groupedVoterNames: groupedVoterNames,
-      votedNames: this.pokersService.getVotedNames(poker),
-    });
   }
 
   /**
@@ -202,13 +231,10 @@ export class PokersGateway implements OnGatewayInit {
    * @private
    */
   private sendMembers(room: string): void {
-    const clients = this.pokersService.getClients(room);
-    this.server.to(room).emit('members', {
-      members: this.getClientsForResponse(clients),
-    });
-    console.log('emit members', {
-      members: this.getClientsForResponse(clients),
-    });
+    const clients: MemberList = this.pokersService.getClients(room);
+    this.server
+      .to(room)
+      .emit('member-list', this.getMembersForResponse(clients));
   }
 
   /**
@@ -223,9 +249,6 @@ export class PokersGateway implements OnGatewayInit {
     this.server.to(room).emit('history', {
       stories: this.getStoriesForResponse(stories),
     });
-    console.log('emit history', {
-      stories: this.getStoriesForResponse(stories),
-    });
   }
 
   /**
@@ -237,11 +260,6 @@ export class PokersGateway implements OnGatewayInit {
    */
   private sendCurrentStory(room: string): void {
     this.server.to(room).emit('storyUpdated', {
-      currentStory: this.getStoryForResponse(
-        this.pokersService.getCurrentStory(room),
-      ),
-    });
-    console.log('emit story updated', {
       currentStory: this.getStoryForResponse(
         this.pokersService.getCurrentStory(room),
       ),
@@ -272,8 +290,13 @@ export class PokersGateway implements OnGatewayInit {
     };
   }
 
-  private getClientsForResponse(clients: Client[]): ClientResponse[] {
-    return clients.map(this.getClientForResponse);
+  private getMembersForResponse(memberList: MemberList): MembersResponse {
+    const mapCallback = this.getClientForResponse;
+    return {
+      voters: Object.values(memberList.voters).map(mapCallback),
+      observers: Object.values(memberList.observers).map(mapCallback),
+      disconnected: Object.values(memberList.disconnected).map(mapCallback),
+    };
   }
 
   private getClientForResponse(client: Client): ClientResponse {

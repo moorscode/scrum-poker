@@ -17,6 +17,18 @@ export interface Vote {
   initialValue: VoteValue;
 }
 
+export interface MemberList {
+  voters: {
+    [clientId: string]: Client;
+  };
+  observers: {
+    [clientId: string]: Client;
+  };
+  disconnected: {
+    [clientId: string]: Client;
+  };
+}
+
 export interface HiddenVote extends Vote {
   currentValue: HiddenVoteValue;
   initialValue: HiddenVoteValue;
@@ -39,12 +51,12 @@ export type VoteValue =
 export type HiddenVoteValue = '?' | 'X';
 
 export class PokerRoom {
-  private readonly clients: { [clientId: string]: Client };
+  private readonly clients: MemberList;
   private readonly history: Story[];
   private currentStory: Story;
 
   constructor() {
-    this.clients = {};
+    this.clients = { disconnected: {}, observers: {}, voters: {} };
     this.history = [];
     this.currentStory = { name: '', votes: [] };
   }
@@ -52,23 +64,31 @@ export class PokerRoom {
   /**
    * Lists clients in a room.
    *
-   * @returns {Client[]} List of clients.
+   * @returns {MemberList[]} List of clients.
    *
    * @private
    */
-  public getClients(): Client[] {
-    return Object.values(this.clients);
+  public getClients(): MemberList {
+    return this.clients;
   }
 
   /**
-   * Lists all poker clients.
+   * Lists all poker voters.
    *
-   * @returns {number} Number of clients.
+   * @returns {number} Number of voters.
    *
    * @private
    */
+  public getVotersCount(): number {
+    return Object.values(this.clients.voters).length;
+  }
+
   public getClientCount(): number {
-    return Object.values(this.clients).length;
+    return (
+      Object.values(this.clients.voters).length +
+      Object.values(this.clients.observers).length +
+      Object.values(this.clients.disconnected).length
+    );
   }
 
   /**
@@ -80,7 +100,16 @@ export class PokerRoom {
    * @private
    */
   public addClient(userId: string, name: string): void {
-    this.clients[userId] = {
+    if (this.clients.observers[userId]) {
+      delete this.clients.observers[userId];
+    }
+
+    if (this.clients.disconnected[userId]) {
+      this.clients.voters[userId] = this.clients.disconnected[userId];
+      delete this.clients.disconnected[userId];
+    }
+
+    this.clients.voters[userId] = {
       id: userId,
       name,
       votes: [],
@@ -96,7 +125,12 @@ export class PokerRoom {
    * @private
    */
   public setClientName(userId: string, name: string): void {
-    this.clients[userId].name = name;
+    if (this.clients.voters[userId]) {
+      this.clients.voters[userId].name = name;
+    }
+    if (this.clients.observers[userId]) {
+      this.clients.observers[userId].name = name;
+    }
   }
 
   /**
@@ -107,44 +141,56 @@ export class PokerRoom {
    * @private
    */
   public removeClient(userId: string): void {
-    delete this.clients[userId];
+    delete this.clients.voters[userId];
+    delete this.clients.disconnected[userId];
+    delete this.clients.observers[userId];
+
     // Remove client's current votes.
     this.currentStory.votes = this.currentStory.votes.filter(
       (vote: Vote) => vote.voter.id !== userId,
     );
     this.setStoryAverage(this.currentStory);
   }
-
   /**
-   * Gets the client.
+   * Sets a user as an observer.
    *
-   * @param {string} userId User Id.
-   *
-   * @returns {Client} The client.
+   * @param {string} userId The user.
    */
-  public getClient(userId: string): Client {
-    return this.clients[userId] || { id: '', name: '', votes: [] };
+  public setObserver(userId: string): void {
+    if (this.clients.voters[userId]) {
+      this.clients.observers[userId] = this.clients.voters[userId];
+      delete this.clients.voters[userId];
+    }
+
+    delete this.clients.disconnected[userId];
   }
 
   /**
-   * Sets a client on a room.
+   * Sets a user as an observer.
    *
-   * @param {string} userId The user Id.
-   * @param {Client} client The client.
+   * @param {string} userId The user.
    */
-  public restoreClient(userId: string, client: Client): void {
-    this.clients[userId] = client;
+  public setDisconnected(userId: string): void {
+    if (this.clients.voters[userId]) {
+      this.clients.disconnected[userId] = this.clients.voters[userId];
+      delete this.clients.voters[userId];
+    }
+
+    if (this.clients.observers[userId]) {
+      this.clients.disconnected[userId] = this.clients.observers[userId];
+      delete this.clients.observers[userId];
+    }
   }
 
   /**
-   * Retrieves the voted clients.
+   * Retrieves the voted voters.
    *
-   * @returns {Client[]} List of voted clients.
+   * @returns {Client[]} List of voted voters.
    *
    * @private
    */
   public getVotedClients(): Client[] {
-    return Object.values(this.clients).filter((client: Client) =>
+    return Object.values(this.clients.voters).filter((client: Client) =>
       client.votes.some((vote: Vote) => vote.story === this.currentStory),
     );
   }
@@ -174,11 +220,11 @@ export class PokerRoom {
   private addVote(userId: string, voteValue: VoteValue): void {
     const vote: Vote = {
       story: this.currentStory,
-      voter: this.clients[userId],
+      voter: this.clients.voters[userId],
       initialValue: voteValue,
       currentValue: voteValue,
     };
-    this.clients[userId].votes.push(vote);
+    this.clients.voters[userId].votes.push(vote);
     this.currentStory.votes.push(vote);
     this.setStoryAverage(this.currentStory);
   }
@@ -198,7 +244,8 @@ export class PokerRoom {
   }
 
   private everybodyVoted(story: Story): boolean {
-    return story.votes.length === Object.keys(this.clients).length;
+
+    return story.votes.length === this.getVotersCount();
   }
 
   /**
@@ -207,7 +254,7 @@ export class PokerRoom {
    * @returns {Vote}
    */
   public getCurrentVote(userId: string): Vote | undefined {
-    return this.clients[userId].votes.find(
+    return this.clients.voters[userId].votes.find(
       (vote: Vote) => vote.story === this.currentStory,
     );
   }
@@ -224,7 +271,7 @@ export class PokerRoom {
   }
 
   public getHiddenVotes(): Vote[] {
-    return Object.values(this.clients).map(
+    return Object.values(this.clients.voters).map(
       (client: Client): HiddenVote => {
         const hasVoted: boolean = this.getCurrentVote(client.id) !== undefined;
         const voteValue: HiddenVoteValue = hasVoted ? 'X' : '?';
@@ -237,23 +284,6 @@ export class PokerRoom {
         };
       },
     );
-  }
-
-  /**
-   * Reset all votes for the current story.
-   *
-   * @private
-   */
-  public resetVotes(): void {
-    // Remove votes from userVotes.
-    for (const clientId of Object.keys(this.clients)) {
-      this.clients[clientId].votes = this.clients[clientId].votes.filter(
-        (vote: Vote) => vote.story === this.currentStory,
-      );
-    }
-    // Remove votes from the current story.
-    this.currentStory.votes = [];
-    this.setStoryAverage(this.currentStory);
   }
 
   public setStoryAverage(story: Story): void {
@@ -296,7 +326,7 @@ export class PokerRoom {
   }
 
   /**
-   * Sets the story name.
+   * Sets the storyName name.
    *
    * @param {string} name The name.
    */
