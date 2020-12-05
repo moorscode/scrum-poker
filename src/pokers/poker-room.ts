@@ -1,3 +1,5 @@
+import { PointsService } from '../points/points.service';
+
 export interface Client {
   votes: Vote[];
   name: string;
@@ -7,6 +9,7 @@ export interface Client {
 export interface Story {
   name: string;
   voteAverage?: number | string;
+  nearestPointAverage?: VoteValue;
   votes: Vote[];
 }
 
@@ -244,7 +247,6 @@ export class PokerRoom {
   }
 
   private everybodyVoted(story: Story): boolean {
-
     return story.votes.length === this.getVotersCount();
   }
 
@@ -293,6 +295,7 @@ export class PokerRoom {
     }
     if (story.votes.some((vote: Vote) => vote.currentValue === 'coffee')) {
       story.voteAverage = 'coffee';
+      story.nearestPointAverage = 'coffee';
       return;
     }
 
@@ -301,6 +304,7 @@ export class PokerRoom {
     );
     if (valueIsHidden) {
       story.voteAverage = 'unknown';
+      story.voteAverage = '?';
       return;
     }
 
@@ -310,6 +314,13 @@ export class PokerRoom {
       0,
     );
     story.voteAverage = Math.fround(pointTotal / story.votes.length);
+    // Find the nearest available point. Always round up.
+    for (const availablePoint of PointsService.getPoints()) {
+      if (story.voteAverage - availablePoint <= 0) {
+        story.nearestPointAverage = availablePoint;
+        break;
+      }
+    }
   }
 
   /**

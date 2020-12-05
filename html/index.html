@@ -174,7 +174,7 @@
                             Delete last result
                         </button>
                         <section v-for="story of storyHistory">
-                            <strong>Story {{ story.name || 'result' }}: {{ story.voteAverage }}</strong><br/>
+                            <strong>Story {{ story.name || 'result' }}: {{ story.nearestPointAverage }}</strong><br/>
                             Votes:
                             <ul>
                                 <li v-for="vote of story.votes">
@@ -498,29 +498,7 @@
           return ''
         }
 
-        if (this.points.indexOf(this.average) !== -1) {
-          return this.average
-        }
-
-        const rounded = Math.round(this.average * 10) / 10
-        if (this.points.indexOf(rounded) !== -1) {
-          return rounded
-        }
-
-        // find nearest point.
-        for (let index = 0; index < this.points.length - 1; index++) {
-          if (isNaN(this.points[index + 1])) {
-            return this.average
-          }
-          if (this.average - this.points[index] > 0 && this.average - this.points[index + 1] < 0) {
-            if (this.average - this.points[index] < Math.abs(this.average - this.points[index + 1])) {
-              return this.points[index]
-            }
-            return this.points[index + 1]
-          }
-        }
-
-        return ''
+        return this.currentStory.nearestPointAverage;
       },
     },
     created () {

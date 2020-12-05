@@ -13,6 +13,7 @@ import { PokersService } from './pokers.service';
 interface StoryResponse {
   name: string;
   voteAverage?: number | string;
+  nearestPointAverage?: VoteValue;
   votes: VoteResponse[];
 }
 
@@ -286,6 +287,7 @@ export class PokersGateway implements OnGatewayInit {
     return {
       name: story.name,
       voteAverage: story.voteAverage,
+      nearestPointAverage: story.nearestPointAverage,
       votes: this.getVotesForResponse(story.votes),
     };
   }
