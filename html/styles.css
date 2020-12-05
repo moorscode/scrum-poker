@@ -257,6 +257,14 @@ button.picked {
     border: 2px solid #477608;
 }
 
+button.initial {
+    background-color: darkgray;
+    border-color: white;
+    top: 1px;
+    position: relative;
+    box-shadow: none;
+}
+
 button.highlighted,
 button.highlighted:hover,
 button.highlighted:active {

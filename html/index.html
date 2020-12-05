@@ -86,13 +86,13 @@
                         </label>
                     </div>
 
-                <button @click.prevent="newStory()" class="newStory" :disabled="voteCount === 0 || observer"><i
+                <button @click="newStory()" class="newStory" :disabled="voteCount === 0 || observer"><i
                         class="fas fa-plus-square"></i>
                     New story
                 </button>
-                <span class="allVoted" v-if="members.voters.length">All votes are in!</span>
+                <span class="allVoted" v-if="allVoted">All votes are in!</span>
                 <button @click="refinementDone()" class="refinement-done"><i class="fas fa-clipboard-check"></i>
-	                Finish refinement
+                    Finish refinement
                 </button>
 
                 <hr/>
@@ -112,10 +112,13 @@
 
                 <button
                         v-for="point of points"
-                        @click.prevent="castVote(point)"
-                        :class="[ 'choice',
-                     votes.map( vote=>vote.currentVote ).includes( point ) ? 'picked' : '',
-                     myVote === point ? 'highlighted' : '' ]">
+                        @click="castVote(point)"
+                        :class="[
+                        'choice',
+                        votes.map( vote=>vote.currentVote ).includes( point ) ? 'picked' : '',
+                        myVote === point ? 'highlighted' : '',
+                        myInitialVote === point ? 'initial' : '',
+                        ]">
                     <i :class="['fas','fa-mug-hot']" v-if="point === 'coffee'"></i>
                     {{ point }}
                 </button>
@@ -125,8 +128,8 @@
                 <p :class="[ 'results', this.members.length === this.voteCount ? 'final' : '' ]">
                     <button v-for="vote of votes" class="result">
                         <i :class="['fas','fa-mug-hot']" v-if="vote.currentValue === 'coffee'"></i>
-	                    <span class="initialVote" v-if="vote.initialValue !== vote.currentValue">{{ vote.initialValue }}</span>
-	                    <i v-if="vote.initialValue !== vote.currentValue" :class="['fas','fa-arrow-right']"></i>
+                        <span class="initialVote" v-if="vote.initialValue !== vote.currentValue">{{ vote.initialValue }}</span>
+                        <i v-if="vote.initialValue !== vote.currentValue" :class="['fas','fa-arrow-right']"></i>
                         {{ vote.currentValue }}
                         <div class="vote-names" v-if="groupedVoterNames && groupedVoterNames[vote.currentValue]">
                             {{ groupedVoterNames[vote.currentValue] && groupedVoterNames[vote.currentValue].join(', ') }}
@@ -264,13 +267,14 @@
       showMembersList: false,
       activePoker: false,
       joinPoker: '',
-      currentStory: { name:'' },
+      currentStory: { name: '', nearestPointAverage: '', voteAverage: '' },
       points: {},
       nickname: '',
       observer: false,
       storyName: '',
       storyNameUpdated: false,
       myVote: '',
+      myInitialVote: '',
       members: { voters: [], observers: [], disconnected: [] },
       votes: [],
       voteCount: 0,
@@ -306,6 +310,9 @@
           return
         }
 
+        if ( this.allVoted && ! this.myInitialVote ) {
+            this.myInitialVote = this.myVote;
+        }
         this.myVote = vote
         this.socket.emit('vote', { poker: this.activePoker, vote: vote })
       },
@@ -343,6 +350,7 @@
         this.joinPoker = this.joinPoker.toLowerCase()
 
         this.myVote = ''
+        this.myInitialVote = ''
         this.voteCount = 0
 
         if (this.joinPoker === '') {
@@ -360,6 +368,7 @@
         const currentPoker = this.activePoker
         this.activePoker = this.joinPoker = msg.poker
         this.myVote = (msg.vote && msg.vote.currentValue) || ''
+        this.myInitialVote = ''
 
         if (currentPoker !== false && currentPoker !== this.activePoker) {
           const url = new URL(window.location)
@@ -500,6 +509,9 @@
 
         return this.currentStory.nearestPointAverage;
       },
+      allVoted () {
+        return this.members.voters.length && this.voteCount === this.members.voters.length;
+      }
     },
     created () {
       this.baseTitle = document.title
