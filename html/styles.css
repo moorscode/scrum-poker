@@ -193,6 +193,10 @@ div.observe {
 	margin-bottom: 14px;
 }
 
+div.reveal-votes {
+    margin-bottom: 2em;
+}
+
 /* USERNAME */
 form.username {
 	margin-bottom: 6px;
@@ -304,7 +308,7 @@ button.highlighted .fas {
 }
 
 p.results {
-	margin-bottom: 2.2em;
+	margin-bottom: 1em;
 }
 
 button.result {

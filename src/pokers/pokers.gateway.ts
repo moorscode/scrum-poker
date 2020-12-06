@@ -1,9 +1,4 @@
-import {
-	OnGatewayInit,
-	SubscribeMessage,
-	WebSocketGateway,
-	WebSocketServer,
-} from "@nestjs/websockets";
+import { OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 // eslint-disable-next-line camelcase
 import { var_export } from "locutus/php/var";
 import { Server, Socket } from "socket.io";
@@ -27,6 +22,7 @@ interface StoryResponse {
 	voteAverage?: number | string;
 	nearestPointAverage?: VoteValue;
 	votes: VoteResponse[];
+	votesRevealed: boolean;
 }
 
 interface MembersResponse {
@@ -214,6 +210,13 @@ export class PokersGateway implements OnGatewayInit {
 		this.sendCurrentStory( message.poker );
 	}
 
+	@SubscribeMessage( "toggleRevealVotes" )
+	toggleRevealVotes( client: Socket, message: { poker: string } ): void {
+		this.pokersService.toggleRevealVotes( message.poker );
+		this.sendCurrentStory( message.poker );
+		this.sendVotes( message.poker );
+	}
+
 	@SubscribeMessage( "debug" )
 	getDebug( client: Socket, message: { secret: string } ): any {
 		if (
@@ -346,6 +349,7 @@ export class PokersGateway implements OnGatewayInit {
 			voteAverage: story.voteAverage,
 			nearestPointAverage: story.nearestPointAverage,
 			votes: this.formatVoteResponseList( story.votes ),
+			votesRevealed: story.votesRevealed,
 		};
 	}
 
