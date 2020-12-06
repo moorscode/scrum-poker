@@ -321,7 +321,7 @@
 					return
 				}
 
-				if (this.allVoted && !this.myInitialVote) {
+				if (this.allVoted && !this.myInitialVote && this.myVote !== 'coffee') {
 					this.myInitialVote = this.myVote;
 				}
 

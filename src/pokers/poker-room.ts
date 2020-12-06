@@ -261,6 +261,9 @@ export class PokerRoom {
 		if ( ! this.hasEverybodyVoted( this.currentStory ) ) {
 			this.getCurrentVote( userId ).initialValue = vote;
 		}
+		if ( this.getCurrentVote( userId ).initialValue === "coffee" ) {
+			this.getCurrentVote( userId ).initialValue = vote;
+		}
 		this.getCurrentVote( userId ).currentValue = vote;
 		this.setStoryAverage( this.currentStory );
 	}
