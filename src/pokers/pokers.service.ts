@@ -311,9 +311,10 @@ export class PokersService {
 				voteCount: votes.length,
 				votes,
 				groupedVoterNames: voted.reduce( ( accumulator, client: Client ) => {
-					const vote                       = this.getRoom( poker ).getCurrentVote( client.id );
-					accumulator[ vote.currentValue ] = accumulator[ vote.currentValue ] || [];
-					accumulator[ vote.currentValue ].push( client.name );
+					const vote                  = this.getRoom( poker ).getCurrentVote( client.id );
+					const voteGroupKey: string  = vote.initialValue + "/" + vote.currentValue;
+					accumulator[ voteGroupKey ] = accumulator[ voteGroupKey ] || [];
+					accumulator[ voteGroupKey ].push( client.name );
 					return accumulator;
 				}, {} ),
 			};

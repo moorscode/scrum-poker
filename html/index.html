@@ -138,8 +138,8 @@
                                 <i :class="['fas','fa-mug-hot']" v-if="vote.currentValue === 'coffee'"></i>
                                 {{ vote.currentValue }}
                                 <div class="vote-names"
-									 v-if="groupedVoterNames && groupedVoterNames[vote.currentValue]">
-                                {{ groupedVoterNames[vote.currentValue] && groupedVoterNames[vote.currentValue].join(', ') }}
+									 v-if="getGroupedVoteNames(vote)">
+                                {{ getGroupedVoteNames(vote).join(', ') }}
                             </div>
                             </button>
 
@@ -434,6 +434,13 @@
 			getFromURL(key) {
 				return new URLSearchParams(window.location.search.substring(1)).get(key)
 			},
+			getGroupedVoteNames( vote ) {
+				if ( ! this.groupedVoterNames ) {
+					return [];
+				}
+				const voteGroupKey = vote.initialValue + "/" + vote.currentValue;
+				return this.groupedVoterNames[ voteGroupKey ];
+			}
 		},
 		computed: {
 			unvotedNames() {
