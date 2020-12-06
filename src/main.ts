@@ -9,7 +9,7 @@ import { join } from "path";
  * @returns {Promise<void>} Listen for a connection.
  */
 async function bootstrap() {
-	const app = await NestFactory.create<NestExpressApplication>( AppModule );
+	const app = await NestFactory.create < NestExpressApplication >( AppModule );
 	app.useStaticAssets( join( __dirname, "..", "html" ) );
 	await app.listen( process.env.SERVER_PORT || 3000 );
 }
