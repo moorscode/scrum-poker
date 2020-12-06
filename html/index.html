@@ -113,18 +113,21 @@
 					</form>
 					<br/>
 
-					<button
-							v-for="point of points"
-							@click="castVote(point)"
-							:class="[
-                            'choice',
-                            votes.map( vote=>vote.currentValue ).includes( point ) ? 'picked' : '',
-                            myVote === point ? 'highlighted' : '',
-                            myInitialVote === point ? 'initial' : '',
-                            ]">
-						<i :class="['fas','fa-mug-hot']" v-if="point === 'coffee'"></i>
-						{{ point }}
-					</button>
+					<div class="choices">
+						<button
+								v-for="point of points"
+								@click="castVote(point)"
+								:class="[
+										'choice',
+										votes.map( vote=>vote.currentValue ).includes( point ) ? 'picked' : '',
+										myVote === point ? 'highlighted' : '',
+										myInitialVote === point ? 'initial' : '',
+									]"
+						>
+							<i :class="['fas','fa-mug-hot']" v-if="point === 'coffee'"></i>
+							{{ point }}
+						</button>
+					</div>
 
 					<hr/>
 

@@ -324,10 +324,6 @@ button.result:active {
 	top: 0;
 }
 
-button.result:first-child {
-	margin-left: 0;
-}
-
 button.result:focus {
 	outline: 0;
 }
@@ -367,6 +363,10 @@ span.resultContainer {
 	margin: 0 4px 8px;
 	position: relative;
 	display: inline-block;
+}
+
+span.resultContainer:first-child {
+	margin-left: 0;
 }
 
 button.result.initialVote {
