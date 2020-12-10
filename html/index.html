@@ -142,16 +142,15 @@
 								{{ vote.currentValue }}
 								<div class="vote-names"
 									 v-if="groupedVoterNames && groupedVoterNames[vote.currentValue]">
-					<div class="reveal-votes">
-						<button v-if="!this.currentStory.votesRevealed" @click="toggleRevealVotes()"
-								:disabled="allVoted || this.voteCount === 0">
-							<i class="fas fa-eye"></i> Reveal votes
-						</button>
-						<button v-if="this.currentStory.votesRevealed" @click="toggleRevealVotes()"
-								:disabled="allVoted || this.voteCount === 0">
-							<i class="fas fa-eye-slash"></i> Hide votes
-						</button>
-					</div>
+								{{ groupedVoterNames[vote.currentValue] && groupedVoterNames[vote.currentValue].join(', ') }}
+							</div>
+							</button>
+						</span>
+						<div class="reveal-votes">
+							<button @click="toggleRevealVotes()" :disabled="allVoted || nobodyVoted">
+								<i :class="['fas',revealVotesButtonIconClass]"></i> {{revealVotesButtonText}}
+							</button>
+						</div>
 					</p>
 
 					<section v-if="average !== ''">
@@ -541,6 +540,15 @@
 			},
 			allVoted() {
 				return this.members.voters.length && this.voteCount === this.members.voters.length;
+			},
+			nobodyVoted() {
+				return this.voteCount === 0;
+			},
+			revealVotesButtonIconClass() {
+				return this.currentStory.votesRevealed ? 'fa-eye-slash' :'fa-eye';
+			},
+			revealVotesButtonText() {
+				return this.currentStory.votesRevealed ? 'Hide votes' :'Reveal votes';
 			}
 		},
 		created() {
@@ -592,8 +600,7 @@
 				this.socket.emit( 'exit' )
 			}
 		}
-	} )
-
+	} );
 </script>
 </body>
 </html>
