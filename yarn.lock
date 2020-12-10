@@ -2493,7 +2493,7 @@ escodegen@^1.14.1:
   optionalDependencies:
     source-map "~0.6.1"
 
-eslint-config-yoast@^5.0.6:
+eslint-config-yoast@^5.0.17:
   version "5.0.17"
   resolved "https://registry.yarnpkg.com/eslint-config-yoast/-/eslint-config-yoast-5.0.17.tgz#51fc7c4cf208639236153c2f9baa7c449e808975"
   integrity sha512-+tFaAx3MyeVoSOOrkMMjbJ5m+s4HG7E26Pxcnrvv9CZf31OQ2M3P/LpV+FLRTOfBFqjgvnemYLIvrrj9+0+ofw==

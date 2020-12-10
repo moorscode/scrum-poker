@@ -119,7 +119,7 @@
 								@click="castVote(point)"
 								:class="[
 										'choice',
-										votes.map( vote=>vote.currentValue ).includes( point ) ? 'picked' : '',
+										pointIsPickedClass(point),
 										myVote === point ? 'highlighted' : '',
 										myInitialVote === point ? 'initial' : '',
 									]"
@@ -141,8 +141,8 @@
 								<i :class="['fas','fa-mug-hot']" v-if="vote.currentValue === 'coffee'"></i>
 								{{ vote.currentValue }}
 								<div class="vote-names"
-									 v-if="groupedVoterNames && groupedVoterNames[vote.currentValue]">
-								{{ groupedVoterNames[vote.currentValue] && groupedVoterNames[vote.currentValue].join(', ') }}
+									 v-if="getGroupedVoteNames(vote)">
+								{{ getGroupedVoteNames(vote).join(', ') }}
 							</div>
 							</button>
 						</span>
@@ -330,9 +330,10 @@
 					return
 				}
 
-				if ( this.allVoted && ! this.myInitialVote ) {
+				if (this.allVoted && ! this.myInitialVote && this.myVote !== 'coffee') {
 					this.myInitialVote = this.myVote;
 				}
+
 				this.myVote = vote
 				this.socket.emit( 'vote', { poker: this.activePoker, vote: vote } )
 			},
@@ -450,6 +451,16 @@
 			},
 			getFromURL( key ) {
 				return new URLSearchParams( window.location.search.substring( 1 ) ).get( key )
+			},
+			getGroupedVoteNames( vote ) {
+				if ( ! this.groupedVoterNames ) {
+					return [];
+				}
+				const voteGroupKey = vote.initialValue + "/" + vote.currentValue;
+				return this.groupedVoterNames[ voteGroupKey ];
+			},
+			pointIsPickedClass( point ) {
+				return this.votes.map( vote=>vote.currentValue ).includes( point ) ? 'picked' : '';
 			},
 		},
 		computed: {
