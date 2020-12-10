@@ -132,20 +132,16 @@
 					<hr/>
 
 					<p :class="[ 'results', this.members.length === this.voteCount ? 'final' : '' ]">
-                        <span class="resultContainer" v-for="vote of votes">
-                            <button class="result initialVote" v-if="vote.initialValue !== vote.currentValue">
-                                <i :class="['fas','fa-mug-hot']" v-if="vote.initialValue === 'coffee'"></i>
-                                {{ vote.initialValue }}
-                            </button>
-                            <button class="result">
-                                <i :class="['fas','fa-mug-hot']" v-if="vote.currentValue === 'coffee'"></i>
-                                {{ vote.currentValue }}
-                                <div class="vote-names"
+						<span class="resultContainer" v-for="vote of votes">
+							<button class="result initialVote" v-if="vote.initialValue !== vote.currentValue">
+								<i :class="['fas','fa-mug-hot']" v-if="vote.initialValue === 'coffee'"></i>
+								{{ vote.initialValue }}
+							</button>
+							<button class="result">
+								<i :class="['fas','fa-mug-hot']" v-if="vote.currentValue === 'coffee'"></i>
+								{{ vote.currentValue }}
+								<div class="vote-names"
 									 v-if="groupedVoterNames && groupedVoterNames[vote.currentValue]">
-                                {{ groupedVoterNames[vote.currentValue] && groupedVoterNames[vote.currentValue].join(', ') }}
-                            </div>
-                            </button>
-                        </span>
 					<div class="reveal-votes">
 						<button v-if="!this.currentStory.votesRevealed" @click="toggleRevealVotes()"
 								:disabled="allVoted || this.voteCount === 0">
