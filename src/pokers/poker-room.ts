@@ -219,7 +219,7 @@ export class PokerRoom {
 	 *
 	 * @returns {Client[]} List of voters that haven't voted yet.
 	 */
-	public getNotVotedClients():Client[] {
+	public getVotePendingClients(): Client[] {
 		return Object.values( this.clients.voters ).filter( ( client: Client ) =>
 			! client.votes.some( ( vote: Vote ) => vote.story === this.currentStory ),
 		);
@@ -310,9 +310,9 @@ export class PokerRoom {
 	 */
 	public getCurrentVotes(): Vote[] {
 		if ( this.hasEverybodyVoted( this.currentStory ) || this.currentStory.votesRevealed ) {
-			return this.getRealVotesWithObscuredVotes( this.currentStory );
+			return this.getUnobscuredVotes( this.currentStory );
 		}
-		return this.getObscuredVotes(this.currentStory);
+		return this.getObscuredVotes( this.currentStory );
 	}
 
 	/**
@@ -320,14 +320,16 @@ export class PokerRoom {
 	 *
 	 * @param {Story} story The story to get votes for.
 	 *
-	 * @return {Vote[]} The actual votes with the backfilled missing votes.
+	 * @returns {Vote[]} The actual votes with the backfilled missing votes.
 	 */
-	public getRealVotesWithObscuredVotes( story: Story ): Vote[] {
-		const notVotedClients:Client[] = this.getNotVotedClients()
+	public getUnobscuredVotes( story: Story ): Vote[] {
+		const notVotedClients:Client[] = this.getVotePendingClients();
 		return [
-			...story.votes, // The actual votes.
+			// The actual votes.
+			...story.votes,
+			// Backfill pending votes with obscured '?' votes.
 			...notVotedClients.map(
-				( client: Client ): ObscuredVote =>  this.getObscuredVote( this.currentStory, client ),
+				( client: Client ): ObscuredVote => this.getObscuredVote( this.currentStory, client ),
 			),
 		];
 	}
@@ -339,7 +341,7 @@ export class PokerRoom {
 	 *
 	 * @returns {ObscuredVote[]} List of obscured votes.
 	 */
-	public getObscuredVotes(story:Story): ObscuredVote[] {
+	public getObscuredVotes( story: Story ): ObscuredVote[] {
 		return Object.values( this.clients.voters ).map(
 			( client: Client ): ObscuredVote =>  this.getObscuredVote( story, client ),
 		);
@@ -349,12 +351,12 @@ export class PokerRoom {
 	 * Gets an obscured vote representing an hidden cast vote ("X") or a missing vote ("?").
 	 *
 	 * @param {Story} story The story to get the obscured vote for.
-	 * @param client The client to get the obscured vote for.
+	 * @param {Client} client The client to get the obscured vote for.
 	 *
-	 * @return {ObscuredVote} The obscured vote representing an hidden cast vote ("X") or a missing vote ("?").
+	 * @returns {ObscuredVote} The obscured vote representing an hidden cast vote ("X") or a missing vote ("?").
 	 */
-	public getObscuredVote( story: Story, client ): ObscuredVote {
-		const hasVoted: boolean = typeof ( this.getCurrentVote( client.id ) ) !== "undefined";
+	public getObscuredVote( story: Story, client: Client ): ObscuredVote {
+		const hasVoted: boolean = typeof( this.getCurrentVote( client.id ) ) !== "undefined";
 		const voteValue: HiddenVoteValue = hasVoted ? "X" : "?";
 		return {
 			initialValue: voteValue,
@@ -472,7 +474,7 @@ export class PokerRoom {
 	/**
 	 * Toggles between showing and or hiding the current votes.
 	 *
-	 * @return {boolean} The new value
+	 * @returns {boolean} The new value
 	 */
 	public toggleRevealVotes(): boolean {
 		this.currentStory.votesRevealed = ! this.currentStory.votesRevealed;
