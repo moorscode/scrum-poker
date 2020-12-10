@@ -301,7 +301,6 @@
 			groupedVoterNames: [],
 			showHistory: false,
 			storyHistory: [],
-			votesAreRevealed: false,
 		},
 		methods: {
 			refinementDone() {
@@ -369,7 +368,7 @@
 				this.socket.emit( 'popHistory', { poker: this.activePoker } )
 			},
 			toggleRevealVotes() {
-				if ( ! this.votesAreRevealed ) {
+				if ( ! this.currentStory.votesRevealed ) {
 					if ( ! window.confirm( "Are you sure you want to reveal all votes before everybody has voted? Everybody can see the results." ) ) {
 						return;
 					}
