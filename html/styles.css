@@ -96,6 +96,22 @@ button .fas {
 	margin-right: 3px;
 }
 
+input[type=submit]:hover,
+input[type=submit]:hover .fas,
+input[type=submit]:active,
+input[type=submit]:active.fas,
+button:hover,
+button:hover .fas,
+button:active,
+button:active .fas {
+	color: #a4286a;
+}
+
+button[disabled],
+button[disabled] .fas {
+	color: darkgrey;
+}
+
 a {
 	color: #a4286a;
 }
@@ -228,19 +244,6 @@ form.username .fas {
 	border: 1px inset;
 }
 
-/* NEW STORY */
-button.newStory:hover,
-button.newStory:hover .fas,
-button.newStory:active,
-button.newStory:active .fas {
-	color: #a4286a;
-}
-
-button.newStory[disabled],
-button.newStory[disabled] .fas {
-	color: darkgrey;
-}
-
 .story-updated {
 	position: relative;
 	top: 3px;
@@ -274,6 +277,7 @@ button.choice {
 button.choice:active,
 button.choice:hover {
 	background-color: darkgray;
+	color: black;
 }
 
 button.choice:first-child {
@@ -322,6 +326,10 @@ button.result {
 	z-index: 10;
 	position: relative;
 	transition: transform 250ms ease-out;
+}
+
+button.result:hover {
+	color: black;
 }
 
 button.result:active {
