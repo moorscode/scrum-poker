@@ -147,7 +147,7 @@
 							</button>
 						</span>
 						<div class="reveal-votes">
-							<button @click="toggleRevealVotes()" :disabled="allVoted || nobodyVoted">
+							<button @click="toggleRevealVotes()" :disabled="allVoted || nobodyVoted || ! myVote">
 								<i :class="['fas',revealVotesButtonIconClass]"></i> {{revealVotesButtonText}}
 							</button>
 						</div>
