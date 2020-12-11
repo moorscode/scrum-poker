@@ -113,37 +113,44 @@
 					</form>
 					<br/>
 
-					<button
-							v-for="point of points"
-							@click="castVote(point)"
-							:class="[
-                            'choice',
-                            pointIsPickedClass(point),
-                            myVote === point ? 'highlighted' : '',
-                            myInitialVote === point ? 'initial' : '',
-                            ]">
-						<i :class="['fas','fa-mug-hot']" v-if="point === 'coffee'"></i>
-						{{ point }}
-					</button>
+					<div class="choices">
+						<button
+								v-for="point of points"
+								@click="castVote(point)"
+								:class="[
+										'choice',
+										pointIsPickedClass(point),
+										myVote === point ? 'highlighted' : '',
+										myInitialVote === point ? 'initial' : '',
+									]"
+						>
+							<i :class="['fas','fa-mug-hot']" v-if="point === 'coffee'"></i>
+							{{ point }}
+						</button>
+					</div>
 
 					<hr/>
 
 					<p :class="[ 'results', this.members.length === this.voteCount ? 'final' : '' ]">
-                        <span class="resultContainer" v-for="vote of votes">
-                            <button class="result initialVote" v-if="vote.initialValue !== vote.currentValue">
-                                <i :class="['fas','fa-mug-hot']" v-if="vote.initialValue === 'coffee'"></i>
-                                {{ vote.initialValue }}
-                            </button>
-                            <button class="result">
-                                <i :class="['fas','fa-mug-hot']" v-if="vote.currentValue === 'coffee'"></i>
-                                {{ vote.currentValue }}
-                                <div class="vote-names"
+						<span class="resultContainer" v-for="vote of votes">
+							<button class="result initialVote" v-if="vote.initialValue !== vote.currentValue">
+								<i :class="['fas','fa-mug-hot']" v-if="vote.initialValue === 'coffee'"></i>
+								{{ vote.initialValue }}
+							</button>
+							<button class="result">
+								<i :class="['fas','fa-mug-hot']" v-if="vote.currentValue === 'coffee'"></i>
+								{{ vote.currentValue }}
+								<div class="vote-names"
 									 v-if="getGroupedVoteNames(vote)">
-                                {{ getGroupedVoteNames(vote).join(', ') }}
-                            </div>
-                            </button>
-
-                        </span>
+								{{ getGroupedVoteNames(vote).join(', ') }}
+							</div>
+							</button>
+						</span>
+						<div class="reveal-votes">
+							<button @click="toggleRevealVotes()" :disabled="allVoted || nobodyVoted || ! myVote">
+								<i :class="['fas',revealVotesButtonIconClass]"></i> {{revealVotesButtonText}}
+							</button>
+						</div>
 					</p>
 
 					<section v-if="average !== ''">
@@ -266,7 +273,7 @@
 </main>
 
 <script>
-	new Vue({
+	new Vue( {
 		el: '#v-app',
 		data: {
 			socket: null,
@@ -277,7 +284,7 @@
 			showMembersList: false,
 			activePoker: false,
 			joinPoker: '',
-			currentStory: {name: '', nearestPointAverage: '', voteAverage: ''},
+			currentStory: { name: '', nearestPointAverage: '', voteAverage: '' },
 			points: {},
 			nickname: '',
 			observer: false,
@@ -285,7 +292,7 @@
 			storyNameUpdated: false,
 			myVote: '',
 			myInitialVote: '',
-			members: {voters: [], observers: [], disconnected: []},
+			members: { voters: [], observers: [], disconnected: [] },
 			votes: [],
 			voteCount: 0,
 			voteNames: {},
@@ -296,67 +303,77 @@
 		},
 		methods: {
 			refinementDone() {
-				this.socket.emit('finish', {poker: this.activePoker})
+				this.socket.emit( 'finish', { poker: this.activePoker } )
 			},
 			onRefinementDone() {
 				this.refinementFinished = true
 			},
 			observerChange() {
-				window.localStorage.setItem(this.activePoker + '-observer', this.observer)
+				window.localStorage.setItem( this.activePoker + '-observer', this.observer )
 
-				if (this.observer) {
-					this.socket.emit('observe', {poker: this.activePoker})
+				if ( this.observer ) {
+					this.socket.emit( 'observe', { poker: this.activePoker } )
 				} else {
 					this.joinRoom()
 				}
 			},
 			updateNickname() {
-				if (!this.nickname) return
-
-				window.localStorage.setItem('nickname', this.nickname)
-				this.socket.emit('nickname', {name: this.nickname, poker: this.activePoker})
-			},
-			castVote(vote) {
-				if (this.observer) {
+				if ( ! this.nickname ) {
 					return
 				}
 
-				if (this.allVoted && !this.myInitialVote && this.myVote !== 'coffee') {
+				window.localStorage.setItem( 'nickname', this.nickname )
+				this.socket.emit( 'nickname', { name: this.nickname, poker: this.activePoker } )
+			},
+			castVote( vote ) {
+				if ( this.observer ) {
+					return
+				}
+
+				if (this.allVoted && ! this.myInitialVote && this.myVote !== 'coffee') {
 					this.myInitialVote = this.myVote;
 				}
 
 				this.myVote = vote
-				this.socket.emit('vote', {poker: this.activePoker, vote: vote})
+				this.socket.emit( 'vote', { poker: this.activePoker, vote: vote } )
 			},
 			setStoryName() {
-				this.socket.emit('changeStoryName', {poker: this.activePoker, name: this.storyName})
+				this.socket.emit( 'changeStoryName', { poker: this.activePoker, name: this.storyName } )
 			},
 			newStory() {
-				if (this.voteCount === 0 || this.observer) {
+				if ( this.voteCount === 0 || this.observer ) {
 					return
 				}
 
 				// Confirm when not everybody has voted.
-				if (this.voteCount !== this.members.voters.length) {
-					if (!window.confirm('Are you sure you want to start a new story, not all votes are in yet.')) {
+				if ( this.voteCount !== this.members.voters.length ) {
+					if ( ! window.confirm( 'Are you sure you want to start a new story, not all votes are in yet.' ) ) {
 						return
 					}
 				}
 
 				this.storyNameUpdated = false
-				this.socket.emit('newStory', {poker: this.activePoker})
+				this.socket.emit( 'newStory', { poker: this.activePoker } )
 			},
 			resetHistory() {
-				if (!window.confirm('Are you sure you want to clear the history?\n\nThis clears the history for all members in this room.')) {
+				if ( ! window.confirm( 'Are you sure you want to clear the history?\n\nThis clears the history for all members in this room.' ) ) {
 					return
 				}
-				this.socket.emit('resetHistory', {poker: this.activePoker})
+				this.socket.emit( 'resetHistory', { poker: this.activePoker } )
 			},
 			popHistory() {
-				if (!window.confirm('Are you sure you want to remove the last history item?\n\nThis removes the item for all members in this room.')) {
+				if ( ! window.confirm( 'Are you sure you want to remove the last history item?\n\nThis removes the item for all members in this room.' ) ) {
 					return
 				}
-				this.socket.emit('popHistory', {poker: this.activePoker})
+				this.socket.emit( 'popHistory', { poker: this.activePoker } )
+			},
+			toggleRevealVotes() {
+				if ( ! this.currentStory.votesRevealed ) {
+					if ( ! window.confirm( "Are you sure you want to reveal all votes before everybody has voted? Everybody can see the results." ) ) {
+						return;
+					}
+				}
+				this.socket.emit( 'toggleRevealVotes', { poker: this.activePoker } )
 			},
 			joinRoom() {
 				this.joinPoker = this.joinPoker.toLowerCase()
@@ -365,75 +382,75 @@
 				this.myInitialVote = ''
 				this.voteCount = 0
 
-				if (this.joinPoker === '') {
+				if ( this.joinPoker === '' ) {
 					this.activePoker = ''
 					return
 				}
 
-				this.socket.emit('join', {poker: this.joinPoker, name: this.nickname})
+				this.socket.emit( 'join', { poker: this.joinPoker, name: this.nickname } )
 			},
 			toggleHistory() {
-				this.showHistory = !this.showHistory
-				window.localStorage.setItem('showHistory', this.showHistory)
+				this.showHistory = ! this.showHistory
+				window.localStorage.setItem( 'showHistory', this.showHistory )
 			},
-			onJoined: function (msg) {
+			onJoined: function( msg ) {
 				const currentPoker = this.activePoker
 				this.activePoker = this.joinPoker = msg.poker
-				this.myVote = (msg.vote && msg.vote.currentValue) || ''
+				this.myVote = ( msg.vote && msg.vote.currentValue ) || ''
 				this.myInitialVote = ''
 
-				if (currentPoker !== false && currentPoker !== this.activePoker) {
-					const url = new URL(window.location)
-					url.searchParams.set('room', this.activePoker)
-					window.history.pushState({room: this.activePoker}, '', url)
+				if ( currentPoker !== false && currentPoker !== this.activePoker ) {
+					const url = new URL( window.location )
+					url.searchParams.set( 'room', this.activePoker )
+					window.history.pushState( { room: this.activePoker }, '', url )
 				}
 
-				if (this.observer) {
-					this.socket.emit('observe', {poker: this.activePoker})
+				if ( this.observer ) {
+					this.socket.emit( 'observe', { poker: this.activePoker } )
 				}
 			},
-			onStoryHistory(msg) {
-				this.storyHistory = (msg.stories || []).reverse()
+			onStoryHistory( msg ) {
+				this.storyHistory = ( msg.stories || [] ).reverse()
 			},
-			onReceiveVote(msg) {
-				this.votes = msg.votes.sort((a, b) => a.currentValue - b.currentValue) || []
+			onReceiveVote( msg ) {
+				this.votes = msg.votes.sort( ( a, b ) => a.currentValue - b.currentValue ) || []
 				this.voteCount = msg.voteCount
 				this.votedNames = msg.votedNames || []
 				this.groupedVoterNames = msg.groupedVoterNames || {}
 
 				// Reset myVote when a new story is started.
-				if (this.voteCount === 0) {
+				if ( this.voteCount === 0 ) {
 					this.myVote = ''
 					this.myInitialVote = ''
 				}
 
 				document.title = this.baseTitle + ' ' + this.voteCount + '/' + this.members.voters.length
 			},
-			onPoints(msg) {
+			onPoints( msg ) {
 				this.points = msg.points
 			},
-			onPageChange(event) {
-				this.joinPoker = (event.state && event.state.room) || ''
-				if (this.joinPoker !== this.activePoker) {
-					this.socket.emit('leave', {poker: this.activePoker})
+			onPageChange( event ) {
+				this.joinPoker = ( event.state && event.state.room ) || ''
+				if ( this.joinPoker !== this.activePoker ) {
+					this.socket.emit( 'leave', { poker: this.activePoker } )
 				}
 				this.joinRoom()
 			},
-			onStoryUpdated(msg) {
-				const nameChanged = (this.currentStory.name !== msg.currentStory.name)
+			onStoryUpdated( msg ) {
+				const nameChanged = ( this.currentStory.name !== msg.currentStory.name )
 				this.currentStory = msg.currentStory;
 				this.storyName = this.currentStory.name;
 
-				if (nameChanged) {
+				if ( nameChanged ) {
 					this.storyNameUpdated = true;
-					setTimeout(() => this.storyNameUpdated = false, 1400)
+					setTimeout( () => this.storyNameUpdated = false, 1400 )
 				}
 			},
-			onMemberList(msg) {
+			onMemberList( msg ) {
 				this.members = msg
 			},
-			getFromURL(key) {
-				return new URLSearchParams(window.location.search.substring(1)).get(key)
+			getFromURL( key ) {
+				return new URLSearchParams( window.location.search.substring( 1 ) ).get( key )
 			},
 			getGroupedVoteNames( vote ) {
 				if ( ! this.groupedVoterNames ) {
@@ -448,11 +465,11 @@
 		},
 		computed: {
 			unvotedNames() {
-				const result = this.members.voters.map(member => member.name)
-				for (const name of this.votedNames) {
-					const index = result.indexOf(name)
-					if (index !== -1) {
-						result.splice(index, 1)
+				const result = this.members.voters.map( member => member.name )
+				for ( const name of this.votedNames ) {
+					const index = result.indexOf( name )
+					if ( index !== - 1 ) {
+						result.splice( index, 1 )
 					}
 				}
 				return result
@@ -461,42 +478,42 @@
 				return this.observer ? 'Observing…' : 'Observe'
 			},
 			average() {
-				if (this.voteCount === 0 || this.voteCount < this.members.voters.length) {
+				if ( this.voteCount === 0 || this.voteCount < this.members.voters.length ) {
 					return ''
 				}
 
-				if (this.currentStory.voteAverage === 'coffee') {
+				if ( this.currentStory.voteAverage === 'coffee' ) {
 					return 'Coffee break'
 				}
 
 				return this.currentStory.voteAverage;
 			},
 			averageContext() {
-				if (this.average === '') {
+				if ( this.average === '' ) {
 					return ''
 				}
 
 				// Find the difference between the lowest and the highest votes.
-				const lowestIndex = this.points.indexOf(this.votes[0].currentValue);
-				const highestIndex = this.points.indexOf(this.votes[this.votes.length - 1].currentValue);
+				const lowestIndex = this.points.indexOf( this.votes[ 0 ].currentValue );
+				const highestIndex = this.points.indexOf( this.votes[ this.votes.length - 1 ].currentValue );
 
-				if (highestIndex - lowestIndex > 2) {
-					return `Large gap between lowest and highest vote: ${highestIndex - lowestIndex} cards!`
+				if ( highestIndex - lowestIndex > 2 ) {
+					return `Large gap between lowest and highest vote: ${ highestIndex - lowestIndex } cards!`
 				}
 			},
 			pointSpread() {
-				if (this.average === '') {
+				if ( this.average === '' ) {
 					return ''
 				}
 
 				// Find the difference between the lowest and the highest votes.
-				const lowestIndex = this.points.indexOf(this.votes[0].currentValue)
-				const highestIndex = this.points.indexOf(this.votes[this.votes.length - 1].currentValue)
+				const lowestIndex = this.points.indexOf( this.votes[ 0 ].currentValue )
+				const highestIndex = this.points.indexOf( this.votes[ this.votes.length - 1 ].currentValue )
 
 				return highestIndex - lowestIndex
 			},
 			backgroundColor() {
-				switch (true) {
+				switch ( true ) {
 					case this.refinementFinished:
 						return 'finished'
 					case this.pointSpread === '':
@@ -510,23 +527,23 @@
 				}
 			},
 			standardDeviation() {
-				if (this.average === '') {
+				if ( this.average === '' ) {
 					return ''
 				}
 
-				if (this.votes.length <= 1 || this.votes.map(vote => vote.currentValue).indexOf('coffee') !== -1) {
+				if ( this.votes.length <= 1 || this.votes.map( vote => vote.currentValue ).indexOf( 'coffee' ) !== - 1 ) {
 					return 'n/a'
 				}
 
 				let powers = 0
-				for (let i = 0; i < this.votes.length; i++) {
-					powers += Math.pow(parseFloat(this.votes.map(vote => vote.currentValue)[i]) - this.average, 2)
+				for ( let i = 0; i < this.votes.length; i ++ ) {
+					powers += Math.pow( parseFloat( this.votes.map( vote => vote.currentValue )[ i ] ) - this.average, 2 )
 				}
 
-				return Math.round(Math.sqrt(powers / this.votes.length) * 100) / 100
+				return Math.round( Math.sqrt( powers / this.votes.length ) * 100 ) / 100
 			},
 			averagePoint() {
-				if (this.average === '') {
+				if ( this.average === '' ) {
 					return ''
 				}
 
@@ -534,59 +551,67 @@
 			},
 			allVoted() {
 				return this.members.voters.length && this.voteCount === this.members.voters.length;
+			},
+			nobodyVoted() {
+				return this.voteCount === 0;
+			},
+			revealVotesButtonIconClass() {
+				return this.currentStory.votesRevealed ? 'fa-eye-slash' :'fa-eye';
+			},
+			revealVotesButtonText() {
+				return this.currentStory.votesRevealed ? 'Hide votes' :'Reveal votes';
 			}
 		},
 		created() {
 			this.baseTitle = document.title
 
-			this.joinPoker = this.getFromURL('room') || ''
+			this.joinPoker = this.getFromURL( 'room' ) || ''
 
 			// Retrieve data from local storage.
-			this.nickname = window.localStorage.getItem('nickname')
-			this.showHistory = window.localStorage.getItem('showHistory') === 'true'
-			if (this.joinPoker) {
-				this.observer = window.localStorage.getItem(this.joinPoker + '-observer') === 'true'
+			this.nickname = window.localStorage.getItem( 'nickname' )
+			this.showHistory = window.localStorage.getItem( 'showHistory' ) === 'true'
+			if ( this.joinPoker ) {
+				this.observer = window.localStorage.getItem( this.joinPoker + '-observer' ) === 'true'
 			}
 
-			const clientId = window.localStorage.getItem('clientId')
-			if (clientId && clientId !== '' && !this.getFromURL('new-client')) {
+			const clientId = window.localStorage.getItem( 'clientId' )
+			if ( clientId && clientId !== '' && ! this.getFromURL( 'new-client' ) ) {
 				this.clientId = clientId
 			}
 
-			this.socket = io(window.location.protocol + '//' + window.location.hostname + ':' + location.port + window.location.pathname + 'pokers')
+			this.socket = io( window.location.protocol + '//' + window.location.hostname + ':' + location.port + window.location.pathname + 'pokers' )
 
-			this.socket.on('userId', (clientId) => {
-				if (!this.clientId) {
+			this.socket.on( 'userId', ( clientId ) => {
+				if ( ! this.clientId ) {
 					this.clientId = clientId
 				}
-				window.localStorage.setItem('clientId', this.clientId)
-				this.socket.emit('identify', {id: this.clientId})
-			})
+				window.localStorage.setItem( 'clientId', this.clientId )
+				this.socket.emit( 'identify', { id: this.clientId } )
+			} )
 
-			this.socket.on('welcome', this.joinRoom)
-			this.socket.on('reconnect', () => {
-				this.socket.emit('identify', {id: this.clientId})
-			})
+			this.socket.on( 'welcome', this.joinRoom )
+			this.socket.on( 'reconnect', () => {
+				this.socket.emit( 'identify', { id: this.clientId } )
+			} )
 
-			this.socket.on('points', (msg) => {
-				this.onPoints(msg)
+			this.socket.on( 'points', ( msg ) => {
+				this.onPoints( msg )
 				this.loading = false
-			})
+			} )
 
-			this.socket.on('joined', this.onJoined)
-			this.socket.on('votes', this.onReceiveVote)
-			this.socket.on('history', this.onStoryHistory)
-			this.socket.on('storyUpdated', this.onStoryUpdated)
-			this.socket.on('member-list', this.onMemberList)
-			this.socket.on('finished', this.onRefinementDone)
+			this.socket.on( 'joined', this.onJoined )
+			this.socket.on( 'votes', this.onReceiveVote )
+			this.socket.on( 'history', this.onStoryHistory )
+			this.socket.on( 'storyUpdated', this.onStoryUpdated )
+			this.socket.on( 'member-list', this.onMemberList )
+			this.socket.on( 'finished', this.onRefinementDone )
 
 			window.onpopstate = this.onPageChange
 			window.onbeforeunload = () => {
-				this.socket.emit('exit')
+				this.socket.emit( 'exit' )
 			}
 		}
-	})
-
+	} );
 </script>
 </body>
 </html>

@@ -16,6 +16,7 @@ export interface Story {
 	nearestPointAverage?: VoteValue;
 	// eslint-disable-next-line no-use-before-define
 	votes: Vote[];
+	votesRevealed: boolean;
 }
 
 export interface Vote {
@@ -37,7 +38,7 @@ export interface MemberList {
 	};
 }
 
-export interface HiddenVote extends Vote {
+export interface ObscuredVote extends Vote {
 	currentValue: HiddenVoteValue;
 	initialValue: HiddenVoteValue;
 }
@@ -58,7 +59,7 @@ export class PokerRoom {
 	constructor() {
 		this.clients      = { disconnected: {}, observers: {}, voters: {} };
 		this.history      = [];
-		this.currentStory = { name: "", votes: [] };
+		this.currentStory = { name: "", votes: [], votesRevealed: false };
 	}
 
 	/**
@@ -116,6 +117,8 @@ export class PokerRoom {
 			delete this.clients.disconnected[ userId ];
 		}
 
+		this.currentStory.votesRevealed = false;
+
 		this.clients.voters[ userId ] = {
 			id: userId,
 			name,
@@ -161,6 +164,7 @@ export class PokerRoom {
 			( vote: Vote ) => vote.voter.id !== userId,
 		);
 		this.setStoryAverage( this.currentStory );
+		this.currentStory.votesRevealed = false;
 	}
 
 	/**
@@ -177,6 +181,7 @@ export class PokerRoom {
 		}
 
 		delete this.clients.disconnected[ userId ];
+		this.currentStory.votesRevealed = false;
 	}
 
 	/**
@@ -202,12 +207,21 @@ export class PokerRoom {
 	 * Retrieves the voted voters.
 	 *
 	 * @returns {Client[]} List of voted voters.
-	 *
-	 * @private
 	 */
 	public getVotedClients(): Client[] {
 		return Object.values( this.clients.voters ).filter( ( client: Client ) =>
 			client.votes.some( ( vote: Vote ) => vote.story === this.currentStory ),
+		);
+	}
+
+	/**
+	 * Retrieves the voters that haven't voted yet.
+	 *
+	 * @returns {Client[]} List of voters that haven't voted yet.
+	 */
+	public getVotePendingClients(): Client[] {
+		return Object.values( this.clients.voters ).filter( ( client: Client ) =>
+			! client.votes.some( ( vote: Vote ) => vote.story === this.currentStory ),
 		);
 	}
 
@@ -293,35 +307,66 @@ export class PokerRoom {
 	}
 
 	/**
-	 * Lists the votes in a room.
+	 * Lists the votes in a room for the current story.
 	 *
 	 * @returns {Vote[]} List of votes.
-	 *
-	 * @private
 	 */
-	public getVotes(): Vote[] {
-		return this.currentStory.votes;
+	public getCurrentVotes(): Vote[] {
+		if ( this.hasEverybodyVoted( this.currentStory ) || this.currentStory.votesRevealed ) {
+			return this.getUnobscuredVotes( this.currentStory );
+		}
+		return this.getObscuredVotes( this.currentStory );
+	}
+
+	/**
+	 * Gets all casted votes and backfills the missing votes with "?".
+	 *
+	 * @param {Story} story The story to get votes for.
+	 *
+	 * @returns {Vote[]} The actual votes with the backfilled missing votes.
+	 */
+	public getUnobscuredVotes( story: Story ): Vote[] {
+		const notVotedClients:Client[] = this.getVotePendingClients();
+		return [
+			// The actual votes.
+			...story.votes,
+			// Backfill pending votes with obscured '?' votes.
+			...notVotedClients.map(
+				( client: Client ): ObscuredVote => this.getObscuredVote( this.currentStory, client ),
+			),
+		];
 	}
 
 	/**
 	 * Retrieves the obscured votes.
 	 *
-	 * @returns {Vote[]} List of obscured votes.
+	 * @param {Story} story The story to get obscured votes for.
+	 *
+	 * @returns {ObscuredVote[]} List of obscured votes.
 	 */
-	public getObscuredVotes(): Vote[] {
+	public getObscuredVotes( story: Story ): ObscuredVote[] {
 		return Object.values( this.clients.voters ).map(
-			( client: Client ): HiddenVote => {
-				const hasVoted: boolean          = typeof( this.getCurrentVote( client.id ) ) !== "undefined";
-				const voteValue: HiddenVoteValue = hasVoted ? "X" : "?";
-
-				return {
-					initialValue: voteValue,
-					currentValue: voteValue,
-					voter: client,
-					story: this.currentStory,
-				};
-			},
+			( client: Client ): ObscuredVote =>  this.getObscuredVote( story, client ),
 		);
+	}
+
+	/**
+	 * Gets an obscured vote representing an hidden cast vote ("X") or a missing vote ("?").
+	 *
+	 * @param {Story} story The story to get the obscured vote for.
+	 * @param {Client} client The client to get the obscured vote for.
+	 *
+	 * @returns {ObscuredVote} The obscured vote representing an hidden cast vote ("X") or a missing vote ("?").
+	 */
+	public getObscuredVote( story: Story, client: Client ): ObscuredVote {
+		const hasVoted: boolean = typeof( this.getCurrentVote( client.id ) ) !== "undefined";
+		const voteValue: HiddenVoteValue = hasVoted ? "X" : "?";
+		return {
+			initialValue: voteValue,
+			currentValue: voteValue,
+			voter: client,
+			story: this.currentStory,
+		};
 	}
 
 	/**
@@ -379,7 +424,7 @@ export class PokerRoom {
 		this.history.push( this.currentStory );
 
 		// Reset the current story.
-		this.currentStory = { name, votes: [] };
+		this.currentStory = { name, votes: [], votesRevealed: false };
 	}
 
 	/**
@@ -427,5 +472,15 @@ export class PokerRoom {
 	 */
 	public popHistory(): void {
 		this.history.pop();
+	}
+
+	/**
+	 * Toggles between showing and or hiding the current votes.
+	 *
+	 * @returns {boolean} The new value
+	 */
+	public toggleRevealVotes(): boolean {
+		this.currentStory.votesRevealed = ! this.currentStory.votesRevealed;
+		return this.currentStory.votesRevealed;
 	}
 }

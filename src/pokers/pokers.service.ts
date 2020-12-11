@@ -300,32 +300,30 @@ export class PokersService {
 	 */
 	public getVotes( poker: string ): CurrentVotes {
 		const voted: Client[] = this.getRoom( poker ).getVotedClients();
-		const votes           = this.getRoom( poker ).getVotes();
+		const votes           = this.getRoom( poker ).getCurrentVotes();
 
-		const voteCount   = votes.length;
-		const memberCount = this.getVoterCount( poker );
-
-		// When all votes are in, show the actual votes.
-		if ( memberCount === voteCount ) {
-			return {
-				voteCount: votes.length,
-				votes,
-				groupedVoterNames: voted.reduce( ( accumulator, client: Client ) => {
-					const vote                  = this.getRoom( poker ).getCurrentVote( client.id );
-					const voteGroupKey: string  = vote.initialValue + "/" + vote.currentValue;
-					accumulator[ voteGroupKey ] = accumulator[ voteGroupKey ] || [];
-					accumulator[ voteGroupKey ].push( client.name );
-					return accumulator;
-				}, {} ),
-			};
-		}
-
-		// Otherwise show an X for voted, ? for unvoted.
 		return {
-			voteCount: votes.length,
-			votes: this.getRoom( poker ).getObscuredVotes(),
-			groupedVoterNames: {},
+			voteCount: voted.length,
+			votes,
+			groupedVoterNames: voted.reduce( ( accumulator, client: Client ) => {
+				const vote                  = this.getRoom( poker ).getCurrentVote( client.id );
+				const voteGroupKey: string  = vote.initialValue + "/" + vote.currentValue;
+				accumulator[ voteGroupKey ] = accumulator[ voteGroupKey ] || [];
+				accumulator[ voteGroupKey ].push( client.name );
+				return accumulator;
+			}, {} ),
 		};
+	}
+
+	/**
+	 * Toggles whether or not to show votes before all votes are in for a room.
+	 *
+	 * @param {string} poker Room to toggle reveal.
+	 *
+	 * @returns {void}
+	 */
+	public toggleRevealVotes( poker: string ): void {
+		this.getRoom( poker ).toggleRevealVotes();
 	}
 
 	/**
