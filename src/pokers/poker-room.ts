@@ -347,7 +347,12 @@ export class PokerRoom {
 	public getObscuredVotes( story: Story ): ObscuredVote[] {
 		return Object.values( this.clients.voters ).map(
 			( client: Client ): ObscuredVote =>  this.getObscuredVote( story, client ),
-		);
+		).sort( ( a, b ) => {
+			if ( a.currentValue === b.currentValue ) {
+				return 0;
+			}
+			return a.currentValue === "X" ? -1 : 1;
+		} );
 	}
 
 	/**
