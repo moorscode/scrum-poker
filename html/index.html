@@ -312,6 +312,7 @@
 				window.localStorage.setItem( this.activePoker + '-observer', this.observer )
 
 				if ( this.observer ) {
+					this.myVote = '';
 					this.socket.emit( 'observe', { poker: this.activePoker } )
 				} else {
 					this.joinRoom()

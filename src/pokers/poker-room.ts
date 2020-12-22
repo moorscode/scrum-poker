@@ -176,6 +176,11 @@ export class PokerRoom {
 	 */
 	public setObserver( userId: string ): void {
 		if ( this.clients.voters[ userId ] ) {
+			// Remove the users vote from the vote-list.
+			const userVote = this.getCurrentVote( userId );
+			this.currentStory.votes = this.currentStory.votes.filter( ( vote ) => userVote !== vote );
+			this.setStoryAverage( this.currentStory );
+
 			this.clients.observers[ userId ] = this.clients.voters[ userId ];
 			delete this.clients.voters[ userId ];
 		}
