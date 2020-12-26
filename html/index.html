@@ -5,11 +5,16 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
 	<title>Pum Scroker!</title>
-	<link href="/styles.css" rel="stylesheet">
+	<style type="text/css">
+	[v-cloak] {
+		display: none;
+	}
+	</style>
 	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.min.js"></script>
 	<script src="/socket.io/socket.io.js"></script>
 	<script src="https://kit.fontawesome.com/92b43d9045.js" crossorigin="anonymous"></script>
 	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link href="/styles.css" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -37,8 +42,7 @@
 				</p>
 			</section>
 
-			<div class="pokerMain" v-if="this.activePoker">
-
+			<div class="pokerMain" v-cloak v-if="this.activePoker">
 				<section v-if="refinementFinished">
 					<h1 class="finished">Refinement done! 📣 🙌 🎉</h1>
 				</section>
@@ -211,7 +215,7 @@
 		</section>
 	</section>
 
-	<section class="poker" v-if="!this.activePoker">
+	<section v-cloak class="poker" v-if="!this.activePoker && !this.loading">
 		<h2>Features</h2>
 		<h3>Voting</h3>
 		<p>
@@ -590,14 +594,17 @@
 				this.socket.emit( 'identify', { id: this.clientId } )
 			} )
 
-			this.socket.on( 'welcome', this.joinRoom )
+			this.socket.on( 'welcome', () => {
+				this.loading = false
+				this.joinRoom()
+			} )
+
 			this.socket.on( 'reconnect', () => {
 				this.socket.emit( 'identify', { id: this.clientId } )
 			} )
 
 			this.socket.on( 'points', ( msg ) => {
 				this.onPoints( msg )
-				this.loading = false
 			} )
 
 			this.socket.on( 'joined', this.onJoined )
