@@ -14,7 +14,7 @@
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
-    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "lint": "eslint \"{src,apps,libs,test,vue}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
@@ -53,7 +53,7 @@
     "@typescript-eslint/parser": "^4.6.1",
     "babel-loader": "^8.2.2",
     "css-loader": "^5.0.1",
-    "eslint": "^7.12.1",
+    "eslint": "^7.17.0",
     "eslint-config-yoast": "^5.0.17",
     "eslint-plugin-jsx-a11y": "^6.4.1",
     "eslint-plugin-react": "^7.12.4",
@@ -78,8 +78,7 @@
     "moduleFileExtensions": [
       "js",
       "json",
-      "ts",
-      "vue"
+      "ts"
     ],
     "rootDir": "src",
     "testRegex": ".*\\.spec\\.ts$",
