@@ -1,0 +1,553 @@
+html, body {
+	font-family: 'Roboto', sans-serif;
+	font-weight: 400;
+	margin: 0;
+	padding: 0;
+	height: 100%;
+}
+
+main {
+	transition: background-color 750ms ease-in-out;
+	background-color: #efefef;
+	width: 100%;
+	min-height: 100%;
+	padding: 20px;
+	box-sizing: border-box;
+}
+
+main.no-spread {
+	background-color: #e3fbc4;
+}
+
+main.high-spread {
+	background-color: #f68787;
+}
+
+main.normal-spread {
+	background-color: #ddd;
+}
+
+main.finished {
+	background: linear-gradient(124deg, #ff2400, #e81d1d, #e8b71d, #e3e81d, #1de840, #1ddde8, #2b1de8, #dd00f3, #dd00f3);
+	background-size: 1800% 1800%;
+
+	-webkit-animation: rainbow 18s ease infinite;
+	-o-animation: rainbow 18s ease infinite;
+	animation: rainbow 18s ease infinite;
+}
+
+h1, h2, h3 {
+	color: #a4286a;
+}
+
+h1 {
+	font-family: 'Roboto', sans-serif;
+	font-weight: 700;
+	font-size: 4em;
+	margin: 0 0 0.2em 0;
+}
+
+h2 {
+	margin: 0 0 0.2em 0;
+}
+
+h1.finished {
+	color: #477608;
+}
+
+label {
+	cursor: pointer;
+}
+
+.fas {
+	color: #a4286a;
+}
+
+.fas.observer {
+	color: black;
+}
+
+button,
+input[type=submit] {
+	box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
+	font-size: 14px;
+	padding: 5px 7px;
+	cursor: pointer;
+	border: 1px solid darkgray;
+	border-radius: 2px;
+	outline: none;
+}
+
+button:active,
+input[type=submit]:active {
+	position: relative;
+	top: 1px;
+	box-shadow: none;
+}
+
+input[type=text] {
+	font-size: 16px;
+	padding: 4px;
+	border: 1px inset;
+}
+
+button .fas {
+	color: black;
+	margin-right: 3px;
+}
+
+input[type=submit]:hover,
+input[type=submit]:hover .fas,
+input[type=submit]:active,
+input[type=submit]:active.fas,
+button:hover,
+button:hover .fas,
+button:active,
+button:active .fas {
+	color: #a4286a;
+}
+
+button[disabled],
+button[disabled] .fas {
+	color: darkgrey;
+}
+
+a {
+	color: #a4286a;
+}
+
+.poker, .credits {
+	max-width: 800px;
+	margin: 0 auto 20px;
+	position: relative;
+}
+
+.credits {
+	color: #666;
+	font-size: 16px;
+	font-variant: all-small-caps;
+	text-align: center;
+	padding-bottom: 20px;
+}
+
+main.finished .credits,
+main.finished .credits a,
+main.no-spread .credits,
+main.no-spread .credits a,
+main.high-spread .credits,
+main.high-spread .credits a {
+	color: black;
+}
+
+.poker {
+	padding: 20px;
+	border: 1px solid #a4286a;
+	border-radius: 4px;
+	background-color: white;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.members-list-container {
+	position: absolute;
+	right: 20px;
+	display: flex;
+	align-items: flex-end;
+	flex-direction: column;
+	text-align: right;
+	background-color: rgba(255, 255, 255, 0.75);
+}
+
+.members-list-container .pressed {
+	box-shadow: none;
+	margin-top: 1px;
+	margin-bottom: -1px;
+}
+
+.members-list {
+	border: 1px solid #a4286a;
+	margin-top: 10px;
+	min-width: 150px;
+	padding: 10px 10px 0 20px;
+	box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
+}
+
+.members-list ul {
+	margin-top: 4px;
+	padding-left: 10px;
+}
+
+.members-list li {
+	list-style: none;
+	margin: 0;
+}
+
+.members-list .fa-person-booth {
+	margin-left: 4px;
+	color: #477608;
+}
+
+.members-list .fa-user-secret {
+	margin-left: 5px;
+	margin-right: 3px;
+}
+
+.members-list .fa-plug {
+	margin-left: 5px;
+	margin-right: 5px;
+}
+
+.members-list.hidden {
+	display: none;
+}
+
+.rooms {
+	margin-bottom: 1em;
+}
+
+form.storyName {
+	margin-bottom: 16px;
+}
+
+div.observe {
+	margin-left: 5px;
+	margin-bottom: 14px;
+}
+
+div.reveal-votes {
+    margin-bottom: 2em;
+}
+
+/* USERNAME */
+form.username {
+	margin-bottom: 6px;
+	margin-left: 6px;
+	min-height: 30px;
+}
+
+form.username .fas {
+	color: black;
+}
+
+.username input[type=submit] {
+	display: none;
+}
+
+.username:active input[type=submit],
+.username:hover input[type=submit],
+.username.hover input[type=submit] {
+	display: inline-block;
+}
+
+.username input[type=text] {
+	border: 1px solid transparent;
+}
+
+.username:active input[type=text],
+.username:hover input[type=text],
+.username.hover input[type=text] {
+	border: 1px inset;
+}
+
+.story-updated {
+	position: relative;
+	top: 3px;
+	margin-left: 4px;
+	color: #477608;
+}
+
+input[type=text].changed {
+	box-shadow: 0 0 0 2px #477608;
+	transition: box-shadow 250ms ease-in-out;
+	border-radius: 3px;
+}
+
+/* POINTS */
+button.choice .fas {
+	color: #a4286a;
+}
+
+button.choice {
+	font-size: 14px;
+	min-width: 40px;
+	height: 40px;
+	border-radius: 4px;
+	border-width: 0;
+	margin: 0 4px 8px;
+	cursor: pointer;
+	outline: 0;
+	user-select: none;
+}
+
+button.choice:active,
+button.choice:hover {
+	background-color: darkgray;
+	color: black;
+}
+
+button.choice:first-child {
+	margin-left: 0;
+}
+
+button.picked {
+	border: 2px solid #477608;
+}
+
+button.initial {
+	background-color: darkgray;
+	border-color: white;
+	top: 1px;
+	position: relative;
+	box-shadow: none;
+}
+
+button.highlighted,
+button.highlighted:hover,
+button.highlighted:active {
+	background-color: #a4286a;
+	border-color: #a4286a;
+	color: white;
+	top: 1px;
+	position: relative;
+	box-shadow: none;
+}
+
+button.highlighted .fas {
+	color: white;
+}
+
+p.results {
+	margin-bottom: 1em;
+}
+
+button.result {
+	font-size: 16px;
+	min-width: 55px;
+	height: 50px;
+	border-radius: 4px;
+	border: 1px solid transparent;
+	padding: 0 14px;
+	box-shadow: none;
+	z-index: 10;
+	position: relative;
+	transition: transform 250ms ease-out;
+}
+
+button.result:hover {
+	color: black;
+}
+
+button.result:active {
+	top: 0;
+}
+
+button.result:focus {
+	outline: 0;
+}
+
+p.final > button.result,
+p.final > button.result:active {
+	font-weight: bold;
+	border-color: #a4286a;
+	border-width: 2px;
+	border-style: solid;
+	color: #a4286a;
+	cursor: help;
+}
+
+button.result > .fas {
+	color: #a4286a;
+}
+
+button.result > .vote-names {
+	position: absolute;
+	padding: 10px;
+	margin-top: 24px;
+	border-radius: 3px;
+	border: 1px solid #a4286a;
+	display: none;
+	background: white;
+	box-shadow: 3px 3px 0 -1px #a4286a;
+}
+
+button.result:active > .vote-names,
+button.result:hover > .vote-names {
+	display: block;
+}
+
+span.resultContainer {
+	margin: 0 4px 8px;
+	position: relative;
+	display: inline-block;
+	z-index: 4;
+}
+span.resultContainer:hover {
+	z-index: 10;
+}
+
+span.resultContainer:first-child {
+	margin-left: 0;
+}
+
+button.result.initialVote {
+	z-index: 1;
+	position: absolute;
+}
+
+button.result.initialVote:hover + button.result,
+button.result.initialVote:active + button.result,
+button.result.initialVote:focus + button.result {
+	transform: translateY(25px);
+}
+
+button.result.initialVote + button.result {
+	left: 0;
+	top: 14px;
+	border: 1px solid #999;
+	box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
+}
+
+div.voting {
+	display: flex;
+}
+
+div.voted {
+	flex: 50%;
+	color: #477608;
+}
+
+div.unvoted {
+	flex: 50%;
+	color: #a4286a;
+}
+
+span.allVoted {
+	padding: 6px;
+	position: relative;
+	top: 1px;
+}
+
+div.pokerMain {
+	margin-top: 14px;
+}
+
+hr {
+	padding: 0;
+	width: 100%;
+	height: 0;
+	margin: 16px 0;
+	border: none;
+	border-top: 1px dashed #a4286a;
+}
+
+.storyHistory h3 {
+	cursor: pointer;
+	user-select: none;
+}
+
+.storyHistory.hidden .story {
+	display: none;
+}
+
+.storyHistory h3::after {
+	font-family: 'Font Awesome 5 Free';
+	content: '\f424';
+	font-size: 14px;
+	margin-left: 8px;
+}
+
+.storyHistory.hidden h3::after {
+	font-family: 'Font Awesome 5 Free';
+	content: '\f422';
+	font-size: 14px;
+	margin-left: 8px;
+}
+
+.story button {
+	margin-bottom: 16px;
+}
+
+.story button[disabled] .fas {
+	color: darkgrey;
+}
+
+.story ul {
+	margin-top: 4px;
+}
+
+.fa-plug.connected {
+	color: #477608;
+}
+
+.fa-plug.disconnected {
+	color: #a4286a;
+}
+
+@media only screen and (max-width: 820px) {
+	.members-list-container {
+		display: none;
+	}
+
+	main .poker:first-child {
+		margin-top: 0;
+	}
+
+	.poker, .credits {
+		padding: 10px 15px;
+	}
+
+	h1 {
+		font-size: 3em;
+	}
+
+	input[type=text] {
+		width: 120px;
+	}
+}
+
+@-webkit-keyframes rainbow {
+	0% {
+		background-position: 0 82%
+	}
+	50% {
+		background-position: 100% 19%
+	}
+	100% {
+		background-position: 0 82%
+	}
+}
+
+@-moz-keyframes rainbow {
+	0% {
+		background-position: 0 82%
+	}
+	50% {
+		background-position: 100% 19%
+	}
+	100% {
+		background-position: 0 82%
+	}
+}
+
+@-o-keyframes rainbow {
+	0% {
+		background-position: 0 82%
+	}
+	50% {
+		background-position: 100% 19%
+	}
+	100% {
+		background-position: 0 82%
+	}
+}
+
+@keyframes rainbow {
+	0% {
+		background-position: 0 82%
+	}
+	50% {
+		background-position: 100% 19%
+	}
+	100% {
+		background-position: 0 82%
+	}
+}

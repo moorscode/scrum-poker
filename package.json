@@ -6,6 +6,7 @@
   "private": false,
   "license": "GPL-3.0-or-later",
   "scripts": {
+    "pref:build": "rimraf dist/frontend",
     "prebuild": "rimraf dist",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
@@ -17,7 +18,10 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
-    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand"
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "f:dev:watch": "webpack-dev-server -d --mode development --config ./vue/webpack.config.js",
+    "f:build": "webpack -p --mode production  --config ./vue/webpack.config.js",
+    "remind-me": "https://dev.to/lampewebdev/nestjs-adding-a-frontend-to-the-monorepo-11g6"
   },
   "dependencies": {
     "@nestjs/common": "^7.5.1",
@@ -26,11 +30,15 @@
     "@nestjs/platform-express": "^7.5.1",
     "@nestjs/platform-socket.io": "^7.5.4",
     "@nestjs/websockets": "^7.5.4",
+    "copy-webpack-plugin": "^7.0.0",
     "locutus": "^2.0.14",
     "redis": "^3.0.2",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
-    "rxjs": "^6.6.3"
+    "rxjs": "^6.6.3",
+    "vue": "^2.6.12",
+    "vue-socket.io": "^3.0.10",
+    "vuex": "^3.6.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^7.5.1",
@@ -43,22 +51,35 @@
     "@types/supertest": "^2.0.10",
     "@typescript-eslint/eslint-plugin": "^4.6.1",
     "@typescript-eslint/parser": "^4.6.1",
+    "babel-loader": "^8.2.2",
+    "css-loader": "^5.0.1",
     "eslint": "^7.12.1",
     "eslint-config-yoast": "^5.0.17",
     "eslint-plugin-jsx-a11y": "^6.4.1",
     "eslint-plugin-react": "^7.12.4",
+    "file-loader": "^6.2.0",
+    "html-webpack-plugin": "^4.5.0",
     "jest": "^26.6.3",
     "supertest": "^6.0.0",
     "ts-jest": "^26.4.3",
     "ts-node": "^9.0.0",
     "tsconfig-paths": "^3.9.0",
-    "typescript": "^4.0.5"
+    "typescript": "^4.0.5",
+    "url-loader": "^4.1.1",
+    "vue-eslint-parser": "^7.3.0",
+    "vue-loader": "^15.9.6",
+    "vue-template-compiler": "^2.6.12",
+    "webpack": "^5.11.0",
+    "webpack-bundle-analyzer": "^4.3.0",
+    "webpack-cli": "3.3.12",
+    "webpack-dev-server": "^3.11.0"
   },
   "jest": {
     "moduleFileExtensions": [
       "js",
       "json",
-      "ts"
+      "ts",
+      "vue"
     ],
     "rootDir": "src",
     "testRegex": ".*\\.spec\\.ts$",
