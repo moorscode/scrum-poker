@@ -15,11 +15,8 @@ import { mapState } from "vuex";
 
 export default {
 	name: "Observer",
-	data() {
-		return {
-		};
-	},
 	created() {
+		// @todo figure out when to read/apply this correctly..
 		this.$store.commit( "observe", window.localStorage.getItem( this.activePoker + "-observer" ) === "true" );
 	},
 	computed: {

@@ -19,12 +19,6 @@ const config = {
 				test: /\.vue$/,
 				loader: "vue-loader",
 			},
-			// {
-			// 	test: /\.ts$/,
-			// 	loader: "ts-loader",
-			// 	options: { appendTsSuffixTo: [ /\.vue$/ ] },
-			// 	exclude: /node_modules/,
-			// },
 		],
 	},
 	resolve: {

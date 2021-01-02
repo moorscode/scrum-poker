@@ -7,7 +7,8 @@ import VueSocketIO from "vue-socket.io";
 Vue.use( Vuex );
 
 Vue.use( new VueSocketIO( {
-	debug: true,
+	debug: false,
+	// @todo figure out how to read the env variable.
 	connection: window.location.protocol + "//" + window.location.hostname + ":3050" + window.location.pathname + "pokers",
 } ) );
 
@@ -23,17 +24,13 @@ const store = new Vuex.Store( {
 		showHistory: window.localStorage.getItem( "showHistory" ) === "true",
 		pointSpread: null,
 		currentStory: { name: "", nearestPointAverage: "", voteAverage: "" },
-		// StoryName: "",
-		// StoryNameUpdated: false,
 		myVote: "",
-		// MyInitialVote: "",
 		members: { voters: [], observers: [], disconnected: [] },
 		votes: [],
 		voteCount: 0,
 		voteNames: {},
 		votedNames: [],
 		groupedVoterNames: [],
-		// StoryHistory: [],
 	},
 	mutations: {
 		loadingFinished( state ) {
