@@ -1,5 +1,5 @@
 <template>
-  <div :class="['storyHistory', showHistory ? '':'hidden']">
+  <div :class="['storyHistory', showHistory !== false ? '':'hidden']">
     <h3 @click="toggleHistory()">
       Story history
     </h3>
@@ -51,7 +51,7 @@ export default {
 	name: "StoryHistory",
 	data() {
 		return {
-			showHistory: window.localStorage.getItem( "showHistory" ),
+			showHistory: window.localStorage.getItem( "showHistory" ) !== "false",
 			storyHistory: [],
 		};
 	},
@@ -64,13 +64,19 @@ export default {
 			window.localStorage.setItem( "showHistory", this.showHistory );
 		},
 		resetHistory() {
-			if ( ! window.confirm( "Are you sure you want to clear the history?\n\nThis clears the history for all members in this room." ) ) {
+			if ( ! window.confirm(
+				"Are you sure you want to clear the history?\n\n" +
+				"This clears the history for all members in this room." )
+			) {
 				return;
 			}
 			this.$socket.emit( "resetHistory", { poker: this.activePoker } );
 		},
 		popHistory() {
-			if ( ! window.confirm( "Are you sure you want to remove the last history item?\n\nThis removes the item for all members in this room." ) ) {
+			if ( ! window.confirm(
+				"Are you sure you want to remove the last history item?\n\n" +
+				"This removes the item for all members in this room." )
+			) {
 				return;
 			}
 			this.$socket.emit( "popHistory", { poker: this.activePoker } );
