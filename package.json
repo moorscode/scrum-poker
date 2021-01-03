@@ -8,15 +8,14 @@
   "scripts": {
     "prefrontend:build": "rimraf dist/frontend",
     "prebuild": "rimraf dist/backend",
-    "build": "nest build",
     "build:all": "yarn build && yarn frontend:build",
-    "format": "prettier --write \"backend/src/**/*.ts\" \"test/**/*.ts\"",
+    "build": "nest build",
+    "frontend:build": "webpack -p --mode production --config ./frontend/webpack.config.js",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "frontend:watch": "webpack-dev-server -d --mode development --config ./frontend/webpack.config.js",
-    "frontend:build": "webpack -p --mode production --config ./frontend/webpack.config.js",
 	"lint": "eslint \"backend/src/**/*.ts\" \"frontend/src/**/*.vue\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -81,7 +80,7 @@
       "json",
       "ts"
     ],
-    "rootDir": "src",
+    "rootDir": "backend/src",
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
