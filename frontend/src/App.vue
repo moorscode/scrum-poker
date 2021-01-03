@@ -12,7 +12,7 @@
           <member-list />
           <nickname />
           <observer />
-          <new-story /> <finish-refinement />
+          <story /> <refinement />
 
           <hr>
 
@@ -41,10 +41,10 @@
 import Vue from "vue";
 import { mapState } from "vuex";
 
-import FinishRefinement from "./components/FinishRefinement.vue";
+import Refinement from "./components/Refinement.vue";
 import MemberList from "./components/MemberList.vue";
 import MemberStatus from "./components/MemberStatus.vue";
-import NewStory from "./components/NewStory.vue";
+import Story from "./components/Story.vue";
 import Observer from "./components/Observer.vue";
 import Room from "./components/Room.vue";
 import PokerChoices from "./components/PokerChoices.vue";
@@ -59,19 +59,19 @@ import Credits from "./components/Credits.vue";
 
 export default Vue.extend( {
 	components: {
-		Observer,
 		Room,
 		Nickname,
-		RefinementFinished,
+		Observer,
 		MemberList,
-		NewStory,
-		FinishRefinement,
+		MemberStatus,
+		Refinement,
+		RefinementFinished,
+		Story,
 		StoryName,
+		StoryHistory,
 		PokerChoices,
 		Results,
 		ResultStatistics,
-		MemberStatus,
-		StoryHistory,
 		FeatureList,
 		Credits,
 	},

@@ -10,7 +10,7 @@
 <script>
 import { mapState } from "vuex";
 export default {
-	name: "FinishRefinement",
+	name: "Refinement",
 	computed: {
 		...mapState( [ "activePoker" ] ),
 	},
