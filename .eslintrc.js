@@ -1,8 +1,10 @@
 module.exports = {
-	parser: "@typescript-eslint/parser",
+	parser: "vue-eslint-parser",
 	parserOptions: {
+		parser: "@typescript-eslint/parser",
 		project: "tsconfig.json",
 		sourceType: "module",
+		extraFileExtensions: [ ".vue" ],
 	},
 	plugins: [ "@typescript-eslint/eslint-plugin" ],
 	"extends": [
@@ -46,4 +48,13 @@ module.exports = {
 			version: "16.8",
 		},
 	},
+	overrides: [
+      {
+        files: ["frontend/src/**/*.vue"], // Or *.test.js
+        rules: {
+          "require-jsdoc": 0,
+          "no-alert": 0,
+        }
+      }
+    ],
 };

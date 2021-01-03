@@ -47,7 +47,9 @@ export default {
 
 			if ( nameChanged ) {
 				this.storyNameUpdated = true;
-				setTimeout( () => this.storyNameUpdated = false, 1400 );
+				setTimeout( () => {
+					this.storyNameUpdated = false;
+				}, 1400 );
 			}
 		},
 	},
