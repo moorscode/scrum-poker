@@ -2,7 +2,6 @@
 const path = require( "path" );
 const webpack = require( "webpack" );
 const VueLoaderPlugin = require( "vue-loader/lib/plugin" );
-const BundleAnalyzerPlugin = require( "webpack-bundle-analyzer" ).BundleAnalyzerPlugin;
 const HtmlPlugin = require( "html-webpack-plugin" );
 const CopyWebpackPlugin = require( "copy-webpack-plugin" );
 
@@ -46,8 +45,8 @@ const config = {
 			 patterns: [
 				{
 					// Wildcard is specified hence will copy only css files
-					from: "*.css", // Will resolve to RepoDir/src/css and all *.css files from this directory
-					to: "css", // Copies all matched css files from above dest to dist/css
+					from: "*.css",
+					to: "css",
 					context: "src/css",
 				},
 			] } ),
