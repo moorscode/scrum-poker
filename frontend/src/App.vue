@@ -47,21 +47,22 @@
 <script lang="ts">
 import Vue from "vue";
 import { mapState } from "vuex";
-import FinishRefinement from "./FinishRefinement.vue";
-import MemberList from "./MemberList.vue";
-import MemberStatus from "./MemberStatus.vue";
-import NewStory from "./NewStory.vue";
-import Observer from "./Observer.vue";
-import Room from "./Room.vue";
-import PokerChoices from "./PokerChoices.vue";
-import RefinementFinished from "./RefinementFinished.vue";
-import Results from "./Results.vue";
-import ResultStatistics from "./ResultStatistics.vue";
-import StoryName from "./StoryName.vue";
-import Nickname from "./Nickname.vue";
-import StoryHistory from "./StoryHistory.vue";
-import FeatureList from "./FeatureList.vue";
-import Credits from "./Credits.vue";
+
+import FinishRefinement from "./components/FinishRefinement.vue";
+import MemberList from "./components/MemberList.vue";
+import MemberStatus from "./components/MemberStatus.vue";
+import NewStory from "./components/NewStory.vue";
+import Observer from "./components/Observer.vue";
+import Room from "./components/Room.vue";
+import PokerChoices from "./components/PokerChoices.vue";
+import RefinementFinished from "./components/RefinementFinished.vue";
+import Results from "./components/Results.vue";
+import ResultStatistics from "./components/ResultStatistics.vue";
+import StoryName from "./components/StoryName.vue";
+import Nickname from "./components/Nickname.vue";
+import StoryHistory from "./components/StoryHistory.vue";
+import FeatureList from "./components/FeatureList.vue";
+import Credits from "./components/Credits.vue";
 
 export default Vue.extend( {
 	components: {
