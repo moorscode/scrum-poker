@@ -9,9 +9,7 @@
         :disabled="storyHistory.length === 0"
         @click="resetHistory()"
       >
-        <i
-          class="fas fa-eraser"
-        />
+        <i class="fas fa-eraser" />
         Reset history
       </button>
       <button
@@ -25,7 +23,8 @@
         Delete last result
       </button>
       <section v-for="story of storyHistory">
-        <strong>Story {{ story.name || 'result' }}: {{ story.nearestPointAverage }}</strong><br>
+        <strong>Story {{ story.name || 'result' }}: {{ story.nearestPointAverage }}</strong>
+		<br>
         Votes:
         <ul>
           <li v-for="vote of story.votes">

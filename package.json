@@ -9,6 +9,7 @@
     "prefrontend:build": "rimraf dist/frontend",
     "prebuild": "rimraf dist/backend",
     "build": "nest build",
+    "build:all": "yarn build && yarn frontend:build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
@@ -16,13 +17,11 @@
     "start:prod": "node dist/main",
     "frontend:watch": "webpack-dev-server -d --mode development --config ./frontend/webpack.config.js",
     "frontend:build": "webpack -p --mode production --config ./frontend/webpack.config.js",
-    "build:all": "yarn build && yarn f:build",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand"
-    
   },
   "dependencies": {
     "@nestjs/common": "^7.5.1",
@@ -54,6 +53,7 @@
     "@typescript-eslint/parser": "^4.6.1",
     "babel-loader": "^8.2.2",
     "css-loader": "^5.0.1",
+    "dotenv": "^8.2.0",
     "eslint": "^7.17.0",
     "eslint-config-yoast": "^5.0.17",
     "eslint-plugin-jsx-a11y": "^6.4.1",

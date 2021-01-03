@@ -1,9 +1,14 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const path = require( "path" );
+const webpack = require( "webpack" );
 const VueLoaderPlugin = require( "vue-loader/lib/plugin" );
 const BundleAnalyzerPlugin = require( "webpack-bundle-analyzer" ).BundleAnalyzerPlugin;
 const HtmlPlugin = require( "html-webpack-plugin" );
 const CopyWebpackPlugin = require( "copy-webpack-plugin" );
+
+const dotenv = require( "dotenv" ).config( {
+	path: path.join( __dirname, "..", ".env" ),
+} );
 
 const config = {
 	context: __dirname,
@@ -37,8 +42,11 @@ const config = {
 			analyzerMode: "static",
 			openAnalyzer: false,
 		} ),
+		new webpack.DefinePlugin( {
+			"process.env": dotenv.parsed,
+		} ),
 		new VueLoaderPlugin(),
-		 new CopyWebpackPlugin( {
+		new CopyWebpackPlugin( {
 			 patterns: [
 				{
 					// Wildcard is specified hence will copy only css files

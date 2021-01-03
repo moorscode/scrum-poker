@@ -8,8 +8,7 @@ Vue.use( Vuex );
 
 Vue.use( new VueSocketIO( {
 	debug: false,
-	// @todo figure out how to read the env variable.
-	connection: window.location.protocol + "//" + window.location.hostname + ":3050" + window.location.pathname + "pokers",
+	connection: window.location.protocol + "//" + window.location.hostname + ":" + process.env.SERVER_PORT + "" + window.location.pathname + "pokers",
 } ) );
 
 const store = new Vuex.Store( {
