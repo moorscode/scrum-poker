@@ -14,10 +14,13 @@
 import { mapState } from "vuex";
 
 export default {
-	name: "Observer",
+	name: "observer",
 	created() {
-		// @todo figure out when to read/apply this correctly..
-		this.$store.commit( "observe", window.localStorage.getItem( this.activePoker + "-observer" ) === "true" );
+		const observing = window.localStorage.getItem( this.activePoker + "-observer" ) === "true";
+		this.$store.commit( "observe", observing );
+		if ( observing ) {
+			this.$socket.emit( "observe", { poker: this.activePoker } );
+		}
 	},
 	computed: {
 		...mapState( [ "activePoker", "joinPoker", "nickname" ] ),
