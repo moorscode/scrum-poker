@@ -17,7 +17,7 @@
 
         <section v-if="!refinementFinished">
           <member-list />
-          <username />
+          <nickname />
           <observer />
           <new-story /> <finish-refinement />
 
@@ -58,7 +58,7 @@ import RefinementFinished from "./RefinementFinished.vue";
 import Results from "./Results.vue";
 import ResultStatistics from "./ResultStatistics.vue";
 import StoryName from "./StoryName.vue";
-import Username from "./Username.vue";
+import Nickname from "./Nickname.vue";
 import StoryHistory from "./StoryHistory.vue";
 import FeatureList from "./FeatureList.vue";
 import Credits from "./Credits.vue";
@@ -67,7 +67,7 @@ export default Vue.extend( {
 	components: {
 		Observer,
 		Room,
-		Username,
+		Nickname,
 		RefinementFinished,
 		MemberList,
 		NewStory,

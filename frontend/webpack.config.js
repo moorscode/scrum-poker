@@ -3,11 +3,11 @@ const path = require( "path" );
 const VueLoaderPlugin = require( "vue-loader/lib/plugin" );
 const BundleAnalyzerPlugin = require( "webpack-bundle-analyzer" ).BundleAnalyzerPlugin;
 const HtmlPlugin = require( "html-webpack-plugin" );
-const CopyWebpackPlugin = require('copy-webpack-plugin');
+const CopyWebpackPlugin = require( "copy-webpack-plugin" );
 
 const config = {
 	context: __dirname,
-	entry: "./src/index.ts",
+	entry: "./src/index.js",
 	output: {
 		path: path.resolve( process.cwd(), "dist/frontend" ),
 		filename: "[name].[contenthash].js",
@@ -31,7 +31,7 @@ const config = {
 	},
 	plugins: [
 		new HtmlPlugin( {
-			template: "index.html",
+			template: "./src/html/index.html",
 		} ),
 		new BundleAnalyzerPlugin( {
 			analyzerMode: "static",
@@ -40,13 +40,13 @@ const config = {
 		new VueLoaderPlugin(),
 		 new CopyWebpackPlugin( {
 			 patterns: [
-            {
-                // Wildcard is specified hence will copy only css files
-                from: '*.css', // Will resolve to RepoDir/src/css and all *.css files from this directory
-				to: 'css',// Copies all matched css files from above dest to dist/css
-				context: 'src/css',
-            }
-        ] }),
+				{
+					// Wildcard is specified hence will copy only css files
+					from: "*.css", // Will resolve to RepoDir/src/css and all *.css files from this directory
+					to: "css", // Copies all matched css files from above dest to dist/css
+					context: "src/css",
+				},
+			] } ),
 	],
 	optimization: {
 		runtimeChunk: "single",

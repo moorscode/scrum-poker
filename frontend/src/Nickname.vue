@@ -22,7 +22,7 @@
 import { mapState } from "vuex";
 
 export default {
-	name: "Username",
+	name: "username",
 	data() {
 		return {
 			nickname: window.localStorage.getItem( "nickname" ),
@@ -40,7 +40,13 @@ export default {
 				return;
 			}
 
+			// Update local storage.
 			window.localStorage.setItem( "nickname", this.nickname );
+
+			// Set name in the store.
+			this.$store.commit( "nickname", this.nickname );
+
+			// Tell the server.
 			this.$socket.emit( "nickname", { name: this.nickname, poker: this.activePoker } );
 		},
 	},
