@@ -29,7 +29,8 @@
           </div>
         </button>
       </span>
-    </p><div class="reveal-votes">
+    </p>
+    <div class="reveal-votes">
       <button
         :disabled="allVoted || nobodyVoted || ! myVote"
         @click="toggleRevealVotes()"
@@ -37,7 +38,6 @@
         <i :class="['fas',revealVotesButtonIconClass]" /> {{ revealVotesButtonText }}
       </button>
     </div>
-    </p>
   </span>
 </template>
 <script>
@@ -45,7 +45,7 @@ import { mapState } from "vuex";
 export default {
 	name: "Results",
 	computed: {
-		...mapState( [ "members", "votes", "voteCount", "currentStory", "activePoker", "myVote" ] ),
+		...mapState( [ "members", "votes", "voteCount", "currentStory", "activePoker", "myVote", "groupedVoterNames" ] ),
 		allVoted() {
 			return this.members.voters.length && this.voteCount === this.members.voters.length;
 		},
@@ -66,7 +66,7 @@ export default {
 			}
 
 			const voteGroupKey = vote.initialValue + "/" + vote.currentValue;
-			return this.groupedVoterNames[ voteGroupKey ];
+			return this.groupedVoterNames[ voteGroupKey ] || [];
 		},
 		toggleRevealVotes() {
 			if ( ! this.currentStory.votesRevealed ) {
