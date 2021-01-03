@@ -14,7 +14,7 @@
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main",
+    "start:prod": "node dist/backend/main",
     "frontend:watch": "webpack-dev-server -d --mode development --config ./frontend/webpack.config.js",
     "lint": "eslint \"backend/src/**/*.ts\" \"frontend/src/**/*.vue\" --fix",
     "test": "jest",

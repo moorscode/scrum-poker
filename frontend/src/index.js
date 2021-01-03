@@ -9,7 +9,7 @@ Vue.use( Vuex );
 
 Vue.use(
 	VueSocketIOExt,
-	io( window.location.protocol + "//" + window.location.hostname + ":" + process.env.SERVER_PORT + "" + window.location.pathname + "pokers" ),
+	io( window.location.protocol + "//" + window.location.hostname + ":" + process.env.SOCKET_PORT + "" + window.location.pathname + "pokers" ),
 );
 
 const store = new Vuex.Store( {
