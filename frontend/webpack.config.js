@@ -38,10 +38,6 @@ const config = {
 		new HtmlPlugin( {
 			template: "./src/html/index.html",
 		} ),
-		new BundleAnalyzerPlugin( {
-			analyzerMode: "static",
-			openAnalyzer: false,
-		} ),
 		new webpack.DefinePlugin( {
 			"process.env": dotenv.parsed,
 		} ),
