@@ -35,7 +35,7 @@ export default {
 	},
 	methods: {
 		setStoryName() {
-			this.$socket.emit( "changeStoryName", { poker: this.activePoker, name: this.storyName } );
+			this.$socket.client.emit( "changeStoryName", { poker: this.activePoker, name: this.storyName } );
 		},
 	},
 	sockets: {

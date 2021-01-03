@@ -70,7 +70,7 @@ export default {
 			) {
 				return;
 			}
-			this.$socket.emit( "resetHistory", { poker: this.activePoker } );
+			this.$socket.client.emit( "resetHistory", { poker: this.activePoker } );
 		},
 		popHistory() {
 			if ( ! window.confirm(
@@ -79,7 +79,7 @@ export default {
 			) {
 				return;
 			}
-			this.$socket.emit( "popHistory", { poker: this.activePoker } );
+			this.$socket.client.emit( "popHistory", { poker: this.activePoker } );
 		},
 	},
 	sockets: {

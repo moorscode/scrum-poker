@@ -2,14 +2,15 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import App from "./App.vue";
-import VueSocketIO from "vue-socket.io";
+import VueSocketIOExt from "vue-socket.io-extended";
+import io from "socket.io-client";
 
 Vue.use( Vuex );
 
-Vue.use( new VueSocketIO( {
-	debug: false,
-	connection: window.location.protocol + "//" + window.location.hostname + ":" + process.env.SERVER_PORT + "" + window.location.pathname + "pokers",
-} ) );
+Vue.use(
+	VueSocketIOExt,
+	io( window.location.protocol + "//" + window.location.hostname + ":" + process.env.SERVER_PORT + "" + window.location.pathname + "pokers" ),
+);
 
 const store = new Vuex.Store( {
 	state: {

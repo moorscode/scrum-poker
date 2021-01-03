@@ -47,7 +47,7 @@ export default {
 			this.$store.commit( "nickname", this.nickname );
 
 			// Tell the server.
-			this.$socket.emit( "nickname", { name: this.nickname, poker: this.activePoker } );
+			this.$socket.client.emit( "nickname", { name: this.nickname, poker: this.activePoker } );
 		},
 	},
 };

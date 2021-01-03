@@ -16,7 +16,7 @@ export default {
 	},
 	methods: {
 		done() {
-			this.$socket.emit( "finish", { poker: this.activePoker } );
+			this.$socket.client.emit( "finish", { poker: this.activePoker } );
 		},
 	},
 	sockets: {

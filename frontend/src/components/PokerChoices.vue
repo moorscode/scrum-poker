@@ -45,7 +45,7 @@ export default {
 			}
 
 			this.$store.commit( "myVote", vote );
-			this.$socket.emit( "vote", { poker: this.activePoker, vote } );
+			this.$socket.client.emit( "vote", { poker: this.activePoker, vote } );
 		},
 		pointIsPickedClass( point ) {
 			return this.votes.map( vote => vote.currentValue ).includes( point ) ? "picked" : "";

@@ -54,8 +54,8 @@ export class PokersGateway implements OnGatewayInit {
 	afterInit(): void {
 		this.server.on( "connection", ( socket ) => {
 			// Let the client know the points that can be chosen from.
-			socket.emit( "points", { points: PointsService.getPoints() } );
-			socket.emit( "userId", this.generateId() );
+			socket.client.emit( "points", { points: PointsService.getPoints() } );
+			socket.client.emit( "userId", this.generateId() );
 
 			// Clean up after disconnection.
 			socket.on( "disconnecting", () => {

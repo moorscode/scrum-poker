@@ -46,7 +46,7 @@ export default {
 				return;
 			}
 
-			this.$socket.emit( "join", { poker: this.joinPoker, name: this.$store.state.nickname } );
+			this.$socket.client.emit( "join", { poker: this.joinPoker, name: this.$store.state.nickname } );
 		},
 		getFromURL( key ) {
 			return new URLSearchParams( window.location.search.substring( 1 ) ).get( key );
@@ -61,7 +61,7 @@ export default {
 		window.onpopstate = ( event ) => {
 			this.joinPoker = ( event.state && event.state.room ) || "";
 			if ( this.joinPoker !== this.activePoker ) {
-				this.$socket.emit( "leave", { poker: this.activePoker } );
+				this.$socket.client.emit( "leave", { poker: this.activePoker } );
 			}
 			this.joinRoom();
 		};

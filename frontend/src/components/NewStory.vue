@@ -36,7 +36,7 @@ export default {
 				}
 			}
 
-			this.$socket.emit( "newStory", { poker: this.activePoker } );
+			this.$socket.client.emit( "newStory", { poker: this.activePoker } );
 			this.$store.commit( "refinementFinished", false );
 		},
 	},

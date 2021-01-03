@@ -74,7 +74,7 @@ export default {
 					return;
 				}
 			}
-			this.$socket.emit( "toggleRevealVotes", { poker: this.activePoker } );
+			this.$socket.client.emit( "toggleRevealVotes", { poker: this.activePoker } );
 		},
 	},
 };

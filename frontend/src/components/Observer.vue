@@ -19,7 +19,7 @@ export default {
 		const observing = window.localStorage.getItem( this.activePoker + "-observer" ) === "true";
 		this.$store.commit( "observe", observing );
 		if ( observing ) {
-			this.$socket.emit( "observe", { poker: this.activePoker } );
+			this.$socket.client.emit( "observe", { poker: this.activePoker } );
 		}
 	},
 	computed: {
@@ -36,9 +36,9 @@ export default {
 				this.$store.commit( "observe", observing );
 
 				if ( observing ) {
-					this.$socket.emit( "observe", { poker: this.activePoker } );
+					this.$socket.client.emit( "observe", { poker: this.activePoker } );
 				} else {
-					this.$socket.emit( "join", { poker: this.activePoker, name: this.nickname } );
+					this.$socket.client.emit( "join", { poker: this.activePoker, name: this.nickname } );
 				}
 			},
 		},
@@ -49,7 +49,7 @@ export default {
 	sockets: {
 		joined() {
 			if ( this.observer ) {
-				this.$socket.emit( "observe", { poker: this.activePoker } );
+				this.$socket.client.emit( "observe", { poker: this.activePoker } );
 			}
 		},
 	},

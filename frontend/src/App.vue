@@ -90,7 +90,7 @@ export default Vue.extend( {
 	},
 	created() {
 		window.onbeforeunload = () => {
-			this.$socket.emit( "exit" );
+			this.$socket.client.emit( "exit" );
 		};
 	},
 	computed: {
@@ -138,13 +138,13 @@ export default Vue.extend( {
 				this.$data.clientId = clientId;
 				window.localStorage.setItem( "clientId", this.$data.clientId );
 			}
-			this.$socket.emit( "identify", { id: this.$data.clientId } );
+			this.$socket.client.emit( "identify", { id: this.$data.clientId } );
 		},
 		welcome() {
 			this.$store.commit( "loadingFinished" );
 		},
 		reconnect() {
-			this.$socket.emit( "identify", { id: this.$data.clientId } );
+			this.$socket.client.emit( "identify", { id: this.$data.clientId } );
 		},
 		"member-list"( msg ) {
 			this.$store.commit( "members", msg );
