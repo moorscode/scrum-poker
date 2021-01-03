@@ -16,19 +16,16 @@ const store = new Vuex.Store( {
 	state: {
 		loading: true,
 		refinementFinished: false,
-		showMembersList: false,
-		nickname: "",
-		activePoker: false,
+		nickname: "", // Required globally because of socket calls.
+		activePoker: false, // Required globally because of socket calls.
 		points: {},
 		observer: false,
-		showHistory: window.localStorage.getItem( "showHistory" ) === "true",
 		pointSpread: null,
 		currentStory: { name: "", nearestPointAverage: "", voteAverage: "" },
 		myVote: "",
 		members: { voters: [], observers: [], disconnected: [] },
 		votes: [],
 		voteCount: 0,
-		voteNames: {},
 		votedNames: [],
 		groupedVoterNames: [],
 	},
@@ -71,9 +68,6 @@ const store = new Vuex.Store( {
 		},
 		votes( state, votes ) {
 			state.votes = votes;
-		},
-		voteNames( state, voteNames ) {
-			state.voteNames = voteNames;
 		},
 		votedNames( state, votedNames ) {
 			state.votedNames = votedNames;
