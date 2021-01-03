@@ -70,10 +70,10 @@ const store = new Vuex.Store( {
 			state.votes = votes;
 		},
 		votedNames( state, votedNames ) {
-			state.votedNames = votedNames;
+			state.votedNames = votedNames || [];
 		},
 		groupedVoterNames( state, groupedVoterNames ) {
-			state.groupedVoterNames = groupedVoterNames;
+			state.groupedVoterNames = groupedVoterNames || [];
 		},
 		myVote( state, vote ) {
 			state.myVote = vote;

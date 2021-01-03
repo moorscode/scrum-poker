@@ -1,18 +1,11 @@
 <template>
   <main :class="backgroundColor">
-    <section
-      v-if="loading === false"
-      class="poker"
-    >
+    <section v-if="loading === false" class="poker">
       <h1>Pum Scroker</h1>
 
       <room v-if="!activePoker" />
 
-      <div
-        v-cloak
-        v-if="activePoker"
-        class="pokerMain"
-      >
+      <div v-cloak v-if="activePoker" class="pokerMain">
         <refinement-finished v-if="refinementFinished" />
 
         <section v-if="!refinementFinished">
@@ -38,7 +31,7 @@
       </div>
     </section>
 
-    <feature-list v-if="!this.activePoker && !this.loading" />
+    <feature-list v-if="this.activePoker === '' && this.loading === false" />
 
     <credits />
   </main>
@@ -157,8 +150,8 @@ export default Vue.extend( {
 
 			this.$store.commit( "votes", votes );
 			this.$store.commit( "voteCount", msg.voteCount );
-			this.$store.commit( "votedNames", msg.votedNames || [] );
-			this.$store.commit( "groupedVoterNames", msg.groupedVoterNames || [] );
+			this.$store.commit( "votedNames", msg.votedNames );
+			this.$store.commit( "groupedVoterNames", msg.groupedVoterNames );
 			this.$store.commit( "pointSpread", this.$data.pointSpread );
 
 			document.title = this.$data.baseTitle + " " + this.$store.state.voteCount + "/" + this.$store.state.members.voters.length;

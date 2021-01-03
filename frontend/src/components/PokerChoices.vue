@@ -2,6 +2,7 @@
   <div class="choices">
     <button
       v-for="point of points"
+	  v-bind:key="point"
       :class="[
         'choice',
         pointIsPickedClass(point),
