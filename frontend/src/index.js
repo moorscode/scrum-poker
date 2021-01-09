@@ -9,13 +9,20 @@ Vue.use( Vuex );
 
 Vue.use(
 	VueSocketIOExt,
-	io( window.location.protocol + "//" + window.location.hostname + ":" + process.env.SOCKET_PORT + "" + window.location.pathname + "pokers" ),
+	io( window.location.protocol + "//" + window.location.hostname + ":" + process.env.SOCKET_PORT + "" + window.location.pathname + "pokers",
+	{
+		reconnection: true,
+		reconnectionDelay: 500,
+		reconnectionAttempts: 10,
+		autoConnect: false
+	} ),
 );
 
 const store = new Vuex.Store( {
 	state: {
 		loading: true,
 		refinementFinished: false,
+		connected: false,
 		nickname: "", // Required globally because of socket calls.
 		activePoker: false, // Required globally because of socket calls.
 		points: {},
@@ -32,6 +39,9 @@ const store = new Vuex.Store( {
 	mutations: {
 		loadingFinished( state ) {
 			state.loading = false;
+		},
+		serverConnection( state, connected ) {
+			state.connected = connected;
 		},
 		refinementFinished( state, finished ) {
 			state.refinementFinished = finished;
@@ -79,6 +89,7 @@ const store = new Vuex.Store( {
 			state.myVote = vote;
 		},
 	},
+
 } );
 
 // eslint-disable-next-line no-new

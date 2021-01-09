@@ -1,39 +1,47 @@
 <template>
   <main :class="backgroundColor">
-    <section v-if="loading === false" class="poker">
-      <h1>Pum Scroker</h1>
+	<server-connection />
 
-      <room v-if="!activePoker" />
+	<section v-if="loading === false" class="poker">
+	<h1>Pum Scroker</h1>
 
-      <div v-cloak v-if="activePoker" class="pokerMain">
-        <refinement-finished v-if="refinementFinished" />
+	<section v-if="connected === false">
+		<connecting />
+	</section>
 
-        <section v-if="!refinementFinished">
-          <member-list />
-          <nickname />
-          <observer />
-          <story /> <refinement />
+	<section v-if="connected === true">
+		<room />
 
-          <hr>
+		<div v-cloak v-if="activePoker" class="pokerMain">
+			<refinement-finished v-if="refinementFinished" />
 
-          <story-name />
-          <poker-choices />
+			<section v-if="!refinementFinished">
+			<member-list />
+			<nickname />
+			<observer />
+			<story /> <refinement />
 
-          <hr>
+			<hr>
 
-          <results />
-          <result-statistics />
+			<story-name />
+			<poker-choices />
 
-          <member-status />
+			<hr>
 
-          <story-history />
-        </section>
-      </div>
-    </section>
+			<results />
+			<result-statistics />
 
-    <feature-list v-if="this.activePoker === '' && this.loading === false" />
+			<member-status />
 
-    <credits />
+			<story-history />
+			</section>
+		</div>
+		</section>
+	</section>
+
+	<feature-list v-if="this.activePoker === '' && this.loading === false" />
+
+	<credits />
   </main>
 </template>
 
@@ -56,6 +64,8 @@ import Nickname from "./components/Nickname.vue";
 import StoryHistory from "./components/StoryHistory.vue";
 import FeatureList from "./components/FeatureList.vue";
 import Credits from "./components/Credits.vue";
+import ServerConnection from "./components/ServerConnection.vue";
+import Connecting from "./components/Connecting.vue";
 
 export default Vue.extend( {
 	components: {
@@ -74,20 +84,27 @@ export default Vue.extend( {
 		ResultStatistics,
 		FeatureList,
 		Credits,
-	},
-	data() {
-		return {
-			clientId: window.localStorage.getItem( "clientId" ) || false,
-			baseTitle: document.title,
-		};
+		ServerConnection,
+		Connecting,
 	},
 	created() {
-		window.onbeforeunload = () => {
-			this.$socket.client.emit( "exit" );
-		};
+		this.$socket.client.open();
 	},
 	computed: {
-		...mapState( [ "loading", "activePoker", "refinementFinished", "pointSpread", "voteCount", "members", "currentStory", "points", "votes" ] ),
+		...mapState(
+			[
+				"loading",
+				"activePoker",
+				"refinementFinished",
+				"pointSpread",
+				"voteCount",
+				"members",
+				"currentStory",
+				"points",
+				"votes",
+				"connected"
+			]
+		),
 		backgroundColor() {
 			switch ( true ) {
 				case this.refinementFinished:
@@ -123,38 +140,6 @@ export default Vue.extend( {
 			const highestIndex = this.points.indexOf( this.votes[ this.votes.length - 1 ].currentValue );
 
 			return highestIndex - lowestIndex;
-		},
-	},
-	sockets: {
-		userId( clientId ) {
-			if ( ! this.$data.clientId ) {
-				this.$data.clientId = clientId;
-				window.localStorage.setItem( "clientId", this.$data.clientId );
-			}
-			this.$socket.client.emit( "identify", { id: this.$data.clientId } );
-		},
-		welcome() {
-			this.$store.commit( "loadingFinished" );
-		},
-		reconnect() {
-			this.$socket.client.emit( "identify", { id: this.$data.clientId } );
-		},
-		"member-list"( msg ) {
-			this.$store.commit( "members", msg );
-		},
-		points( msg ) {
-			this.$store.commit( "points", msg.points );
-		},
-		votes( msg ) {
-			const votes = msg.votes.sort( ( a, b ) => a.currentValue - b.currentValue ) || [];
-
-			this.$store.commit( "votes", votes );
-			this.$store.commit( "voteCount", msg.voteCount );
-			this.$store.commit( "votedNames", msg.votedNames );
-			this.$store.commit( "groupedVoterNames", msg.groupedVoterNames );
-			this.$store.commit( "pointSpread", this.$data.pointSpread );
-
-			document.title = this.$data.baseTitle + " " + this.$store.state.voteCount + "/" + this.$store.state.members.voters.length;
 		},
 	},
 } );

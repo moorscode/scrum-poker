@@ -54,13 +54,11 @@ export class PokersGateway implements OnGatewayInit {
 	afterInit(): void {
 		this.server.on( "connection", ( socket ) => {
 			// Let the client know the points that can be chosen from.
-			socket.emit( "points", { points: PointsService.getPoints() } );
 			socket.emit( "userId", this.generateId() );
+			socket.emit( "points", { points: PointsService.getPoints() } );
 
 			// Clean up after disconnection.
 			socket.on( "disconnecting", () => {
-				const sockets = this.pokersService.getClientSockets( socket );
-
 				for ( const room in socket.rooms ) {
 					if ( ! socket.rooms[ room ] ) {
 						continue;
@@ -68,11 +66,6 @@ export class PokersGateway implements OnGatewayInit {
 					if ( ! room.includes( "/pokers#" ) ) {
 						this.pokersService.disconnect( socket, room );
 					}
-
-					sockets.forEach( ( socketId: string ) => {
-						// eslint-disable-next-line no-unused-expressions
-						this.server.sockets[ socketId ] && this.server.sockets[ socketId ].emit( "reconnect" );
-					} );
 
 					this.sendMembers( room );
 					this.sendVotes( room );
@@ -263,7 +256,7 @@ export class PokersGateway implements OnGatewayInit {
 		const clients: MemberList = this.pokersService.getClients( room );
 		this.server
 			.to( room )
-			.emit( "member-list", this.formatMembersResponse( clients ) );
+			.emit( "memberList", this.formatMembersResponse( clients ) );
 	}
 
 	/**

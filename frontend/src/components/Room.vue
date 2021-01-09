@@ -1,5 +1,5 @@
 <template>
-  <section>
+  <section v-if="!activePoker" >
     <p>Welcome to Pum Scroker!</p>
 
     <p>
@@ -67,6 +67,9 @@ export default {
 		};
 	},
 	sockets: {
+		welcome() {
+			this.joinRoom()
+		},
 		joined( msg ) {
 			const currentPoker = this.activePoker;
 			this.joinPoker = msg.poker;
