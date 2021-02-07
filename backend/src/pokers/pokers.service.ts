@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { Socket } from "socket.io";
 import { PointsService } from "../points/points.service";
-import { Client, MemberList, PokerRoom, Story, Vote } from "./poker-room";
+import { Member, MemberList, PokerRoom, Story, Vote } from "./poker-room";
 
 interface CurrentVotes {
 	voteCount: number;
@@ -26,15 +26,6 @@ export class PokersService {
 	private users: Users = {};
 
 	/**
-	 * Returns debug information.
-	 *
-	 * @returns {any} Debug info.
-	 */
-	public debug() {
-		return this.rooms;
-	}
-
-	/**
 	 * Greets a new user.
 	 *
 	 * @param {Socket} client The client socket.
@@ -42,7 +33,7 @@ export class PokersService {
 	 *
 	 * @returns {void}
 	 */
-	public greet( client: Socket, userId: string ): void {
+	public identify( client: Socket, userId: string ): void {
 		this.users[ client.id ] = userId;
 	}
 
@@ -66,7 +57,7 @@ export class PokersService {
 	 * @returns {void}
 	 */
 	public exit( client: Socket ): void {
-		const userId = this.users[ client.id ];
+		const userId = this.getUserId( client );
 
 		this.removeUserFromRooms( userId );
 
@@ -101,7 +92,7 @@ export class PokersService {
 	private removeUserFromRooms( userId: string ): void {
 		for ( const room of Object.keys( this.rooms ) ) {
 			this.rooms[ room ].removeClient( userId );
-			this.cleanRoom( room );
+			this.cleanupRoom( room );
 		}
 	}
 
@@ -114,7 +105,7 @@ export class PokersService {
 	 */
 	public getClientSockets( client: Socket ): string[] {
 		const sockets = [];
-		const userId  = this.users[ client.id ];
+		const userId  = this.getUserId( client );
 
 		if ( ! userId ) {
 			return sockets;
@@ -189,7 +180,7 @@ export class PokersService {
 	public leave( client: Socket, poker: string ): void {
 		this.getRoom( poker ).removeClient( this.getUserId( client ) );
 
-		this.cleanRoom( poker );
+		this.cleanupRoom( poker );
 
 		client.leave( poker );
 	}
@@ -203,8 +194,8 @@ export class PokersService {
 	 *
 	 * @private
 	 */
-	private cleanRoom( room: string ): void {
-		if ( this.getRoom( room ).getClientCount() === 0 ) {
+	private cleanupRoom( room: string ): void {
+		if ( this.getRoom( room ).getClientCount( false ) === 0 ) {
 			delete this.rooms[ room ];
 		}
 	}
@@ -218,7 +209,7 @@ export class PokersService {
 	 * @returns {void}
 	 */
 	public observe( client: Socket, poker: string ): void {
-		this.getRoom( poker ).setObserver( this.getUserId( client ) );
+		this.getRoom( poker ).makeObserver( this.getUserId( client ) );
 	}
 
 	/**
@@ -259,7 +250,7 @@ export class PokersService {
 	public getVotedNames( poker: string ): string[] {
 		return this.getRoom( poker )
 			.getVotedClients()
-			.map( ( client: Client ) => client.name );
+			.map( ( member: Member ) => member.name );
 	}
 
 	/**
@@ -299,32 +290,31 @@ export class PokersService {
 	 * @returns {CurrentVotes} Votes in that room. Obfuscated if not all votes are in yet.
 	 */
 	public getVotes( poker: string ): CurrentVotes {
-		const voted: Client[] = this.getRoom( poker ).getVotedClients();
-		const votes           = this.getRoom( poker ).getVotes();
+		const voted: Member[] = this.getRoom( poker ).getVotedClients();
+		const votes           = this.getRoom( poker ).getCurrentVotes();
 
-		const voteCount   = votes.length;
-		const memberCount = this.getVoterCount( poker );
-
-		// When all votes are in, show the actual votes.
-		if ( memberCount === voteCount ) {
-			return {
-				voteCount: votes.length,
-				votes,
-				groupedVoterNames: voted.reduce( ( accumulator, client: Client ) => {
-					const vote                       = this.getRoom( poker ).getCurrentVote( client.id );
-					accumulator[ vote.currentValue ] = accumulator[ vote.currentValue ] || [];
-					accumulator[ vote.currentValue ].push( client.name );
-					return accumulator;
-				}, {} ),
-			};
-		}
-
-		// Otherwise show an X for voted, ? for unvoted.
 		return {
-			voteCount: votes.length,
-			votes: this.getRoom( poker ).getObscuredVotes(),
-			groupedVoterNames: {},
+			voteCount: voted.length,
+			votes,
+			groupedVoterNames: voted.reduce( ( accumulator, member: Member ) => {
+				const vote                  = this.getRoom( poker ).getCurrentVote( member.id );
+				const voteGroupKey: string  = vote.initialValue + "/" + vote.currentValue;
+				accumulator[ voteGroupKey ] = accumulator[ voteGroupKey ] || [];
+				accumulator[ voteGroupKey ].push( member.name );
+				return accumulator;
+			}, {} ),
 		};
+	}
+
+	/**
+	 * Toggles whether or not to show votes before all votes are in for a room.
+	 *
+	 * @param {string} poker Room to toggle reveal.
+	 *
+	 * @returns {void}
+	 */
+	public toggleRevealVotes( poker: string ): void {
+		this.getRoom( poker ).toggleRevealVotes();
 	}
 
 	/**

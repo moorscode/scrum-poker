@@ -10,7 +10,7 @@ main {
 	transition: background-color 750ms ease-in-out;
 	background-color: #efefef;
 	width: 100%;
-	height: 100%;
+	min-height: 100%;
 	padding: 20px;
 	box-sizing: border-box;
 }
@@ -94,6 +94,22 @@ input[type=text] {
 button .fas {
 	color: black;
 	margin-right: 3px;
+}
+
+input[type=submit]:hover,
+input[type=submit]:hover .fas,
+input[type=submit]:active,
+input[type=submit]:active.fas,
+button:hover,
+button:hover .fas,
+button:active,
+button:active .fas {
+	color: #a4286a;
+}
+
+button[disabled],
+button[disabled] .fas {
+	color: darkgrey;
 }
 
 a {
@@ -188,9 +204,17 @@ main.high-spread .credits a {
 	margin-bottom: 1em;
 }
 
+form.storyName {
+	margin-bottom: 16px;
+}
+
 div.observe {
 	margin-left: 5px;
 	margin-bottom: 14px;
+}
+
+div.reveal-votes {
+    margin-bottom: 2em;
 }
 
 /* USERNAME */
@@ -222,19 +246,6 @@ form.username .fas {
 .username:hover input[type=text],
 .username.hover input[type=text] {
 	border: 1px inset;
-}
-
-/* NEW STORY */
-button.newStory:hover,
-button.newStory:hover .fas,
-button.newStory:active,
-button.newStory:active .fas {
-	color: #a4286a;
-}
-
-button.newStory[disabled],
-button.newStory[disabled] .fas {
-	color: darkgrey;
 }
 
 .story-updated {
@@ -270,6 +281,7 @@ button.choice {
 button.choice:active,
 button.choice:hover {
 	background-color: darkgray;
+	color: black;
 }
 
 button.choice:first-child {
@@ -304,7 +316,7 @@ button.highlighted .fas {
 }
 
 p.results {
-	margin-bottom: 2.2em;
+	margin-bottom: 1em;
 }
 
 button.result {
@@ -320,12 +332,12 @@ button.result {
 	transition: transform 250ms ease-out;
 }
 
-button.result:active {
-	top: 0;
+button.result:hover {
+	color: black;
 }
 
-button.result:first-child {
-	margin-left: 0;
+button.result:active {
+	top: 0;
 }
 
 button.result:focus {
@@ -355,7 +367,6 @@ button.result > .vote-names {
 	display: none;
 	background: white;
 	box-shadow: 3px 3px 0 -1px #a4286a;
-	z-index: 1000;
 }
 
 button.result:active > .vote-names,
@@ -367,6 +378,14 @@ span.resultContainer {
 	margin: 0 4px 8px;
 	position: relative;
 	display: inline-block;
+	z-index: 4;
+}
+span.resultContainer:hover {
+	z-index: 10;
+}
+
+span.resultContainer:first-child {
+	margin-left: 0;
 }
 
 button.result.initialVote {
