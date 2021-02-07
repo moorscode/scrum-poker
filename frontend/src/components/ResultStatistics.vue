@@ -26,6 +26,10 @@ export default {
 				return "Coffee break";
 			}
 
+			if ( this.currentStory.voteAverage === "?" ) {
+				return "Not enough clarity, please go further in depth.";
+			}
+
 			return Math.round( this.currentStory.voteAverage * 100 ) / 100;
 		},
 		averageContext() {
@@ -46,7 +50,17 @@ export default {
 				return "";
 			}
 
-			if ( this.votes.length <= 1 || this.votes.map( vote => vote.currentValue ).indexOf( "coffee" ) !== -1 ) {
+			if ( this.votes.length <= 1 ) {
+				return "n/a";
+			}
+
+			const flattendVotes = this.votes.map( vote => vote.currentValue );
+
+			if ( flattendVotes.indexOf( "coffee" ) !== -1 ) {
+				return "n/a";
+			}
+
+			if ( flattendVotes.indexOf( "?" ) !== -1 ) {
 				return "n/a";
 			}
 

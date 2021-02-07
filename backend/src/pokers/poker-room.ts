@@ -1,6 +1,6 @@
 import { PointsService, PointValue } from "../points/points.service";
 
-export type HiddenVoteValue = "?" | "X";
+export type HiddenVoteValue = "#" | "X";
 export type VoteValue = PointValue | HiddenVoteValue;
 
 export interface Client {
@@ -370,7 +370,7 @@ export class PokerRoom {
 	 */
 	public getObscuredVote( story: Story, client: Client ): ObscuredVote {
 		const hasVoted: boolean = typeof( this.getCurrentVote( client.id ) ) !== "undefined";
-		const voteValue: HiddenVoteValue = hasVoted ? "X" : "?";
+		const voteValue: HiddenVoteValue = hasVoted ? "X" : "#";
 		return {
 			initialValue: voteValue,
 			currentValue: voteValue,
@@ -391,19 +391,27 @@ export class PokerRoom {
 			delete story.voteAverage;
 			return;
 		}
+
 		if ( story.votes.some( ( vote: Vote ) => vote.currentValue === "coffee" ) ) {
 			story.voteAverage         = "coffee";
 			story.nearestPointAverage = "coffee";
-			return;
+			return story
+		}
+
+		if ( story.votes.some( ( vote: Vote ) => vote.currentValue === "?" ) ) {
+			story.voteAverage         = "?";
+			story.nearestPointAverage = "?";
+			return story;
 		}
 
 		const valueIsHidden = story.votes.some(
-			( vote: Vote ) => vote.currentValue === "X" || vote.currentValue === "?",
+			( vote: Vote ) => vote.currentValue === "X" || vote.currentValue === "#",
 		);
+
 		if ( valueIsHidden ) {
 			story.voteAverage         = "unknown";
-			story.nearestPointAverage = "?";
-			return;
+			story.nearestPointAverage = "#";
+			return story;
 		}
 
 		const pointTotal  = story.votes.reduce<number>(
