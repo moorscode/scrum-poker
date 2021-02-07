@@ -42,7 +42,7 @@ export class PokersService {
 	 *
 	 * @returns {void}
 	 */
-	public greet( client: Socket, userId: string ): void {
+	public identify( client: Socket, userId: string ): void {
 		this.users[ client.id ] = userId;
 	}
 
@@ -66,7 +66,7 @@ export class PokersService {
 	 * @returns {void}
 	 */
 	public exit( client: Socket ): void {
-		const userId = this.users[ client.id ];
+		const userId = this.getUserId( client );
 
 		this.removeUserFromRooms( userId );
 
@@ -101,7 +101,7 @@ export class PokersService {
 	private removeUserFromRooms( userId: string ): void {
 		for ( const room of Object.keys( this.rooms ) ) {
 			this.rooms[ room ].removeClient( userId );
-			this.cleanRoom( room );
+			this.cleanupRoom( room );
 		}
 	}
 
@@ -114,7 +114,7 @@ export class PokersService {
 	 */
 	public getClientSockets( client: Socket ): string[] {
 		const sockets = [];
-		const userId  = this.users[ client.id ];
+		const userId  = this.getUserId( client );
 
 		if ( ! userId ) {
 			return sockets;
@@ -189,7 +189,7 @@ export class PokersService {
 	public leave( client: Socket, poker: string ): void {
 		this.getRoom( poker ).removeClient( this.getUserId( client ) );
 
-		this.cleanRoom( poker );
+		this.cleanupRoom( poker );
 
 		client.leave( poker );
 	}
@@ -203,8 +203,8 @@ export class PokersService {
 	 *
 	 * @private
 	 */
-	private cleanRoom( room: string ): void {
-		if ( this.getRoom( room ).getClientCount() === 0 ) {
+	private cleanupRoom( room: string ): void {
+		if ( this.getRoom( room ).getClientCount( false ) === 0 ) {
 			delete this.rooms[ room ];
 		}
 	}
@@ -218,7 +218,7 @@ export class PokersService {
 	 * @returns {void}
 	 */
 	public observe( client: Socket, poker: string ): void {
-		this.getRoom( poker ).setObserver( this.getUserId( client ) );
+		this.getRoom( poker ).makeObserver( this.getUserId( client ) );
 	}
 
 	/**

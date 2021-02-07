@@ -90,7 +90,7 @@ export class PokersGateway implements OnGatewayInit {
 	/* eslint-disable require-jsdoc */
 	@SubscribeMessage( "identify" )
 	identify( client: Socket, message: { id: string } ): void {
-		this.pokersService.greet( client, message.id );
+		this.pokersService.identify( client, message.id );
 		client.emit( "welcome" );
 	}
 
@@ -357,7 +357,7 @@ export class PokersGateway implements OnGatewayInit {
 		const mapCallback = this.formatClientResponse;
 
 		return {
-			voters: Object.values( memberList.voters ).map( mapCallback ),
+			voters: Object.values( memberList.participants ).map( mapCallback ),
 			observers: Object.values( memberList.observers ).map( mapCallback ),
 			disconnected: Object.values( memberList.disconnected ).map( mapCallback ),
 		};
