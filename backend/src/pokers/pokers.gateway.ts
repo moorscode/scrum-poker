@@ -67,8 +67,7 @@ export class PokersGateway implements OnGatewayInit {
 						this.pokersService.disconnect( socket, room );
 					}
 
-					this.sendMembers( room );
-					this.sendVotes( room );
+					this.send( { poker: room, members: true, votes: true } );
 				}
 			} );
 		} );
@@ -121,10 +120,7 @@ export class PokersGateway implements OnGatewayInit {
 		}
 		client.emit( "joined", { poker: message.poker, vote } );
 
-		this.sendMembers( message.poker );
-		this.sendVotes( message.poker );
-		this.sendHistory( message.poker );
-		this.sendCurrentStory( message.poker );
+		this.send( { poker: message.poker, all: true } );
 	}
 
 	@SubscribeMessage( "leave" )
@@ -138,17 +134,14 @@ export class PokersGateway implements OnGatewayInit {
 			this.server.sockets[ socketId ] && this.server.sockets[ socketId ].emit( "reconnect" );
 		} );
 
-		this.sendMembers( message.poker );
-		this.sendVotes( message.poker );
-		this.sendCurrentStory( message.poker );
+		this.send( { poker: message.poker, members: true, votes: true, story: true } );
 	}
 
 	@SubscribeMessage( "vote" )
 	vote( client: Socket, message: { poker: string; vote } ): void {
 		this.pokersService.vote( client, message.poker, message.vote );
 
-		this.sendVotes( message.poker );
-		this.sendCurrentStory( message.poker );
+		this.send( { poker: message.poker, story: true, votes: true } );
 	}
 
 	@SubscribeMessage( "finish" )
@@ -160,54 +153,49 @@ export class PokersGateway implements OnGatewayInit {
 	setNickname( client: Socket, message: { name: string; poker: string } ): void {
 		this.pokersService.setName( message.poker, client, message.name );
 
-		this.sendMembers( message.poker );
-		this.sendVotes( message.poker );
+		this.send( { poker: message.poker, members: true, votes: true } );
 	}
 
 	@SubscribeMessage( "newStory" )
 	newStory( client: Socket, message: { poker: string } ): void {
 		this.pokersService.newStory( message.poker );
 
-		this.sendVotes( message.poker );
-		this.sendCurrentStory( message.poker );
-		this.sendHistory( message.poker );
+		this.send( { poker: message.poker, story: true, votes: true, history: true } );
 	}
 
 	@SubscribeMessage( "changeStoryName" )
 	story( client: Socket, message: { poker: string; name: string } ): void {
 		this.pokersService.setStoryName( message.poker, message.name );
 
-		this.sendCurrentStory( message.poker );
+		this.send( { poker: message.poker, story: true } );
 	}
 
 	@SubscribeMessage( "popHistory" )
 	popHistory( client: Socket, message: { poker: string } ): void {
 		this.pokersService.popHistory( message.poker );
 
-		this.sendHistory( message.poker );
+		this.send( { poker: message.poker, history: true } );
 	}
 
 	@SubscribeMessage( "resetHistory" )
 	resetHistory( client: Socket, message: { poker: string } ): void {
 		this.pokersService.resetHistory( message.poker );
 
-		this.sendHistory( message.poker );
+		this.send( { poker: message.poker, history: true } );
 	}
 
 	@SubscribeMessage( "observe" )
 	observer( client: Socket, message: { poker: string } ): void {
 		this.pokersService.observe( client, message.poker );
 
-		this.sendMembers( message.poker );
-		this.sendVotes( message.poker );
-		this.sendCurrentStory( message.poker );
+		this.send( { poker: message.poker, story: true, votes: true, members: true } );
 	}
 
 	@SubscribeMessage( "toggleRevealVotes" )
 	toggleRevealVotes( client: Socket, message: { poker: string } ): void {
 		this.pokersService.toggleRevealVotes( message.poker );
-		this.sendCurrentStory( message.poker );
-		this.sendVotes( message.poker );
+
+		this.send( { poker: message.poker, story: true, votes: true } );
 	}
 
 	@SubscribeMessage( "debug" )
@@ -220,6 +208,38 @@ export class PokersGateway implements OnGatewayInit {
 		}
 	}
 	/* eslint-enable require-jsdoc */
+
+	/**
+	 * Sends data to all members in the room.
+	 *
+	 * @param {object} param0 Which data to send.
+	 *
+	 * @returns {void}
+	 */
+	private send( {
+		poker = "",
+		story = false,
+		votes = false,
+		members = false,
+		history = false,
+		all = false
+	} = {} ) {
+		if ( all || story ) {
+			this.sendCurrentStory( poker );
+		}
+
+		if ( all || votes ) {
+			this.sendVotes( poker );
+		}
+
+		if ( all || members ) {
+			this.sendMembers( poker );
+		}
+
+		if ( all || history ) {
+			this.sendHistory( poker );
+		}
+	}
 
 	/**
 	 * Sends all votes to a room.
@@ -254,9 +274,7 @@ export class PokersGateway implements OnGatewayInit {
 	 */
 	private sendMembers( room: string ): void {
 		const clients: MemberList = this.pokersService.getClients( room );
-		this.server
-			.to( room )
-			.emit( "memberList", this.formatMembersResponse( clients ) );
+		this.server.to( room ).emit( "memberList", this.formatMembersResponse( clients ) );
 	}
 
 	/**
@@ -270,9 +288,7 @@ export class PokersGateway implements OnGatewayInit {
 	 */
 	private sendHistory( room: string ): void {
 		const stories = this.pokersService.getHistory( room );
-		this.server.to( room ).emit( "history", {
-			stories: this.formatStoryResponseList( stories ),
-		} );
+		this.server.to( room ).emit( "history", { stories: this.formatStoryResponseList( stories ) } );
 	}
 
 	/**
@@ -285,11 +301,12 @@ export class PokersGateway implements OnGatewayInit {
 	 * @private
 	 */
 	private sendCurrentStory( room: string ): void {
-		this.server.to( room ).emit( "storyUpdated", {
-			currentStory: this.formatStoryResponse(
-				this.pokersService.getCurrentStory( room ),
-			),
-		} );
+		this.server.to( room ).emit(
+			"storyUpdated",
+			{
+				currentStory: this.formatStoryResponse( this.pokersService.getCurrentStory( room ) ),
+			}
+		);
 	}
 
 	/**
