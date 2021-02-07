@@ -120,12 +120,8 @@ export default Vue.extend( {
 			}
 		},
 		average() {
-			if ( this.voteCount === 0 || this.voteCount < this.members.voters.length ) {
+			if ( this.voteCount === 0 || this.voteCount < this.members.voters.length || typeof this.currentStory.voteAverage === "string" ) {
 				return "";
-			}
-
-			if ( this.currentStory.voteAverage === "coffee" ) {
-				return "Coffee break";
 			}
 
 			return Math.round( this.currentStory.voteAverage * 100 ) / 100;
