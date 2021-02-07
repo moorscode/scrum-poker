@@ -102,15 +102,9 @@ export class PokersGateway implements OnGatewayInit {
 	join( client: Socket, message: { poker: string; name?: string } ): void {
 		this.pokersService.join( client, message.poker, message.name );
 
-		const voteObject: Vote | null = this.pokersService.getVote(
-			client,
-			message.poker,
-		);
+		const voteObject: Vote | null = this.pokersService.getVote( client, message.poker );
+		const vote: VoteResponse | null = ( voteObject ) ? this.formatVoteResponse( voteObject ) : null;
 
-		let vote: VoteResponse | null = null;
-		if ( voteObject ) {
-			vote = this.formatVoteResponse( voteObject );
-		}
 		client.emit( "joined", { poker: message.poker, vote } );
 
 		this.send( { poker: message.poker, all: true } );
