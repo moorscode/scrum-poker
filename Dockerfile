@@ -9,7 +9,7 @@ RUN yarn install --network-timeout 3600000
 
 COPY . .
 
-RUN npm run build
+RUN yarn build
 
 FROM node:12.13-alpine AS production
 

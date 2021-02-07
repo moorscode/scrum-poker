@@ -10,7 +10,7 @@ main {
 	transition: background-color 750ms ease-in-out;
 	background-color: #efefef;
 	width: 100%;
-	height: 100%;
+	min-height: 100%;
 	padding: 20px;
 	box-sizing: border-box;
 }
@@ -202,6 +202,10 @@ main.high-spread .credits a {
 
 .rooms {
 	margin-bottom: 1em;
+}
+
+form.storyName {
+	margin-bottom: 16px;
 }
 
 div.observe {
