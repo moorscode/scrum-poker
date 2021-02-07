@@ -197,16 +197,6 @@ export class PokersGateway implements OnGatewayInit {
 
 		this.send( { poker: message.poker, story: true, votes: true } );
 	}
-
-	@SubscribeMessage( "debug" )
-	getDebug( client: Socket, message: { secret: string } ): any {
-		if (
-			process.env.DEBUG_SECRET &&
-			message.secret === process.env.DEBUG_SECRET
-		) {
-			client.emit( "debug", var_export( this.pokersService.debug(), true ) );
-		}
-	}
 	/* eslint-enable require-jsdoc */
 
 	/**

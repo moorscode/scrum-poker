@@ -26,15 +26,6 @@ export class PokersService {
 	private users: Users = {};
 
 	/**
-	 * Returns debug information.
-	 *
-	 * @returns {any} Debug info.
-	 */
-	public debug() {
-		return this.rooms;
-	}
-
-	/**
 	 * Greets a new user.
 	 *
 	 * @param {Socket} client The client socket.
