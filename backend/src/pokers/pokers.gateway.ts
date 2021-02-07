@@ -200,7 +200,7 @@ export class PokersGateway implements OnGatewayInit {
 		history = false,
 		all = false
 	} = {} ) {
-		if ( all || story ) {
+		if ( all || story || votes ) {
 			this.sendCurrentStory( poker );
 		}
 
