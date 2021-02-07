@@ -79,6 +79,11 @@ export class PokerRoom {
 		return this.getActiveMembers().length;
 	}
 
+	/**
+	 * Lists the active members of the room.
+	 *
+	 * @returns {Member[]} List of active members.
+	 */
 	public getActiveMembers(): Member[] {
 		return Object.values( this.members )
 			.filter( ( member: Member ) => member.type === "voter" && member.connected );
@@ -91,7 +96,7 @@ export class PokerRoom {
 	 *
 	 * @returns {number} The total number of clients connected.
 	 */
-	public getClientCount( includeDisconnected: boolean = true ): number {
+	public getClientCount( includeDisconnected = true ): number {
 		return Object.values( this.members ).filter( member => member.connected || includeDisconnected ).length;
 	}
 
@@ -113,7 +118,7 @@ export class PokerRoom {
 			type: "voter",
 			connected: true,
 		};
-		
+
 		this.currentStory = this.setStoryAverage();
 		this.currentStory.votesRevealed = false;
 	}
@@ -150,7 +155,7 @@ export class PokerRoom {
 	/**
 	 * Removes a vote from a user.
 	 *
-	 * @param memberId User ID to remove the vote of.
+	 * @param {string} memberId User ID to remove the vote of.
 	 *
 	 * @returns {void}
 	 *
@@ -269,7 +274,7 @@ export class PokerRoom {
 			this.getCurrentVote( memberId ).initialValue = vote;
 		}
 		this.getCurrentVote( memberId ).currentValue = vote;
-		
+
 		this.currentStory = this.setStoryAverage();
 	}
 
@@ -384,7 +389,7 @@ export class PokerRoom {
 		if ( story.votes.some( ( vote: Vote ) => vote.currentValue === "coffee" ) ) {
 			story.voteAverage         = "coffee";
 			story.nearestPointAverage = "coffee";
-			return story
+			return story;
 		}
 
 		if ( story.votes.some( ( vote: Vote ) => vote.currentValue === "?" ) ) {
@@ -428,7 +433,7 @@ export class PokerRoom {
 	 *
 	 * @returns {void}
 	 */
-	public newStory( name: string = "" ): void {
+	public newStory( name = "" ): void {
 		// Save the current story to the history.
 		this.history.push( this.currentStory );
 

@@ -16,10 +16,10 @@ export default {
 	},
 	sockets: {
 		disconnect() {
-			this.$store.commit( 'serverConnection', false );
+			this.$store.commit( "serverConnection", false );
 		},
 		connect() {
-			this.$store.commit( 'serverConnection', true );
+			this.$store.commit( "serverConnection", true );
 		},
 		userId( clientId ) {
 			if ( ! this.$data.clientId ) {
@@ -49,5 +49,5 @@ export default {
 			document.title = this.$data.baseTitle + " " + this.$store.state.voteCount + "/" + this.$store.state.members.voters.length;
 		},
 	},
-}
+};
 </script>

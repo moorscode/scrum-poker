@@ -4,7 +4,7 @@
       <span
         v-for="vote of votes"
         class="resultContainer"
-		v-bind:key=vote
+        v-bind:key=vote
       >
         <button
           v-if="vote.initialValue !== vote.currentValue"
@@ -21,12 +21,12 @@
             v-if="vote.currentValue === 'coffee'"
             :class="['fas','fa-mug-hot']"
           />
-		  <span v-if="vote.currentValue === '#'">
-			  <i class="fas fa-spinner fa-pulse"></i>
-		  </span>
-		  <span v-if="vote.currentValue !== '#'">
-          	{{ vote.currentValue }}
-		  </span>
+          <span v-if="vote.currentValue === '#'">
+            <i class="fas fa-spinner fa-pulse"></i>
+          </span>
+          <span v-if="vote.currentValue !== '#'">
+            {{ vote.currentValue }}
+          </span>
           <div
             v-if="getGroupedVoteNames(vote).length > 0"
             class="vote-names"

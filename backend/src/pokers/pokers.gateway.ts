@@ -1,6 +1,5 @@
 import { OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 // eslint-disable-next-line camelcase
-import { var_export } from "locutus/php/var";
 import { Server, Socket } from "socket.io";
 import { PointsService } from "../points/points.service";
 import { Member, MemberList, Story, Vote, VoteValue } from "./poker-room";
@@ -192,7 +191,7 @@ export class PokersGateway implements OnGatewayInit {
 		votes = false,
 		members = false,
 		history = false,
-		all = false
+		all = false,
 	} = {} ) {
 		if ( all || story || votes ) {
 			this.sendCurrentStory( poker );
@@ -275,7 +274,7 @@ export class PokersGateway implements OnGatewayInit {
 			"storyUpdated",
 			{
 				currentStory: this.formatStoryResponse( this.pokersService.getCurrentStory( room ) ),
-			}
+			},
 		);
 	}
 
