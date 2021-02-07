@@ -12,10 +12,16 @@ import { mapState } from "vuex";
 export default {
 	name: "Refinement",
 	computed: {
-		...mapState( [ "activePoker" ] ),
+		...mapState( [ "voteCount", "members", "activePoker" ] ),
 	},
 	methods: {
 		done() {
+			if ( this.voteCount !== this.members.voters.length ) {
+				if ( ! window.confirm( "Are you sure you want to finish the refinement, not all votes are in yet." ) ) {
+					return;
+				}
+			}
+
 			this.$socket.client.emit( "finish", { poker: this.activePoker } );
 		},
 	},
