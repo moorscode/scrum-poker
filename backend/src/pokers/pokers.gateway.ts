@@ -95,14 +95,7 @@ export class PokersGateway implements OnGatewayInit {
 
 	@SubscribeMessage( "exit" )
 	exit( client: Socket ): void {
-		const sockets = this.pokersService.getClientSockets( client );
-
 		this.pokersService.exit( client );
-
-		sockets.forEach( ( socketId: string ) => {
-			// eslint-disable-next-line no-unused-expressions
-			this.server.sockets[ socketId ] && this.server.sockets[ socketId ].emit( "reconnect" );
-		} );
 	}
 
 	@SubscribeMessage( "join" )
@@ -125,14 +118,7 @@ export class PokersGateway implements OnGatewayInit {
 
 	@SubscribeMessage( "leave" )
 	leave( client: Socket, message: { poker: string } ): void {
-		const sockets = this.pokersService.getClientSockets( client );
-
 		this.pokersService.leave( client, message.poker );
-
-		sockets.forEach( ( socketId: string ) => {
-			// eslint-disable-next-line no-unused-expressions
-			this.server.sockets[ socketId ] && this.server.sockets[ socketId ].emit( "reconnect" );
-		} );
 
 		this.send( { poker: message.poker, members: true, votes: true, story: true } );
 	}
