@@ -6,6 +6,6 @@
 
 <script>
 export default {
-	name: "connecting"
-}
+	name: "connecting",
+};
 </script>

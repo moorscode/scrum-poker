@@ -102,8 +102,8 @@ export default Vue.extend( {
 				"currentStory",
 				"points",
 				"votes",
-				"connected"
-			]
+				"connected",
+			],
 		),
 		backgroundColor() {
 			switch ( true ) {

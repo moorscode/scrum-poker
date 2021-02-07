@@ -8,8 +8,8 @@ module.exports = {
 	},
 	plugins: [ "@typescript-eslint/eslint-plugin" ],
 	"extends": [
-		"yoast",
-		"plugin:@typescript-eslint/recommended",
+		'yoast-base',
+		'yoast-typescript',
 	],
 	root: true,
 	env: {

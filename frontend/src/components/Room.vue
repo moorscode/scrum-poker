@@ -68,7 +68,7 @@ export default {
 	},
 	sockets: {
 		welcome() {
-			this.joinRoom()
+			this.joinRoom();
 		},
 		joined( msg ) {
 			const currentPoker = this.activePoker;
