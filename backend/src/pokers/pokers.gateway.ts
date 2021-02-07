@@ -3,7 +3,7 @@ import { OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } fr
 import { var_export } from "locutus/php/var";
 import { Server, Socket } from "socket.io";
 import { PointsService } from "../points/points.service";
-import { Client, MemberList, Story, Vote, VoteValue } from "./poker-room";
+import { Member, MemberList, Story, Vote, VoteValue } from "./poker-room";
 import { PokersService } from "./pokers.service";
 
 interface ClientResponse {
@@ -357,20 +357,20 @@ export class PokersGateway implements OnGatewayInit {
 		const mapCallback = this.formatClientResponse;
 
 		return {
-			voters: Object.values( memberList.participants ).map( mapCallback ),
-			observers: Object.values( memberList.observers ).map( mapCallback ),
-			disconnected: Object.values( memberList.disconnected ).map( mapCallback ),
+			voters: Object.values( memberList ).filter( member => member.type === "voter" && member.connected ).map( mapCallback ),
+			observers: Object.values( memberList ).filter( member => member.type === "observer" && member.connected ).map( mapCallback ),
+			disconnected: Object.values( memberList ).filter( member => ! member.connected ).map( mapCallback ),
 		};
 	}
 
 	/**
 	 * Formats a client for response.
 	 *
-	 * @param {Client} client The client to format.
+	 * @param {Member} client The client to format.
 	 *
 	 * @returns {ClientResponse} The formatted client.
 	 */
-	private formatClientResponse( client: Client ): ClientResponse {
+	private formatClientResponse( client: Member ): ClientResponse {
 		return {
 			id: client.id,
 			name: client.name,

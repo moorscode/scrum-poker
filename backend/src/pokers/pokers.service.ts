@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { Socket } from "socket.io";
 import { PointsService } from "../points/points.service";
-import { Client, MemberList, PokerRoom, Story, Vote } from "./poker-room";
+import { Member, MemberList, PokerRoom, Story, Vote } from "./poker-room";
 
 interface CurrentVotes {
 	voteCount: number;
@@ -259,7 +259,7 @@ export class PokersService {
 	public getVotedNames( poker: string ): string[] {
 		return this.getRoom( poker )
 			.getVotedClients()
-			.map( ( client: Client ) => client.name );
+			.map( ( member: Member ) => member.name );
 	}
 
 	/**
@@ -299,17 +299,17 @@ export class PokersService {
 	 * @returns {CurrentVotes} Votes in that room. Obfuscated if not all votes are in yet.
 	 */
 	public getVotes( poker: string ): CurrentVotes {
-		const voted: Client[] = this.getRoom( poker ).getVotedClients();
+		const voted: Member[] = this.getRoom( poker ).getVotedClients();
 		const votes           = this.getRoom( poker ).getCurrentVotes();
 
 		return {
 			voteCount: voted.length,
 			votes,
-			groupedVoterNames: voted.reduce( ( accumulator, client: Client ) => {
-				const vote                  = this.getRoom( poker ).getCurrentVote( client.id );
+			groupedVoterNames: voted.reduce( ( accumulator, member: Member ) => {
+				const vote                  = this.getRoom( poker ).getCurrentVote( member.id );
 				const voteGroupKey: string  = vote.initialValue + "/" + vote.currentValue;
 				accumulator[ voteGroupKey ] = accumulator[ voteGroupKey ] || [];
-				accumulator[ voteGroupKey ].push( client.name );
+				accumulator[ voteGroupKey ].push( member.name );
 				return accumulator;
 			}, {} ),
 		};
