@@ -46,14 +46,14 @@ export default {
 				return;
 			}
 
-			this.$socket.client.emit( "join", { poker: this.joinPoker, name: this.$store.state.nickname } );
+			this.$socket.client.emit( "join", { poker: this.joinPoker, name: this.nickname } );
 		},
 		getFromURL( key ) {
 			return new URLSearchParams( window.location.search.substring( 1 ) ).get( key );
 		},
 	},
 	computed: {
-		...mapState( [ "activePoker" ] ),
+		...mapState( [ "activePoker", "nickname" ] ),
 	},
 	created() {
 		this.joinRoom();
