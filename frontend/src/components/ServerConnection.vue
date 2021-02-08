@@ -48,9 +48,8 @@ export default {
 			this.$store.commit( "voteCount", msg.voteCount );
 			this.$store.commit( "votedNames", msg.votedNames );
 			this.$store.commit( "groupedVoterNames", msg.groupedVoterNames );
-			this.$store.commit( "pointSpread", this.$data.pointSpread );
 
-			document.title = this.$data.baseTitle + " " + this.$store.state.voteCount + "/" + this.$store.state.members.voters.length;
+			document.title = this.$data.baseTitle + " " + msg.voteCount + "/" + msg.voters;
 		},
 	},
 };

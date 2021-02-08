@@ -19,6 +19,7 @@ export interface Story {
 	nearestPointAverage?: VoteValue;
 	// eslint-disable-next-line no-use-before-define
 	votes: Vote[];
+	voters: number;
 	votesRevealed: boolean;
 }
 
@@ -54,7 +55,7 @@ export class PokerRoom {
 	constructor() {
 		this.members      = {};
 		this.history      = [];
-		this.currentStory = { name: "", votes: [], votesRevealed: false };
+		this.currentStory = { name: "", votes: [], voters: 0, votesRevealed: false };
 	}
 
 	/**
@@ -149,8 +150,13 @@ export class PokerRoom {
 			connected: true,
 		};
 
+		this.recalculateStory();
+	}
+
+	public recalculateStory() {
 		this.currentStory = this.setStoryAverage();
 		this.currentStory.votesRevealed = false;
+		this.currentStory.voters = this.getVotersCount();
 	}
 
 	/**
@@ -197,8 +203,7 @@ export class PokerRoom {
 			( vote: Vote ) => vote.voter.id !== memberId,
 		);
 
-		this.currentStory = this.setStoryAverage();
-		this.currentStory.votesRevealed = false;
+		this.recalculateStory();
 	}
 
 	/**
@@ -209,10 +214,10 @@ export class PokerRoom {
 	 * @returns {void}
 	 */
 	public makeObserver( memberId: string ): void {
-		this.removeVote( memberId );
-
 		this.members[ memberId ].type = "observer";
 		this.members[ memberId ].connected = true;
+
+		this.removeVote( memberId );
 	}
 
 	/**
@@ -226,6 +231,8 @@ export class PokerRoom {
 		if ( this.members[ memberId ] ) {
 			this.members[ memberId ].connected = false;
 		}
+
+		this.recalculateStory();
 	}
 
 	/**
@@ -468,7 +475,7 @@ export class PokerRoom {
 		this.history.push( this.currentStory );
 
 		// Reset the current story.
-		this.currentStory = { name, votes: [], votesRevealed: false };
+		this.currentStory = { name, votes: [], voters: this.getVotersCount(), votesRevealed: false };
 	}
 
 	/**

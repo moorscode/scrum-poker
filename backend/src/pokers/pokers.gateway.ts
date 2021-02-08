@@ -18,10 +18,10 @@ interface VoteResponse {
 
 interface StoryResponse {
 	name: string;
-	voteAverage?: number | string;
-	nearestPointAverage?: VoteValue;
 	votes: VoteResponse[];
 	votesRevealed: boolean;
+	voteAverage?: number | string;
+	nearestPointAverage?: VoteValue;
 }
 
 interface MembersResponse {
@@ -193,7 +193,7 @@ export class PokersGateway implements OnGatewayInit {
 		history = false,
 		all = false,
 	} = {} ) {
-		if ( all || story || votes ) {
+		if ( all || story ) {
 			this.sendCurrentStory( poker );
 		}
 
@@ -221,10 +221,12 @@ export class PokersGateway implements OnGatewayInit {
 	 */
 	private sendVotes( poker: string ): void {
 		const { voteCount, votes, groupedVoterNames } = this.pokersService.getVotes( poker );
+		const story = this.pokersService.getCurrentStory( poker );
 
 		const data = {
 			votes: this.formatVoteResponseList( votes ),
 			voteCount: voteCount,
+			voters: story.voters,
 			groupedVoterNames: groupedVoterNames,
 			votedNames: this.pokersService.getVotedNames( poker ),
 		};
@@ -321,10 +323,10 @@ export class PokersGateway implements OnGatewayInit {
 	private formatStoryResponse( story: Story ): StoryResponse {
 		return {
 			name: story.name,
-			voteAverage: story.voteAverage,
-			nearestPointAverage: story.nearestPointAverage,
 			votes: this.formatVoteResponseList( story.votes ),
 			votesRevealed: story.votesRevealed,
+			voteAverage: story.voteAverage,
+			nearestPointAverage: story.nearestPointAverage,
 		};
 	}
 
