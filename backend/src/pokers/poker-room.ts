@@ -471,8 +471,10 @@ export class PokerRoom {
 	 * @returns {void}
 	 */
 	public newStory( name = "" ): void {
-		// Save the current story to the history.
-		this.history.push( this.currentStory );
+		if ( typeof this.currentStory.voteAverage === "number" ) {
+			// Save the current story to the history.
+			this.history.push( this.currentStory );
+		}
 
 		// Reset the current story.
 		this.currentStory = { name, votes: [], voters: this.getVoterCount(), votesRevealed: false };
