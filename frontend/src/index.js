@@ -12,8 +12,8 @@ Vue.use(
 	io( window.location.protocol + "//" + window.location.hostname + ":" + process.env.SOCKET_PORT + "" + window.location.pathname + "pokers",
 	{
 		reconnection: true,
-		reconnectionDelay: 500,
-		reconnectionAttempts: 10,
+		reconnectionDelay: 750,
+		reconnectionAttempts: Infinity,
 		autoConnect: false
 	} ),
 );
