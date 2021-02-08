@@ -16,7 +16,7 @@
     <i
       class="fas fa-plug"
       :class="$socket.connected ? 'connected':'disconnected'"
-      title="Connection status"
+      :title="$socket.connected ? 'Connected to the server.':'Disconnected from the server.'"
     />
   </section>
 </template>
