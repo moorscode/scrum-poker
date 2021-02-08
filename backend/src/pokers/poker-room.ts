@@ -69,6 +69,36 @@ export class PokerRoom {
 	}
 
 	/**
+	 * Lists voters in a room.
+	 *
+	 * @returns {Member[]} List of voters.
+	 */
+	public getVoters(): Member[] {
+		return Object.values( this.members )
+			.filter( ( member: Member ) => member.type === 'voter' && member.connected );
+	}
+
+	/**
+	 * Lists clients in a room.
+	 *
+	 * @returns {Member[]} List of observers.
+	 */
+	public getObservers(): Member[] {
+		return Object.values( this.members )
+			.filter( ( member: Member ) => member.type === 'observer' && member.connected );
+	}
+
+	/**
+	 * Lists disconnected members in a room.
+	 *
+	 * @returns {Member[]} List of disconnected members.
+	 */
+	public getDisconnected(): Member[] {
+		return Object.values( this.members )
+			.filter( ( member: Member ) => ! member.connected );
+	}
+
+	/**
 	 * Lists all poker voters.
 	 *
 	 * @returns {number} Number of voters.

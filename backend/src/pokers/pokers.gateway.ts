@@ -2,8 +2,8 @@ import { OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } fr
 // eslint-disable-next-line camelcase
 import { Server, Socket } from "socket.io";
 import { PointsService } from "../points/points.service";
-import { Member, MemberList, Story, Vote, VoteValue } from "./poker-room";
-import { PokersService } from "./pokers.service";
+import { Member, Story, Vote, VoteValue } from "./poker-room";
+import { PokersService, MemberGroups } from "./pokers.service";
 
 interface ClientResponse {
 	name: string;
@@ -242,8 +242,8 @@ export class PokersGateway implements OnGatewayInit {
 	 * @private
 	 */
 	private sendMembers( room: string ): void {
-		const clients: MemberList = this.pokersService.getClients( room );
-		this.server.to( room ).emit( "memberList", this.formatMembersResponse( clients ) );
+		const memberGroups: MemberGroups = this.pokersService.getMembers( room );
+		this.server.to( room ).emit( "memberList", this.formatMembersResponse( memberGroups ) );
 	}
 
 	/**
@@ -333,19 +333,19 @@ export class PokersGateway implements OnGatewayInit {
 	}
 
 	/**
-	 * Formats a memberlist for response.
+	 * Formats the members in a room for response.
 	 *
-	 * @param {MemberList} memberList The memberlist.
+	 * @param {MemberGroups} memberGroups The members in their groups.
 	 *
 	 * @returns {MembersResponse} The formatted list.
 	 */
-	private formatMembersResponse( memberList: MemberList ): MembersResponse {
+	private formatMembersResponse( memberGroups: MemberGroups ): MembersResponse {
 		const mapCallback = this.formatClientResponse;
 
 		return {
-			voters: Object.values( memberList ).filter( member => member.type === "voter" && member.connected ).map( mapCallback ),
-			observers: Object.values( memberList ).filter( member => member.type === "observer" && member.connected ).map( mapCallback ),
-			disconnected: Object.values( memberList ).filter( member => ! member.connected ).map( mapCallback ),
+			voters: memberGroups.voters.map( mapCallback ),
+			observers: memberGroups.observers.map( mapCallback ),
+			disconnected: memberGroups.disconnected.map( mapCallback ),
 		};
 	}
 

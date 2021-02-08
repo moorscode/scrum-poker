@@ -17,6 +17,12 @@ export interface Users {
 	[ socketId: string ]: string;
 }
 
+export interface MemberGroups {
+	voters: Member[];
+	observers: Member[];
+	disconnected: Member[];
+}
+
 @Injectable()
 /**
  * The Pokers service.
@@ -238,6 +244,22 @@ export class PokersService {
 	 */
 	public getClients( poker: string ): MemberList {
 		return this.getRoom( poker ).getClients();
+	}
+
+	/**
+	 * Retrieves all members.
+	 *
+	 * @param {string} poker The poker.
+	 *
+	 * @returns {MemberList} All clients in a room.
+	 */
+	public getMembers( poker: string ): MemberGroups {
+		const room = this.getRoom( poker );
+		return {
+			voters: room.getVoters(),
+			observers: room.getObservers(),
+			disconnected: room.getDisconnected()
+		};
 	}
 
 	/**
