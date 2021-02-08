@@ -119,15 +119,8 @@ export default Vue.extend( {
 					return "normal-spread";
 			}
 		},
-		average() {
-			if ( this.voteCount === 0 || this.voteCount < this.members.voters.length || typeof this.currentStory.voteAverage === "string" ) {
-				return "";
-			}
-
-			return Math.round( this.currentStory.voteAverage * 100 ) / 100;
-		},
 		pointSpread() {
-			if ( this.average === "" ) {
+			if ( this.voteCount === 0 || this.voteCount < this.members.voters.length || typeof this.currentStory.voteAverage === "string" ) {
 				return null;
 			}
 
