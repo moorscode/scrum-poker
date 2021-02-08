@@ -6,6 +6,7 @@ import { Member, MemberList, PokerRoom, Story, Vote } from "./poker-room";
 interface CurrentVotes {
 	voteCount: number;
 	votes: Vote[];
+	voters: number;
 	groupedVoterNames: { [ vote: string ]: string[] };
 }
 
@@ -283,7 +284,7 @@ export class PokersService {
 	 * @returns {number} Number of members that can vote in the room.
 	 */
 	public getVoterCount( poker: string ): number {
-		return this.getRoom( poker ).getVotersCount();
+		return this.getRoom( poker ).getVoterCount();
 	}
 
 	/**
@@ -295,7 +296,7 @@ export class PokersService {
 	 *
 	 * @returns {void}
 	 */
-	public vote( client: Socket, poker: string, vote ): void {
+	public castVote( client: Socket, poker: string, vote ): void {
 		// Prevent cheaters from entering bogus point totals.
 		if ( ! PointsService.getPoints().includes( vote ) ) {
 			return;
@@ -312,14 +313,17 @@ export class PokersService {
 	 * @returns {CurrentVotes} Votes in that room. Obfuscated if not all votes are in yet.
 	 */
 	public getVotes( poker: string ): CurrentVotes {
-		const voted: Member[] = this.getRoom( poker ).getVotedClients();
-		const votes           = this.getRoom( poker ).getCurrentVotes();
+		const room: PokerRoom = this.getRoom( poker );
+		const voted: Member[] = room.getVotedClients();
+		const votes           = room.getCurrentVotes();
+		const voters: number  = room.getVoterCount();
 
 		return {
 			voteCount: voted.length,
 			votes,
+			voters,
 			groupedVoterNames: voted.reduce( ( accumulator, member: Member ) => {
-				const vote                  = this.getRoom( poker ).getCurrentVote( member.id );
+				const vote                  = room.getCurrentVote( member.id );
 				const voteGroupKey: string  = vote.initialValue + "/" + vote.currentValue;
 				accumulator[ voteGroupKey ] = accumulator[ voteGroupKey ] || [];
 				accumulator[ voteGroupKey ].push( member.name );

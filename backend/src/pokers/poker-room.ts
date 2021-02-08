@@ -106,7 +106,7 @@ export class PokerRoom {
 	 *
 	 * @private
 	 */
-	public getVotersCount(): number {
+	public getVoterCount(): number {
 		return this.getActiveMembers().length;
 	}
 
@@ -156,7 +156,7 @@ export class PokerRoom {
 	public recalculateStory() {
 		this.currentStory = this.setStoryAverage();
 		this.currentStory.votesRevealed = false;
-		this.currentStory.voters = this.getVotersCount();
+		this.currentStory.voters = this.getVoterCount();
 	}
 
 	/**
@@ -323,7 +323,7 @@ export class PokerRoom {
 	 * @returns {boolean} True if every client has voted.
 	 */
 	private hasEverybodyVoted( story: Story ): boolean {
-		return story.votes.length === this.getVotersCount();
+		return story.votes.length === this.getVoterCount();
 	}
 
 	/**
@@ -475,7 +475,7 @@ export class PokerRoom {
 		this.history.push( this.currentStory );
 
 		// Reset the current story.
-		this.currentStory = { name, votes: [], voters: this.getVotersCount(), votesRevealed: false };
+		this.currentStory = { name, votes: [], voters: this.getVoterCount(), votesRevealed: false };
 	}
 
 	/**

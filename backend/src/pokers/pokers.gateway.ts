@@ -118,7 +118,7 @@ export class PokersGateway implements OnGatewayInit {
 
 	@SubscribeMessage( "vote" )
 	vote( client: Socket, message: { poker: string; vote } ): void {
-		this.pokersService.vote( client, message.poker, message.vote );
+		this.pokersService.castVote( client, message.poker, message.vote );
 
 		this.send( { poker: message.poker, story: true, votes: true } );
 	}
@@ -220,14 +220,13 @@ export class PokersGateway implements OnGatewayInit {
 	 * @private
 	 */
 	private sendVotes( poker: string ): void {
-		const { voteCount, votes, groupedVoterNames } = this.pokersService.getVotes( poker );
-		const story = this.pokersService.getCurrentStory( poker );
-
+		const { voteCount, votes, voters, groupedVoterNames } = this.pokersService.getVotes( poker );
+		
 		const data = {
 			votes: this.formatVoteResponseList( votes ),
-			voteCount: voteCount,
-			voters: story.voters,
-			groupedVoterNames: groupedVoterNames,
+			voteCount,
+			voters,
+			groupedVoterNames,
 			votedNames: this.pokersService.getVotedNames( poker ),
 		};
 
