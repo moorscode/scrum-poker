@@ -75,7 +75,7 @@ export class PokerRoom {
 	 */
 	public getVoters(): Member[] {
 		return Object.values( this.members )
-			.filter( ( member: Member ) => member.type === 'voter' && member.connected );
+			.filter( ( member: Member ) => member.type === "voter" && member.connected );
 	}
 
 	/**
@@ -85,7 +85,7 @@ export class PokerRoom {
 	 */
 	public getObservers(): Member[] {
 		return Object.values( this.members )
-			.filter( ( member: Member ) => member.type === 'observer' && member.connected );
+			.filter( ( member: Member ) => member.type === "observer" && member.connected );
 	}
 
 	/**

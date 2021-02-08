@@ -258,7 +258,7 @@ export class PokersService {
 		return {
 			voters: room.getVoters(),
 			observers: room.getObservers(),
-			disconnected: room.getDisconnected()
+			disconnected: room.getDisconnected(),
 		};
 	}
 

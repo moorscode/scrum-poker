@@ -220,16 +220,16 @@ export class PokersGateway implements OnGatewayInit {
 	 * @private
 	 */
 	private sendVotes( poker: string ): void {
-		const { voteCount, votes, groupedVoterNames } = this.pokersService.getVotes(
-			poker,
-		);
+		const { voteCount, votes, groupedVoterNames } = this.pokersService.getVotes( poker );
 
-		this.server.to( poker ).emit( "votes", {
+		const data = {
 			votes: this.formatVoteResponseList( votes ),
 			voteCount: voteCount,
 			groupedVoterNames: groupedVoterNames,
 			votedNames: this.pokersService.getVotedNames( poker ),
-		} );
+		};
+
+		this.server.to( poker ).emit( "votes", data );
 	}
 
 	/**
@@ -242,8 +242,8 @@ export class PokersGateway implements OnGatewayInit {
 	 * @private
 	 */
 	private sendMembers( room: string ): void {
-		const memberGroups: MemberGroups = this.pokersService.getMembers( room );
-		this.server.to( room ).emit( "memberList", this.formatMembersResponse( memberGroups ) );
+		const data = this.formatMembersResponse( this.pokersService.getMembers( room ) );
+		this.server.to( room ).emit( "memberList", data );
 	}
 
 	/**
@@ -256,8 +256,8 @@ export class PokersGateway implements OnGatewayInit {
 	 * @private
 	 */
 	private sendHistory( room: string ): void {
-		const stories = this.pokersService.getHistory( room );
-		this.server.to( room ).emit( "history", { stories: this.formatStoryResponseList( stories ) } );
+		const data = { stories: this.formatStoryResponseList( this.pokersService.getHistory( room ) ) };
+		this.server.to( room ).emit( "history", data );
 	}
 
 	/**
@@ -270,12 +270,8 @@ export class PokersGateway implements OnGatewayInit {
 	 * @private
 	 */
 	private sendCurrentStory( room: string ): void {
-		this.server.to( room ).emit(
-			"storyUpdated",
-			{
-				currentStory: this.formatStoryResponse( this.pokersService.getCurrentStory( room ) ),
-			},
-		);
+		const data = { currentStory: this.formatStoryResponse( this.pokersService.getCurrentStory( room ) ) };
+		this.server.to( room ).emit( "storyUpdated", data );
 	}
 
 	/**
