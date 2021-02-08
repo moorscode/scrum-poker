@@ -35,7 +35,7 @@ export default {
 			this.$store.commit( "members", msg );
 		},
 		points( msg ) {
-			this.$store.commit( "points", msg.points );
+			this.$store.commit( "points", msg );
 		},
 		votes( msg ) {
 			const votes = msg.votes.sort( ( a, b ) => a.currentValue - b.currentValue ) || [];
