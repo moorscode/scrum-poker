@@ -197,12 +197,12 @@ export class PokersGateway implements OnGatewayInit {
 			this.sendCurrentStory( poker );
 		}
 
-		if ( all || votes ) {
-			this.sendVotes( poker );
-		}
-
 		if ( all || members ) {
 			this.sendMembers( poker );
+		}
+
+		if ( all || votes ) {
+			this.sendVotes( poker );
 		}
 
 		if ( all || history ) {
