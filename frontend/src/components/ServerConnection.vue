@@ -6,10 +6,14 @@ export default {
 	data() {
 		return {
 			clientId: window.localStorage.getItem( "clientId" ) || false,
+			nickname: window.localStorage.getItem( "nickname" ),
 			baseTitle: document.title,
 		};
 	},
 	created() {
+		// Set name in the store.
+		this.$store.commit( "nickname", this.nickname );
+
 		window.onbeforeunload = () => {
 			this.$socket.client.emit( "exit" );
 		};

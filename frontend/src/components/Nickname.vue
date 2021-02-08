@@ -28,9 +28,6 @@ export default {
 			nickname: window.localStorage.getItem( "nickname" ),
 		};
 	},
-	created() {
-		this.updateNickname();
-	},
 	computed: {
 		...mapState( [ "activePoker" ] ),
 	},
