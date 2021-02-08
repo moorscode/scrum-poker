@@ -30,7 +30,7 @@ export default {
 			}
 
 			// Confirm when not everybody has voted.
-			if ( this.voteCount !== this.members.voters.length ) {
+			if ( ! this.allVoted ) {
 				if ( ! window.confirm( "Are you sure you want to start a new story, not all votes are in yet." ) ) {
 					return;
 				}
