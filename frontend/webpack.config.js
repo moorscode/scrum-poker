@@ -49,6 +49,12 @@ const config = {
 					to: "css",
 					context: "src/css",
 				},
+				{
+					// Wildcard is specified hence will copy only css files
+					from: "*.ico",
+					to: "",
+					context: "src/html",
+				},
 			] } ),
 	],
 	optimization: {
