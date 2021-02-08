@@ -2,7 +2,7 @@
   <div class="members-list-container">
     <button
       :class="showMemberList ? 'pressed' : ''"
-      @click="showMemberList = !showMemberList"
+      @click="showMemberList = ! showMemberList"
     >
       <i
         class="fas fa-clipboard-list"
@@ -11,8 +11,8 @@
     <div :class="['members-list', showMemberList ? '' : 'hidden']">
       <strong>Voters</strong>
       <ul>
-        <li v-for="voter in members.voters">
-          {{ voter.name }} <i class="fas fa-person-booth" />
+        <li v-for="voter in members.voters" v-bind:key=voter>
+          {{ voter }} <i class="fas fa-person-booth" />
         </li>
         <li v-if="!members.voters.length">
           None
@@ -20,8 +20,8 @@
       </ul>
       <strong>Observers</strong>
       <ul>
-        <li v-for="observer in members.observers">
-          {{ observer.name }} <i class="fas fa-user-secret" />
+        <li v-for="observer in members.observers" v-bind:key=observer>
+          {{ observer }} <i class="fas fa-user-secret" />
         </li>
         <li v-if="!members.observers.length">
           None
@@ -29,8 +29,8 @@
       </ul>
       <strong>Disconnected</strong>
       <ul>
-        <li v-for="disconnected in members.disconnected">
-          {{ disconnected.name }} <i class="fas fa-plug disconnected" />
+        <li v-for="disconnected in members.disconnected" v-bind:key=disconnected>
+          {{ disconnected }} <i class="fas fa-plug disconnected" />
         </li>
         <li v-if="!members.disconnected.length">
           None

@@ -5,11 +5,6 @@ import { PointsService } from "../points/points.service";
 import { Member, Story, Vote, VoteValue } from "./poker-room";
 import { PokersService, MemberGroups } from "./pokers.service";
 
-interface ClientResponse {
-	name: string;
-	id: string;
-}
-
 interface VoteResponse {
 	voterName: string;
 	currentValue: VoteValue;
@@ -25,9 +20,9 @@ interface StoryResponse {
 }
 
 interface MembersResponse {
-	voters: ClientResponse[];
-	observers: ClientResponse[];
-	disconnected: ClientResponse[];
+	voters: string[];
+	observers: string[];
+	disconnected: string[];
 }
 
 @WebSocketGateway( { namespace: "/pokers" } )
@@ -349,14 +344,11 @@ export class PokersGateway implements OnGatewayInit {
 	/**
 	 * Formats a client for response.
 	 *
-	 * @param {Member} client The client to format.
+	 * @param {Member} member The client to format.
 	 *
 	 * @returns {ClientResponse} The formatted client.
 	 */
-	private formatClientResponse( client: Member ): ClientResponse {
-		return {
-			id: client.id,
-			name: client.name,
-		};
+	private formatClientResponse( member: Member ): string {
+		return member.name;
 	}
 }

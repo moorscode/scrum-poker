@@ -6,7 +6,7 @@
     <div class="voted">
       <strong><i class="far fa-check-circle" /> Voted:</strong>
       <ul>
-        <li v-for="name of votedNames">
+        <li v-for="name of votedNames" v-bind:key=name>
           {{ name }}
         </li>
       </ul>
@@ -17,7 +17,7 @@
     <div class="unvoted">
       <strong><i class="far fa-times-circle" /> Not voted yet:</strong>
       <ul>
-        <li v-for="name of unvotedNames">
+        <li v-for="name of unvotedNames" v-bind:key=name>
           {{ name }}
         </li>
       </ul>
@@ -35,7 +35,7 @@ export default {
 	computed: {
 		...mapState( [ "votedNames", "members" ] ),
 		unvotedNames() {
-			const result = this.members.voters.map( member => member.name );
+			const result = Object.values( this.members.voters );
 			for ( const name of this.votedNames ) {
 				const index = result.indexOf( name );
 				if ( index !== -1 ) {
