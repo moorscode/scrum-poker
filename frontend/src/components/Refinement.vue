@@ -16,7 +16,7 @@ export default {
 	},
 	methods: {
 		done() {
-			if ( this.voteCount !== this.members.voters.length ) {
+			if ( this.voteCount > 0 && this.voteCount !== this.members.voters.length ) {
 				if ( ! window.confirm( "Are you sure you want to finish the refinement, not all votes are in yet." ) ) {
 					return;
 				}
