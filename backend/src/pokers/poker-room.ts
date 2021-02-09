@@ -6,7 +6,6 @@ export type MemberType = "voter" | "observer";
 
 export interface Member {
 	// eslint-disable-next-line no-use-before-define
-	votes: Vote[];
 	name: string;
 	id: string;
 	type: MemberType;
@@ -145,7 +144,6 @@ export class PokerRoom {
 		this.members[ memberId ] = {
 			id: memberId,
 			name,
-			votes: [],
 			type: "voter",
 			connected: true,
 		};
@@ -242,7 +240,7 @@ export class PokerRoom {
 	 */
 	public getVotedClients(): Member[] {
 		return this.getActiveMembers()
-			.filter( ( member: Member ) => member.votes.some( ( vote: Vote ) => vote.story === this.getCurrentStory() ) );
+			.filter( ( member: Member ) => this.currentStory.votes.map( ( vote: Vote ) => vote.voter.id ).includes( member.id ) );
 	}
 
 	/**
@@ -252,7 +250,7 @@ export class PokerRoom {
 	 */
 	public getVotePendingClients(): Member[] {
 		return this.getActiveMembers()
-			.filter( ( member: Member ) => ! member.votes.some( ( vote: Vote ) => vote.story === this.currentStory ) );
+			.filter( ( member: Member ) => ! this.currentStory.votes.map( ( vote: Vote ) => vote.voter.id ).includes( member.id ) );
 	}
 
 	/**
@@ -289,9 +287,7 @@ export class PokerRoom {
 			currentValue: voteValue,
 		};
 
-		this.members[ memberId ].votes.push( vote );
 		this.currentStory.votes.push( vote );
-
 		this.currentStory = this.setStoryAverage();
 	}
 
@@ -334,9 +330,7 @@ export class PokerRoom {
 	 * @returns {Vote} The vote of the user.
 	 */
 	public getCurrentVote( memberId: string ): Vote | undefined {
-		return this.members[ memberId ].votes.find(
-			( vote: Vote ) => vote.story === this.currentStory,
-		);
+		return this.currentStory.votes.filter( ( vote: Vote ) => vote.voter.id === memberId )[0];
 	}
 
 	/**
@@ -360,6 +354,7 @@ export class PokerRoom {
 	 */
 	public getUnobscuredVotes( story: Story ): Vote[] {
 		const notVotedClients:Member[] = this.getVotePendingClients();
+
 		return [
 			// The actual votes.
 			...story.votes,
