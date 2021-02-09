@@ -35,56 +35,54 @@ export class PokersService {
 	/**
 	 * Greets a new user.
 	 *
-	 * @param {Socket} client The client socket.
+	 * @param {Socket} socket The client socket.
 	 * @param {string} userId The user Id.
 	 *
 	 * @returns {void}
 	 */
-	public identify( client: Socket, userId: string ): void {
-		this.users[ client.id ] = userId;
+	public identify( socket: Socket, userId: string ): void {
+		this.users[ socket.id ] = userId;
 	}
 
 	/**
 	 * Get the vote of a user.
 	 *
-	 * @param {Socket} client The client.
+	 * @param {Socket} socket The client.
 	 * @param {string} room The room.
 	 *
 	 * @returns {Vote|null} The vote of the user.
 	 */
-	public getVote( client: Socket, room: string ): Vote | null {
-		return this.getRoom( room ).getCurrentVote( this.getUserId( client ) ) || null;
+	public getVote( socket: Socket, room: string ): Vote | null {
+		return this.getRoom( room ).getCurrentVote( this.getUserId( socket ) ) || null;
 	}
 
 	/**
 	 * Lets the client leave.
 	 *
-	 * @param {Socket} client The client.
+	 * @param {Socket} socket The client.
 	 *
 	 * @returns {void}
 	 */
-	public exit( client: Socket ): void {
-		const userId = this.getUserId( client );
+	public exit( socket: Socket ): void {
+		const userId = this.getUserId( socket );
 
-		this.removeUserFromRooms( userId );
+		delete this.users[ socket.id ];
 
-		for ( const socketId of Object.keys( this.users ) ) {
-			if ( this.users[ socketId ] === userId ) {
-				delete this.users[ socketId ];
-			}
+		if ( ! Object.values( this.users ).includes( userId ) ) {
+			this.removeUserFromRooms( userId );
 		}
 	}
 
 	/**
 	 * Disconnects a client, stores data for reconnection.
 	 *
-	 * @param {Socket} client Disconnecting client.
+	 * @param {Socket} socket Disconnecting client.
 	 * @param {string} room The room of the user.
 	 *
 	 * @returns {void}
 	 */
-	public disconnect( client: Socket, room: string ): void {
-		this.getRoom( room ).setDisconnected( this.getUserId( client ) );
+	public disconnect( socket: Socket, room: string ): void {
+		this.getRoom( room ).setDisconnected( this.getUserId( socket ) );
 	}
 
 	/**
@@ -104,63 +102,34 @@ export class PokersService {
 	}
 
 	/**
-	 * Retrieves all sockets a client has connected with.
-	 *
-	 * @param {Socket} client The client.
-	 *
-	 * @returns {string[]} List of socket Ids.
-	 */
-	public getClientSockets( client: Socket ): string[] {
-		const sockets = [];
-		const userId  = this.getUserId( client );
-
-		if ( ! userId ) {
-			return sockets;
-		}
-
-		for ( const clientId in this.users ) {
-			if ( client.id === clientId ) {
-				continue;
-			}
-			if (
-				Object.prototype.hasOwnProperty.call( this.users, clientId ) &&
-				this.users[ clientId ] === userId
-			) {
-				sockets.push( clientId );
-			}
-		}
-		return sockets;
-	}
-
-	/**
 	 * Retrieves a user Id for a client.
 	 *
-	 * @param {Socket} client The client
+	 * @param {Socket} socket The client
 	 *
 	 * @returns {string} The user Id.
 	 *
 	 * @private
 	 */
-	public getUserId( client: Socket ): string {
-		return this.users[ client.id ];
+	public getUserId( socket: Socket ): string {
+		return this.users[ socket.id ];
 	}
 
 	/**
 	 * Lets a client join a room.
 	 *
-	 * @param {Socket} client The client.
+	 * @param {Socket} socket The client.
 	 * @param {string} poker The room.
 	 * @param {string} name Client name.
 	 *
 	 * @returns {void}
 	 */
-	public join( client: Socket, poker: string, name: string ): void {
+	public join( socket: Socket, poker: string, name: string ): void {
 		const useName = name || "Unnamed" + Math.floor( Math.random() * 100000 );
 
-		client.join( poker );
+		socket.join( poker );
 
 		this.rooms[ poker ] = this.getRoom( poker );
-		this.rooms[ poker ].addClient( this.getUserId( client ), useName );
+		this.rooms[ poker ].addClient( this.getUserId( socket ), useName );
 	}
 
 	/**
@@ -179,17 +148,17 @@ export class PokersService {
 	/**
 	 * Lets a client leave a room.
 	 *
-	 * @param {Socket} client The client.
+	 * @param {Socket} socket The client.
 	 * @param {string} poker The room.
 	 *
 	 * @returns {void}
 	 */
-	public leave( client: Socket, poker: string ): void {
-		this.getRoom( poker ).removeClient( this.getUserId( client ) );
+	public leave( socket: Socket, poker: string ): void {
+		this.getRoom( poker ).removeClient( this.getUserId( socket ) );
 
 		this.cleanupRoom( poker );
 
-		client.leave( poker );
+		socket.leave( poker );
 	}
 
 	/**
@@ -210,30 +179,30 @@ export class PokersService {
 	/**
 	 * Removes the client from the room and votes lists.
 	 *
-	 * @param {Socket} client The client.
+	 * @param {Socket} socket The client.
 	 * @param {string} poker The room.
 	 *
 	 * @returns {void}
 	 */
-	public observe( client: Socket, poker: string ): void {
-		this.getRoom( poker ).makeObserver( this.getUserId( client ) );
+	public observe( socket: Socket, poker: string ): void {
+		this.getRoom( poker ).makeObserver( this.getUserId( socket ) );
 	}
 
 	/**
 	 * Set a name for a client.
 	 *
 	 * @param {string} poker The poker.
-	 * @param {Socket} client The client.
+	 * @param {Socket} socket The client.
 	 * @param {string} name The name.
 	 *
 	 * @returns {void}
 	 */
-	public setName( poker: string, client: Socket, name: string ): void {
+	public setName( poker: string, socket: Socket, name: string ): void {
 		if ( ! name ) {
 			return;
 		}
 
-		this.getRoom( poker ).setClientName( this.getUserId( client ), name );
+		this.getRoom( poker ).setClientName( this.getUserId( socket ), name );
 	}
 
 	/**
@@ -290,19 +259,19 @@ export class PokersService {
 	/**
 	 * Registers a vote for a client in a room.
 	 *
-	 * @param {Socket} client The client.
+	 * @param {Socket} socket The client.
 	 * @param {string} poker The room.
 	 * @param {number|string} vote The vote.
 	 *
 	 * @returns {void}
 	 */
-	public castVote( client: Socket, poker: string, vote ): void {
+	public castVote( socket: Socket, poker: string, vote ): void {
 		// Prevent cheaters from entering bogus point totals.
 		if ( ! PointsService.getPoints().includes( vote ) ) {
 			return;
 		}
 
-		this.getRoom( poker ).castVote( this.getUserId( client ), vote );
+		this.getRoom( poker ).castVote( this.getUserId( socket ), vote );
 	}
 
 	/**
