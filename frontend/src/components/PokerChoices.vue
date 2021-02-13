@@ -62,8 +62,8 @@ export default {
 			}
 		},
 		myVote( msg ) {
-			this.setVote( msg.currentValue );
-			this.myInitialVote = msg.initialValue;
+			this.setVote( msg.currentVote );
+			this.myInitialVote = msg.initialVote;
 		},
 	},
 };

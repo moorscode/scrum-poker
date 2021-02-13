@@ -110,7 +110,7 @@ export class PokersGateway implements OnGatewayInit {
 
 		const vote = this.pokersService.getVote( client, message.poker );
 		if ( vote ) {
-			client.emit( "myVote", { currentValue: vote.currentValue, initialValue: vote.initialValue } );
+			client.emit( "myVote", { currentVote: vote.currentValue, initialVote: vote.initialValue } );
 		}
 
 		this.send( message.poker, { members: true, votes: true } );
@@ -128,10 +128,11 @@ export class PokersGateway implements OnGatewayInit {
 		this.pokersService.castVote( client, message.poker, message.vote );
 
 		// Send this vote to all sockets for the current user.
+		const vote      = this.pokersService.getVote( client, message.poker );
 		const socketIds = this.pokersService.getUserSockets( this.pokersService.getUserId( client ) );
-		const vote = this.pokersService.getVote( client, message.poker );
+
 		for ( const socketId of socketIds ) {
-			this.server.sockets[ socketId ].emit( "myVote", { currentValue: vote.currentValue, initialValue: vote.initialValue } );
+			this.server.sockets[ socketId ].emit( "myVote", { currentVote: vote.currentValue, initialVote: vote.initialValue } );
 		}
 
 		this.send( message.poker, { votes: true } );
