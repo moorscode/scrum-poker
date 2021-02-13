@@ -50,6 +50,8 @@ export class PokerRoom {
 	 * Sets the provided story as the current story.
 	 *
 	 * @param {Story} story Story to set as the current storyl
+	 *
+	 * @returns {void}
 	 */
 	private setCurrentStory( story: Story ): void {
 		this.currentStory = story;
