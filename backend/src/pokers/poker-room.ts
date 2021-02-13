@@ -524,10 +524,9 @@ export class PokerRoom {
 	/**
 	 * Toggles between showing and or hiding the current votes.
 	 *
-	 * @returns {boolean} The new value
+	 * @returns {void} Nothing.
 	 */
-	public toggleRevealVotes(): boolean {
+	public toggleRevealVotes(): void {
 		this.currentStory.votesRevealed = ! this.currentStory.votesRevealed;
-		return this.currentStory.votesRevealed;
 	}
 }
