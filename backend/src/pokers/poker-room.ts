@@ -151,6 +151,11 @@ export class PokerRoom {
 		this.recalculateStory();
 	}
 
+	/**
+	 * Recalculates the story.
+	 *
+	 * @returns {void}
+	 */
 	public recalculateStory() {
 		this.currentStory = this.setStoryAverage( this.currentStory );
 		this.currentStory.votesRevealed = false;
@@ -330,7 +335,7 @@ export class PokerRoom {
 	 * @returns {Vote} The vote of the user.
 	 */
 	public getCurrentVote( memberId: string ): Vote | undefined {
-		return this.currentStory.votes.filter( ( vote: Vote ) => vote.voter.id === memberId )[0];
+		return this.currentStory.votes.filter( ( vote: Vote ) => vote.voter.id === memberId )[ 0 ];
 	}
 
 	/**

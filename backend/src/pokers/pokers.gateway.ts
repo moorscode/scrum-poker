@@ -1,5 +1,4 @@
 import { OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
-// eslint-disable-next-line camelcase
 import { Server, Socket } from "socket.io";
 import { PointsService } from "../points/points.service";
 import { Member, Story, Vote, VoteValue } from "./poker-room";
@@ -222,7 +221,7 @@ export class PokersGateway implements OnGatewayInit {
 	 */
 	private sendVotes( poker: string ): void {
 		const { voteCount, votes, voters, groupedVoterNames } = this.pokersService.getVotes( poker );
-		
+
 		const data = {
 			votes: this.formatVoteResponseList( votes ),
 			voteCount,
