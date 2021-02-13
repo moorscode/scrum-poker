@@ -232,7 +232,7 @@ export class PokersService {
 	 * @returns {MemberList} All clients in a room.
 	 */
 	public getClients( poker: string ): MemberList {
-		return this.getRoom( poker ).getClients();
+		return this.getRoom( poker ).getMembers();
 	}
 
 	/**

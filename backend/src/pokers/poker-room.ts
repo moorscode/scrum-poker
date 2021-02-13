@@ -64,7 +64,7 @@ export class PokerRoom {
 	 *
 	 * @private
 	 */
-	public getClients(): MemberList {
+	public getMembers(): MemberList {
 		return this.members;
 	}
 
