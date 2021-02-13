@@ -465,6 +465,7 @@ export class PokerRoom {
 	 * @returns {void}
 	 */
 	public newStory( name = "" ): void {
+		// If the averages is not a number, like "coffee", don't add to the history.
 		if ( typeof this.currentStory.voteAverage === "number" ) {
 			// Save the current story to the history.
 			this.history.push( this.currentStory );
