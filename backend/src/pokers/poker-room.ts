@@ -42,19 +42,35 @@ export interface ObscuredVote extends Vote {
  * Poker Room
  */
 export class PokerRoom {
-	private readonly members: MemberList;
-	private readonly history: Story[];
-	private currentStory: Story;
+	private readonly members: MemberList = {};
+	private readonly history: Story[] = [];
+	private currentStory: Story = { name: "", votes: [], voters: 0, votesRevealed: false };
 
 	/**
-	 * Poker room constructor.
+	 * Sets the provided story as the current story.
 	 *
-	 * Creates the empty objects.
+	 * @param {Story} story Story to set as the current storyl
 	 */
-	constructor() {
-		this.members      = {};
-		this.history      = [];
-		this.currentStory = { name: "", votes: [], voters: 0, votesRevealed: false };
+	private setCurrentStory( story: Story ): void {
+		this.currentStory = story;
+	}
+
+	/**
+	 * Gets the current story.
+	 *
+	 * @returns {Story} The current story.
+	 */
+	public getCurrentStory(): Story {
+		return this.currentStory;
+	}
+
+	/**
+	 * Retrieves all stories for the room.
+	 *
+	 * @returns {Story[]} The stories of the room.
+	 */
+	public getHistory(): Story[] {
+		return this.history;
 	}
 
 	/**
@@ -74,7 +90,7 @@ export class PokerRoom {
 	 * @returns {Member[]} List of voters.
 	 */
 	public getVoters(): Member[] {
-		return Object.values( this.members )
+		return Object.values( this.getMembers() )
 			.filter( ( member: Member ) => member.type === "voter" && member.connected );
 	}
 
@@ -84,7 +100,7 @@ export class PokerRoom {
 	 * @returns {Member[]} List of observers.
 	 */
 	public getObservers(): Member[] {
-		return Object.values( this.members )
+		return Object.values( this.getMembers() )
 			.filter( ( member: Member ) => member.type === "observer" && member.connected );
 	}
 
@@ -94,7 +110,7 @@ export class PokerRoom {
 	 * @returns {Member[]} List of disconnected members.
 	 */
 	public getDisconnected(): Member[] {
-		return Object.values( this.members )
+		return Object.values( this.getMembers() )
 			.filter( ( member: Member ) => ! member.connected );
 	}
 
@@ -115,7 +131,7 @@ export class PokerRoom {
 	 * @returns {Member[]} List of active members.
 	 */
 	public getActiveMembers(): Member[] {
-		return Object.values( this.members )
+		return Object.values( this.getMembers() )
 			.filter( ( member: Member ) => member.type === "voter" && member.connected );
 	}
 
@@ -127,7 +143,8 @@ export class PokerRoom {
 	 * @returns {number} The total number of clients connected.
 	 */
 	public getClientCount( includeDisconnected = true ): number {
-		return Object.values( this.members ).filter( member => member.connected || includeDisconnected ).length;
+		return Object.values( this.getMembers() )
+			.filter( member => member.connected || includeDisconnected ).length;
 	}
 
 	/**
@@ -141,25 +158,30 @@ export class PokerRoom {
 	 * @private
 	 */
 	public addClient( memberId: string, name: string ): void {
-		this.members[ memberId ] = {
+		const member: Member = {
 			id: memberId,
 			name,
 			type: "voter",
 			connected: true,
 		};
 
-		this.recalculateStory();
+		this.getMembers()[ memberId ] = member;
+
+		this.recalculateCurrentStory();
 	}
 
 	/**
 	 * Recalculates the story.
 	 *
-	 * @returns {void}
+	 * @param {Story} story The base story to use.
+	 *
+	 * @returns {Story} The modified story.
 	 */
-	public recalculateStory() {
-		this.currentStory = this.setStoryAverage( this.currentStory );
-		this.currentStory.votesRevealed = false;
-		this.currentStory.voters = this.getVoterCount();
+	public recalculateStory( story: Story ): Story {
+		story.votesRevealed = false;
+		story.voters = this.getVoterCount();
+
+		return this.setStoryAverage( story );
 	}
 
 	/**
@@ -173,7 +195,7 @@ export class PokerRoom {
 	 * @private
 	 */
 	public setClientName( memberId: string, name: string ): void {
-		this.members[ memberId ].name = name;
+		this.getMembers()[ memberId ].name = name;
 	}
 
 	/**
@@ -186,7 +208,8 @@ export class PokerRoom {
 	 * @private
 	 */
 	public removeClient( memberId: string ): void {
-		delete this.members[ memberId ];
+		const members: MemberList = this.getMembers();
+		delete members[ memberId ];
 
 		this.removeVote( memberId );
 	}
@@ -201,12 +224,14 @@ export class PokerRoom {
 	 * @private
 	 */
 	public removeVote( memberId: string ): void {
+		const story = this.getCurrentStory();
+
 		// Remove client's current votes.
-		this.currentStory.votes = this.currentStory.votes.filter(
+		story.votes = story.votes.filter(
 			( vote: Vote ) => vote.voter.id !== memberId,
 		);
 
-		this.recalculateStory();
+		this.recalculateCurrentStory();
 	}
 
 	/**
@@ -217,8 +242,10 @@ export class PokerRoom {
 	 * @returns {void}
 	 */
 	public makeObserver( memberId: string ): void {
-		this.members[ memberId ].type = "observer";
-		this.members[ memberId ].connected = true;
+		const members: MemberList = this.getMembers();
+
+		members[ memberId ].type = "observer";
+		members[ memberId ].connected = true;
 
 		this.removeVote( memberId );
 	}
@@ -231,11 +258,22 @@ export class PokerRoom {
 	 * @returns {void}
 	 */
 	public setDisconnected( memberId: string ): void {
-		if ( this.members[ memberId ] ) {
-			this.members[ memberId ].connected = false;
+		const members: MemberList = this.getMembers();
+
+		if ( members[ memberId ] ) {
+			members[ memberId ].connected = false;
 		}
 
-		this.recalculateStory();
+		this.recalculateCurrentStory();
+	}
+
+	/**
+	 * Recalculates the current story.
+	 *
+	 * @returns {void}
+	 */
+	private recalculateCurrentStory() {
+		this.setCurrentStory( this.recalculateStory( this.getCurrentStory() ) );
 	}
 
 	/**
@@ -244,8 +282,10 @@ export class PokerRoom {
 	 * @returns {Member[]} List of voted voters.
 	 */
 	public getVotedClients(): Member[] {
+		const story = this.getCurrentStory();
+
 		return this.getActiveMembers()
-			.filter( ( member: Member ) => this.currentStory.votes.map( ( vote: Vote ) => vote.voter.id ).includes( member.id ) );
+			.filter( ( member: Member ) => story.votes.map( ( vote: Vote ) => vote.voter.id ).includes( member.id ) );
 	}
 
 	/**
@@ -254,8 +294,10 @@ export class PokerRoom {
 	 * @returns {Member[]} List of voters that haven't voted yet.
 	 */
 	public getVotePendingClients(): Member[] {
+		const story = this.getCurrentStory();
+
 		return this.getActiveMembers()
-			.filter( ( member: Member ) => ! this.currentStory.votes.map( ( vote: Vote ) => vote.voter.id ).includes( member.id ) );
+			.filter( ( member: Member ) => ! story.votes.map( ( vote: Vote ) => vote.voter.id ).includes( member.id ) );
 	}
 
 	/**
@@ -285,15 +327,18 @@ export class PokerRoom {
 	 * @private
 	 */
 	private addVote( memberId: string, voteValue: VoteValue ): void {
+		const story = this.getCurrentStory();
+
 		const vote: Vote = {
-			story: this.getCurrentStory(),
-			voter: this.members[ memberId ],
+			story,
+			voter: this.getMembers()[ memberId ],
 			initialValue: voteValue,
 			currentValue: voteValue,
 		};
 
-		this.currentStory.votes.push( vote );
-		this.currentStory = this.setStoryAverage( this.currentStory );
+		story.votes.push( vote );
+
+		this.setCurrentStory( this.setStoryAverage( story ) );
 	}
 
 	/**
@@ -305,15 +350,19 @@ export class PokerRoom {
 	 * @returns {void}
 	 */
 	private changeVote( memberId: string, vote: VoteValue ): void {
-		if ( ! this.hasAllVotes( this.currentStory ) ) {
-			this.getCurrentVote( memberId ).initialValue = vote;
-		}
-		if ( this.getCurrentVote( memberId ).initialValue === "coffee" ) {
-			this.getCurrentVote( memberId ).initialValue = vote;
-		}
-		this.getCurrentVote( memberId ).currentValue = vote;
+		const story = this.getCurrentStory();
 
-		this.currentStory = this.setStoryAverage( this.currentStory );
+		const currentVote: Vote = this.getCurrentVote( memberId );
+
+		if ( ! this.hasAllVotes( story ) ) {
+			currentVote.initialValue = vote;
+		}
+		if ( currentVote.initialValue === "coffee" ) {
+			currentVote.initialValue = vote;
+		}
+		currentVote.currentValue = vote;
+
+		this.recalculateCurrentStory();
 	}
 
 	/**
@@ -335,7 +384,7 @@ export class PokerRoom {
 	 * @returns {Vote} The vote of the user.
 	 */
 	public getCurrentVote( memberId: string ): Vote | undefined {
-		return this.currentStory.votes.filter( ( vote: Vote ) => vote.voter.id === memberId )[ 0 ];
+		return this.getCurrentStory().votes.filter( ( vote: Vote ) => vote.voter.id === memberId )[ 0 ];
 	}
 
 	/**
@@ -344,11 +393,13 @@ export class PokerRoom {
 	 * @returns {Vote[]} List of votes.
 	 */
 	public getCurrentVotes(): Vote[] {
-		if ( this.currentStory.votesRevealed || this.hasAllVotes( this.currentStory ) ) {
-			return this.getUnobscuredVotes( this.currentStory );
+		const story = this.getCurrentStory();
+
+		if ( story.votesRevealed || this.hasAllVotes( story ) ) {
+			return this.getUnobscuredVotes( story );
 		}
 
-		return this.getObscuredVotes( this.currentStory );
+		return this.getObscuredVotes( story );
 	}
 
 	/**
@@ -361,7 +412,7 @@ export class PokerRoom {
 	public getUnobscuredVotes( story: Story ): Vote[] {
 		const notVotedClients:Member[] = this.getVotePendingClients();
 		const notVoted = notVotedClients.map(
-			( client: Member ): ObscuredVote => this.getObscuredVote( this.currentStory, client ),
+			( client: Member ): ObscuredVote => this.getObscuredVote( story, client ),
 		);
 
 		return [
@@ -406,7 +457,7 @@ export class PokerRoom {
 			initialValue: voteValue,
 			currentValue: voteValue,
 			voter: member,
-			story: this.getCurrentStory(),
+			story,
 		};
 	}
 
@@ -421,6 +472,7 @@ export class PokerRoom {
 		if ( story.votes.length === 0 ) {
 			delete story.voteAverage;
 			delete story.nearestPointAverage;
+
 			return story;
 		}
 
@@ -472,14 +524,18 @@ export class PokerRoom {
 	 * @returns {void}
 	 */
 	public newStory( name = "" ): void {
+		const story: Story = this.getCurrentStory();
+
 		// If the averages is not a number, like "coffee", don't add to the history.
-		if ( typeof this.currentStory.voteAverage === "number" ) {
+		if ( typeof story.voteAverage === "number" ) {
 			// Save the current story to the history.
-			this.history.push( this.currentStory );
+			this.getHistory().push( story );
 		}
 
-		// Reset the current story.
-		this.currentStory = { name, votes: [], voters: this.getVoterCount(), votesRevealed: false };
+		// Create a new story.
+		const newStory: Story = { name, votes: [], voters: this.getVoterCount(), votesRevealed: false };
+
+		this.setCurrentStory( newStory );
 	}
 
 	/**
@@ -490,25 +546,7 @@ export class PokerRoom {
 	 * @returns {void}
 	 */
 	public setStoryName( name: string ): void {
-		this.currentStory.name = name;
-	}
-
-	/**
-	 * Gets the current story.
-	 *
-	 * @returns {Story} The current story.
-	 */
-	public getCurrentStory(): Story {
-		return this.currentStory;
-	}
-
-	/**
-	 * Retrieves all stories for the room.
-	 *
-	 * @returns {Story[]} The stories of the room.
-	 */
-	public getHistory(): Story[] {
-		return this.history;
+		this.getCurrentStory().name = name;
 	}
 
 	/**
@@ -517,7 +555,8 @@ export class PokerRoom {
 	 * @returns {void}
 	 */
 	public resetHistory(): void {
-		this.history.splice( 0, this.history.length );
+		const history = this.getHistory();
+		history.splice( 0, history.length );
 	}
 
 	/**
@@ -526,7 +565,7 @@ export class PokerRoom {
 	 * @returns {void}
 	 */
 	public popHistory(): void {
-		this.history.pop();
+		this.getHistory().pop();
 	}
 
 	/**
@@ -535,6 +574,7 @@ export class PokerRoom {
 	 * @returns {void} Nothing.
 	 */
 	public toggleRevealVotes(): void {
-		this.currentStory.votesRevealed = ! this.currentStory.votesRevealed;
+		const story = this.getCurrentStory();
+		story.votesRevealed = ! story.votesRevealed;
 	}
 }
