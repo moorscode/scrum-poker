@@ -36,20 +36,19 @@ export default {
 		},
 	},
 	methods: {
-		castVote( vote, sendToServer = true ) {
+		castVote( vote ) {
 			if ( this.observer ) {
 				return;
 			}
 
+			this.$socket.client.emit( "vote", { poker: this.activePoker, vote } );
+		},
+		setVote( vote ) {
 			if ( this.allVoted && ! this.myInitialVote && this.myVote !== "coffee" ) {
 				this.myInitialVote = this.myVote;
 			}
 
 			this.$store.commit( "myVote", vote );
-
-			if ( sendToServer ) {
-				this.$socket.client.emit( "vote", { poker: this.activePoker, vote } );
-			}
 		},
 		pointIsPickedClass( point ) {
 			return this.votes.map( vote => vote.currentValue ).includes( point ) ? "picked" : "";
@@ -63,7 +62,7 @@ export default {
 			}
 		},
 		myVote( msg ) {
-			this.castVote( msg.vote, false );
+			this.setVote( msg.vote );
 		},
 	},
 };
