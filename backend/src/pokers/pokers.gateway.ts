@@ -294,7 +294,7 @@ export class PokersGateway implements OnGatewayInit {
 	 * @returns {VoteResponse[]} Formatted votes.
 	 */
 	private formatVoteResponseList( votes: Vote[] ): VoteResponse[] {
- 		return votes.map( this.formatVoteResponse );
+		return votes.map( this.formatVoteResponse );
 	}
 
 	/**
