@@ -152,7 +152,7 @@ export class PokerRoom {
 	}
 
 	public recalculateStory() {
-		this.currentStory = this.setStoryAverage();
+		this.currentStory = this.setStoryAverage( this.currentStory );
 		this.currentStory.votesRevealed = false;
 		this.currentStory.voters = this.getVoterCount();
 	}
@@ -288,7 +288,7 @@ export class PokerRoom {
 		};
 
 		this.currentStory.votes.push( vote );
-		this.currentStory = this.setStoryAverage();
+		this.currentStory = this.setStoryAverage( this.currentStory );
 	}
 
 	/**
@@ -308,7 +308,7 @@ export class PokerRoom {
 		}
 		this.getCurrentVote( memberId ).currentValue = vote;
 
-		this.currentStory = this.setStoryAverage();
+		this.currentStory = this.setStoryAverage( this.currentStory );
 	}
 
 	/**
@@ -318,7 +318,7 @@ export class PokerRoom {
 	 *
 	 * @returns {boolean} True if every client has voted.
 	 */
-	private hasEverybodyVoted( story: Story ): boolean {
+	private hasAllVotes( story: Story ): boolean {
 		return story.votes.length === this.getVoterCount();
 	}
 
@@ -410,11 +410,10 @@ export class PokerRoom {
 	 *
 	 * @returns {Story} The adjusted story.
 	 */
-	public setStoryAverage(): Story {
-		const story = this.getCurrentStory();
-
+	public setStoryAverage( story: Story ): Story {
 		if ( story.votes.length === 0 ) {
 			delete story.voteAverage;
+			delete story.nearestPointAverage;
 			return story;
 		}
 
