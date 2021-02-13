@@ -28,13 +28,16 @@ const store = new Vuex.Store( {
 		points: {},
 		observer: false,
 		pointSpread: null,
-		currentStory: { name: "", nearestPointAverage: "", voteAverage: "" },
+		storyName: "",
 		myVote: "",
 		members: { voters: [], observers: [], disconnected: [] },
 		votes: [],
 		voteCount: 0,
 		votedNames: [],
 		groupedVoterNames: [],
+		votesRevealed: false,
+		nearestPointAverage: null,
+		voteAverage: null,
 	},
 	mutations: {
 		loadingFinished( state ) {
@@ -73,8 +76,8 @@ const store = new Vuex.Store( {
 		nickname( state, nickname ) {
 			state.nickname = nickname;
 		},
-		currentStory( state, story ) {
-			state.currentStory = story;
+		storyName( state, story ) {
+			state.storyName = story;
 		},
 		votes( state, votes ) {
 			state.votes = votes;
@@ -87,6 +90,15 @@ const store = new Vuex.Store( {
 		},
 		myVote( state, vote ) {
 			state.myVote = vote;
+		},
+		votesRevealed( state, revealed ) {
+			state.votesRevealed = revealed;
+		},
+		nearestPointAverage( state, nearestPointAverage ) {
+			state.nearestPointAverage = nearestPointAverage;
+		},
+		voteAverage( state, voteAverage ) {
+			state.voteAverage = voteAverage;
 		},
 	},
 

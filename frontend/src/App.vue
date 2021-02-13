@@ -99,7 +99,7 @@ export default Vue.extend( {
 				"pointSpread",
 				"voteCount",
 				"members",
-				"currentStory",
+				"voteAverage",
 				"points",
 				"votes",
 				"connected",
@@ -120,7 +120,7 @@ export default Vue.extend( {
 			}
 		},
 		pointSpread() {
-			if ( this.voteCount === 0 || this.voteCount < this.members.voters.length || typeof this.currentStory.voteAverage === "string" ) {
+			if ( this.voteCount === 0 || this.voteCount < this.members.voters.length || typeof this.voteAverage === "string" ) {
 				return null;
 			}
 

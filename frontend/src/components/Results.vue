@@ -51,7 +51,7 @@ import { mapState } from "vuex";
 export default {
 	name: "Results",
 	computed: {
-		...mapState( [ "members", "votes", "voteCount", "currentStory", "activePoker", "myVote", "groupedVoterNames" ] ),
+		...mapState( [ "members", "votes", "voteCount", "votesRevealed", "activePoker", "myVote", "groupedVoterNames" ] ),
 		allVoted() {
 			return this.members.voters.length && this.voteCount === this.members.voters.length;
 		},
@@ -59,10 +59,10 @@ export default {
 			return this.voteCount === 0;
 		},
 		revealVotesButtonText() {
-			return this.currentStory.votesRevealed ? "Hide votes" : "Reveal votes";
+			return this.votesRevealed ? "Hide votes" : "Reveal votes";
 		},
 		revealVotesButtonIconClass() {
-			return this.currentStory.votesRevealed ? "fa-eye-slash" : "fa-eye";
+			return this.votesRevealed ? "fa-eye-slash" : "fa-eye";
 		},
 	},
 	methods: {
@@ -75,7 +75,7 @@ export default {
 			return this.groupedVoterNames[ voteGroupKey ] || [];
 		},
 		toggleRevealVotes() {
-			if ( ! this.currentStory.votesRevealed ) {
+			if ( ! this.votesRevealed ) {
 				if ( ! window.confirm( "Are you sure you want to reveal all votes before everybody has voted? Everybody can see the results." ) ) {
 					return;
 				}

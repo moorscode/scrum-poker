@@ -1,6 +1,8 @@
 <template></template>
 
 <script>
+import { mapState } from "vuex";
+
 export default {
 	name: "ServerConnection",
 	data() {
@@ -17,6 +19,9 @@ export default {
 		window.onbeforeunload = () => {
 			this.$socket.client.emit( "exit" );
 		};
+	},
+	computed: {
+		...mapState( [ "members" ] ),
 	},
 	sockets: {
 		disconnect() {
@@ -41,6 +46,9 @@ export default {
 		points( msg ) {
 			this.$store.commit( "points", msg );
 		},
+		story( msg ) {
+			this.$store.commit( "votesRevealed", msg.votesRevealed );
+		},
 		votes( msg ) {
 			const votes = msg.votes.sort( ( a, b ) => a.currentValue - b.currentValue ) || [];
 
@@ -48,8 +56,11 @@ export default {
 			this.$store.commit( "voteCount", msg.voteCount );
 			this.$store.commit( "votedNames", msg.votedNames );
 			this.$store.commit( "groupedVoterNames", msg.groupedVoterNames );
+			this.$store.commit( "nearestPointAverage", msg.nearestPointAverage );
+			this.$store.commit( "voteAverage", msg.voteAverage );
+			this.$store.commit( "votesRevealed", msg.votesRevealed );
 
-			document.title = this.$data.baseTitle + " " + msg.voteCount + "/" + msg.voters;
+			document.title = this.$data.baseTitle + " " + msg.voteCount + "/" + this.members.voters.length;
 		},
 	},
 };

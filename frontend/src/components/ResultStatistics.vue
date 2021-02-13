@@ -13,24 +13,25 @@
 
 <script>
 import { mapState } from "vuex";
+
 export default {
 	name: "ResultStatistics",
 	computed: {
-		...mapState( [ "voteCount", "members", "currentStory", "points", "votes" ] ),
+		...mapState( [ "voteCount", "members", "voteAverage", "nearestPointAverage", "points", "votes" ] ),
 		average() {
 			if ( this.voteCount === 0 || this.voteCount < this.members.voters.length ) {
 				return "";
 			}
 
-			if ( this.currentStory.voteAverage === "coffee" ) {
+			if ( this.voteAverage === "coffee" ) {
 				return "Coffee break";
 			}
 
-			if ( this.currentStory.voteAverage === "?" ) {
+			if ( this.voteAverage === "?" ) {
 				return "Not enough clarity, please go further in depth.";
 			}
 
-			return Math.round( this.currentStory.voteAverage * 100 ) / 100;
+			return Math.round( this.voteAverage * 100 ) / 100;
 		},
 		averageContext() {
 			if ( this.average === "" ) {
@@ -76,7 +77,7 @@ export default {
 				return "";
 			}
 
-			return this.currentStory.nearestPointAverage;
+			return this.nearestPointAverage;
 		},
 	},
 };

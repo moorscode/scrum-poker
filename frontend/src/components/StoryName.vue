@@ -2,7 +2,7 @@
   <form class="storyName">
     <label>Story name:
       <input
-        v-model="storyName"
+        v-model="editStoryName"
         type="text"
         :class="storyNameUpdated ? 'changed' : ''"
         @keydown="storyNameUpdated = false"
@@ -26,24 +26,24 @@ export default {
 	name: "StoryName",
 	data() {
 		return {
-			storyName: "",
+			editStoryName: "",
 			storyNameUpdated: false,
 		};
 	},
 	computed: {
-		...mapState( [ "activePoker", "currentStory" ] ),
+		...mapState( [ "activePoker", "storyName" ] ),
 	},
 	methods: {
 		setStoryName() {
-			this.$socket.client.emit( "changeStoryName", { poker: this.activePoker, name: this.storyName } );
+			this.$socket.client.emit( "changeStoryName", { poker: this.activePoker, name: this.editStoryName } );
 		},
 	},
 	sockets: {
-		storyUpdated( msg ) {
-			const nameChanged = ( this.currentStory.name !== msg.currentStory.name );
+		story( name ) {
+			const nameChanged = ( this.storyName !== name );
 
-			this.storyName = msg.currentStory.name;
-			this.$store.commit( "currentStory", msg.currentStory );
+			this.editStoryName = name;
+			this.$store.commit( "storyName", name );
 
 			if ( nameChanged ) {
 				this.storyNameUpdated = true;

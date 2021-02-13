@@ -2,7 +2,17 @@ import { OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } fr
 import { Server, Socket } from "socket.io";
 import { PointsService } from "../points/points.service";
 import { Member, Story, Vote, VoteValue } from "./poker-room";
-import { PokersService, MemberGroups } from "./pokers.service";
+import { PokersService, MemberGroups, VoterName } from "./pokers.service";
+
+interface VotesResponse {
+	votes: VoteResponse[];
+	voteCount: number;
+	groupedVoterNames: VoterName[];
+	votedNames: string[];
+	voteAverage?: number | string;
+	nearestPointAverage?: VoteValue;
+	votesRevealed: boolean;
+}
 
 interface VoteResponse {
 	voterName: string;
@@ -12,10 +22,13 @@ interface VoteResponse {
 
 interface StoryResponse {
 	name: string;
-	votes: VoteResponse[];
 	votesRevealed: boolean;
+}
+
+interface StoryHistoryResponse {
+	name: string;
+	votes: VoteResponse[];
 	voteAverage?: number | string;
-	nearestPointAverage?: VoteValue;
 }
 
 interface MembersResponse {
@@ -60,7 +73,7 @@ export class PokersGateway implements OnGatewayInit {
 						this.pokersService.disconnect( socket, room );
 					}
 
-					this.send( { poker: room, members: true, votes: true } );
+					this.send( room, { members: true, votes: true } );
 				}
 			} );
 		} );
@@ -95,23 +108,23 @@ export class PokersGateway implements OnGatewayInit {
 	join( client: Socket, message: { poker: string; name?: string } ): void {
 		this.pokersService.join( client, message.poker, message.name );
 
-		const voteObject: Vote | null = this.pokersService.getVote( client, message.poker );
-		const vote: VoteResponse | null = ( voteObject ) ? this.formatVoteResponse( voteObject ) : null;
+		client.emit( "joined", { poker: message.poker } );
 
-		client.emit( "joined", { poker: message.poker, vote } );
+		const story = this.pokersService.getCurrentStory( message.poker );
+		client.emit( "story", story.name );
 
-		this.send( { poker: message.poker, all: true } );
+		this.send( message.poker, { members: true, votes: true } );
 	}
 
 	@SubscribeMessage( "leave" )
 	leave( client: Socket, message: { poker: string } ): void {
 		this.pokersService.leave( client, message.poker );
 
-		this.send( { poker: message.poker, members: true, votes: true, story: true } );
+		this.send( message.poker, { members: true, votes: true } );
 	}
 
 	@SubscribeMessage( "vote" )
-	vote( client: Socket, message: { poker: string; vote } ): void {
+	vote( client: Socket, message: { poker: string; vote: Vote } ): void {
 		this.pokersService.castVote( client, message.poker, message.vote );
 
 		// Send this vote to all sockets for the current user.
@@ -120,7 +133,7 @@ export class PokersGateway implements OnGatewayInit {
 			this.server.sockets[ socketId ].emit( "myVote", { vote: message.vote } );
 		}
 
-		this.send( { poker: message.poker, story: true, votes: true } );
+		this.send( message.poker, { votes: true } );
 	}
 
 	@SubscribeMessage( "finish" )
@@ -132,61 +145,61 @@ export class PokersGateway implements OnGatewayInit {
 	setNickname( client: Socket, message: { name: string; poker: string } ): void {
 		this.pokersService.setName( message.poker, client, message.name );
 
-		this.send( { poker: message.poker, members: true, votes: true } );
+		this.send( message.poker, { members: true, votes: true } );
 	}
 
 	@SubscribeMessage( "newStory" )
 	newStory( client: Socket, message: { poker: string } ): void {
 		this.pokersService.newStory( message.poker );
 
-		this.send( { poker: message.poker, story: true, votes: true, history: true } );
+		this.send( message.poker, { story: true, votes: true, history: true } );
 	}
 
 	@SubscribeMessage( "changeStoryName" )
 	story( client: Socket, message: { poker: string; name: string } ): void {
 		this.pokersService.setStoryName( message.poker, message.name );
 
-		this.send( { poker: message.poker, story: true } );
+		this.send( message.poker, { story: true } );
 	}
 
 	@SubscribeMessage( "popHistory" )
 	popHistory( client: Socket, message: { poker: string } ): void {
 		this.pokersService.popHistory( message.poker );
 
-		this.send( { poker: message.poker, history: true } );
+		this.send( message.poker, { history: true } );
 	}
 
 	@SubscribeMessage( "resetHistory" )
 	resetHistory( client: Socket, message: { poker: string } ): void {
 		this.pokersService.resetHistory( message.poker );
 
-		this.send( { poker: message.poker, history: true } );
+		this.send( message.poker, { history: true } );
 	}
 
 	@SubscribeMessage( "observe" )
 	observer( client: Socket, message: { poker: string } ): void {
 		this.pokersService.observe( client, message.poker );
 
-		this.send( { poker: message.poker, story: true, votes: true, members: true } );
+		this.send( message.poker, { votes: true, members: true } );
 	}
 
 	@SubscribeMessage( "toggleRevealVotes" )
 	toggleRevealVotes( client: Socket, message: { poker: string } ): void {
 		this.pokersService.toggleRevealVotes( message.poker );
 
-		this.send( { poker: message.poker, story: true, votes: true } );
+		this.send( message.poker, { votes: true } );
 	}
 	/* eslint-enable require-jsdoc */
 
 	/**
 	 * Sends data to all members in the room.
 	 *
-	 * @param {object} param0 Which data to send.
+	 * @param {string} poker    The room to send to.
+	 * @param {object} settings Which data to send.
 	 *
 	 * @returns {void}
 	 */
-	private send( {
-		poker = "",
+	private send( poker: string, {
 		story = false,
 		votes = false,
 		members = false,
@@ -220,14 +233,17 @@ export class PokersGateway implements OnGatewayInit {
 	 * @private
 	 */
 	private sendVotes( poker: string ): void {
-		const { voteCount, votes, voters, groupedVoterNames } = this.pokersService.getVotes( poker );
+		const { voteCount, votes, groupedVoterNames } = this.pokersService.getVotes( poker );
+		const story: Story = this.pokersService.getCurrentStory( poker );
 
-		const data = {
+		const data: VotesResponse = {
 			votes: this.formatVoteResponseList( votes ),
 			voteCount,
-			voters,
 			groupedVoterNames,
 			votedNames: this.pokersService.getVotedNames( poker ),
+			voteAverage: story.voteAverage,
+			nearestPointAverage: story.nearestPointAverage,
+			votesRevealed: story.votesRevealed,
 		};
 
 		this.server.to( poker ).emit( "votes", data );
@@ -257,7 +273,7 @@ export class PokersGateway implements OnGatewayInit {
 	 * @private
 	 */
 	private sendHistory( room: string ): void {
-		const data = { stories: this.formatStoryResponseList( this.pokersService.getHistory( room ) ) };
+		const data = { stories: this.formatStoryHistoryResponseList( this.pokersService.getHistory( room ) ) };
 		this.server.to( room ).emit( "history", data );
 	}
 
@@ -271,8 +287,8 @@ export class PokersGateway implements OnGatewayInit {
 	 * @private
 	 */
 	private sendCurrentStory( room: string ): void {
-		const data = { currentStory: this.formatStoryResponse( this.pokersService.getCurrentStory( room ) ) };
-		this.server.to( room ).emit( "storyUpdated", data );
+		const story = this.pokersService.getCurrentStory( room );
+		this.server.to( room ).emit( "story", story.name );
 	}
 
 	/**
@@ -283,7 +299,7 @@ export class PokersGateway implements OnGatewayInit {
 	 * @returns {VoteResponse[]} Formatted votes.
 	 */
 	private formatVoteResponseList( votes: Vote[] ): VoteResponse[] {
-		return votes.map( this.formatVoteResponse );
+ 		return votes.map( this.formatVoteResponse );
 	}
 
 	/**
@@ -306,10 +322,10 @@ export class PokersGateway implements OnGatewayInit {
 	 *
 	 * @param {Story[]} stories The stories to format.
 	 *
-	 * @returns {StoryResponse[]} The formatted list.
+	 * @returns {StoryHistoryResponse[]} The formatted list.
 	 */
-	private formatStoryResponseList( stories: Story[] ): StoryResponse[] {
-		return stories.map( this.formatStoryResponse.bind( this ) );
+	private formatStoryHistoryResponseList( stories: Story[] ): StoryHistoryResponse[] {
+		return stories.map( this.formatStoryHistoryResponse.bind( this ) );
 	}
 
 	/**
@@ -317,15 +333,13 @@ export class PokersGateway implements OnGatewayInit {
 	 *
 	 * @param {Story} story The story to format.
 	 *
-	 * @returns {StoryResponse} The formatted story.
+	 * @returns {StoryHistoryResponse} The formatted story.
 	 */
-	private formatStoryResponse( story: Story ): StoryResponse {
+	private formatStoryHistoryResponse( story: Story ): StoryHistoryResponse {
 		return {
 			name: story.name,
 			votes: this.formatVoteResponseList( story.votes ),
-			votesRevealed: story.votesRevealed,
 			voteAverage: story.voteAverage,
-			nearestPointAverage: story.nearestPointAverage,
 		};
 	}
 
