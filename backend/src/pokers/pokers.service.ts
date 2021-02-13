@@ -3,14 +3,14 @@ import { Socket } from "socket.io";
 import { PointsService } from "../points/points.service";
 import { Member, MemberList, PokerRoom, Story, Vote } from "./poker-room";
 
-export interface VoterName {
-	[ vote: string ]: string[];
+export interface GroupVoteName {
+	[ group: string ]: string[];
 }
 
 interface CurrentVotes {
 	voteCount: number;
 	votes: Vote[];
-	groupedVoterNames: VoterName[];
+	groupedVoterNames: GroupVoteName[];
 }
 
 export interface Rooms {
@@ -285,7 +285,7 @@ export class PokersService {
 		const room: PokerRoom = this.getRoom( poker );
 		const voted: Member[] = room.getVotedClients();
 		const votes           = room.getCurrentVotes();
-		const groupedVoterNames: VoterName[] = voted.reduce( ( accumulator, member: Member ) => {
+		const groupedVoterNames: GroupVoteName[] = voted.reduce( ( accumulator, member: Member ) => {
 			const vote                  = room.getCurrentVote( member.id );
 			const voteGroupKey: string  = vote.initialValue + "/" + vote.currentValue;
 			accumulator[ voteGroupKey ] = accumulator[ voteGroupKey ] || [];

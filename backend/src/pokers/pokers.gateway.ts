@@ -2,17 +2,7 @@ import { OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } fr
 import { Server, Socket } from "socket.io";
 import { PointsService } from "../points/points.service";
 import { Member, Story, Vote, VoteValue } from "./poker-room";
-import { PokersService, MemberGroups, VoterName } from "./pokers.service";
-
-interface VotesResponse {
-	votes: VoteResponse[];
-	voteCount: number;
-	groupedVoterNames: VoterName[];
-	votedNames: string[];
-	voteAverage?: number | string;
-	nearestPointAverage?: VoteValue;
-	votesRevealed: boolean;
-}
+import { PokersService, MemberGroups, GroupVoteName } from "./pokers.service";
 
 interface VoteResponse {
 	voterName: string;
@@ -20,8 +10,13 @@ interface VoteResponse {
 	initialValue: VoteValue;
 }
 
-interface StoryResponse {
-	name: string;
+interface VotesResponse {
+	votes: VoteResponse[];
+	voteCount: number;
+	groupedVoterNames: GroupVoteName[];
+	votedNames: string[];
+	voteAverage?: number | string;
+	nearestPointAverage?: VoteValue;
 	votesRevealed: boolean;
 }
 
