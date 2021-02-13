@@ -115,6 +115,12 @@ export class PokersGateway implements OnGatewayInit {
 	vote( client: Socket, message: { poker: string; vote } ): void {
 		this.pokersService.castVote( client, message.poker, message.vote );
 
+		// Send this vote to all sockets for the current user.
+		const socketIds = this.pokersService.getUserSockets( this.pokersService.getUserId( client ) );
+		for ( const socketId of socketIds ) {
+			this.server.sockets[ socketId ].emit( "myVote", { vote: message.vote } );
+		}
+
 		this.send( { poker: message.poker, story: true, votes: true } );
 	}
 

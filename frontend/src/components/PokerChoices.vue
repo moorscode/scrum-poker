@@ -36,7 +36,7 @@ export default {
 		},
 	},
 	methods: {
-		castVote( vote ) {
+		castVote( vote, sendToServer = true ) {
 			if ( this.observer ) {
 				return;
 			}
@@ -46,7 +46,10 @@ export default {
 			}
 
 			this.$store.commit( "myVote", vote );
-			this.$socket.client.emit( "vote", { poker: this.activePoker, vote } );
+
+			if ( sendToServer ) {
+				this.$socket.client.emit( "vote", { poker: this.activePoker, vote } );
+			}
 		},
 		pointIsPickedClass( point ) {
 			return this.votes.map( vote => vote.currentValue ).includes( point ) ? "picked" : "";
@@ -58,6 +61,9 @@ export default {
 				this.$store.commit( "myVote", "" );
 				this.myInitialVote = "";
 			}
+		},
+		myVote( msg ) {
+			this.castVote( msg.vote, false );
 		},
 	},
 };

@@ -115,6 +115,25 @@ export class PokersService {
 	}
 
 	/**
+	 * Retrieves the sockets the userId is connected with.
+	 *
+	 * @param {string} userId The user to get the sockets for.
+	 *
+	 * @returns {string[]} List of sockets with the userId.
+	 */
+	public getUserSockets( userId: string ): string[] {
+		const socketIds = [];
+
+		for ( const socketId of Object.keys( this.users ) ) {
+			if ( this.users[ socketId ] === userId ) {
+				socketIds.push( socketId );
+			}
+		}
+
+		return socketIds;
+	}
+
+	/**
 	 * Lets a client join a room.
 	 *
 	 * @param {Socket} socket The client.
