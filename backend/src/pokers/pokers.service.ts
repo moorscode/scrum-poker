@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { Socket } from "socket.io";
 import { PointsService } from "../points/points.service";
-import { Member, MemberList, PokerRoom, Story, Vote } from "./poker-room";
+import { Member, PokerRoom, Story, Vote } from "./poker-room";
 
 export interface GroupVoteName {
 	[ group: string ]: string[];
