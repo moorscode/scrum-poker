@@ -225,17 +225,6 @@ export class PokersService {
 	}
 
 	/**
-	 * Retrieves all clients.
-	 *
-	 * @param {string} poker The poker.
-	 *
-	 * @returns {MemberList} All clients in a room.
-	 */
-	public getClients( poker: string ): MemberList {
-		return this.getRoom( poker ).getMembers();
-	}
-
-	/**
 	 * Retrieves all members.
 	 *
 	 * @param {string} poker The poker.
@@ -262,17 +251,6 @@ export class PokersService {
 		return this.getRoom( poker )
 			.getVotedClients()
 			.map( ( member: Member ) => member.name );
-	}
-
-	/**
-	 * Retrieves the number of members that can vote in a room.
-	 *
-	 * @param {string} poker The room.
-	 *
-	 * @returns {number} Number of members that can vote in the room.
-	 */
-	public getVoterCount( poker: string ): number {
-		return this.getRoom( poker ).getVoterCount();
 	}
 
 	/**
