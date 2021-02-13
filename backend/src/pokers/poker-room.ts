@@ -354,14 +354,15 @@ export class PokerRoom {
 	 */
 	public getUnobscuredVotes( story: Story ): Vote[] {
 		const notVotedClients:Member[] = this.getVotePendingClients();
+		const notVoted = notVotedClients.map(
+			( client: Member ): ObscuredVote => this.getObscuredVote( this.currentStory, client ),
+		);
 
 		return [
 			// The actual votes.
 			...story.votes,
-			// Backfill pending votes with obscured '?' votes.
-			...notVotedClients.map(
-				( client: Member ): ObscuredVote => this.getObscuredVote( this.currentStory, client ),
-			),
+			// Backfill pending votes with obscured votes.
+			...notVoted,
 		];
 	}
 
