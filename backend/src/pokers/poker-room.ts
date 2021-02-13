@@ -300,7 +300,7 @@ export class PokerRoom {
 	 * @returns {void}
 	 */
 	private changeVote( memberId: string, vote: VoteValue ): void {
-		if ( ! this.hasEverybodyVoted( this.currentStory ) ) {
+		if ( ! this.hasAllVotes( this.currentStory ) ) {
 			this.getCurrentVote( memberId ).initialValue = vote;
 		}
 		if ( this.getCurrentVote( memberId ).initialValue === "coffee" ) {
@@ -339,9 +339,10 @@ export class PokerRoom {
 	 * @returns {Vote[]} List of votes.
 	 */
 	public getCurrentVotes(): Vote[] {
-		if ( this.hasEverybodyVoted( this.currentStory ) || this.currentStory.votesRevealed ) {
+		if ( this.currentStory.votesRevealed || this.hasAllVotes( this.currentStory ) ) {
 			return this.getUnobscuredVotes( this.currentStory );
 		}
+
 		return this.getObscuredVotes( this.currentStory );
 	}
 
