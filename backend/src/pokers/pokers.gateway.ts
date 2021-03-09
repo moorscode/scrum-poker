@@ -132,7 +132,9 @@ export class PokersGateway implements OnGatewayInit {
 		const socketIds = this.pokersService.getUserSockets( this.pokersService.getUserId( client ) );
 
 		for ( const socketId of socketIds ) {
-			this.server.sockets[ socketId ].emit( "myVote", { currentVote: vote.currentValue, initialVote: vote.initialValue } );
+			if ( this.server.sockets[ socketId ] ) {
+				this.server.sockets[ socketId ].emit( "myVote", { currentVote: vote.currentValue, initialVote: vote.initialValue } );
+			}
 		}
 
 		this.send( message.poker, { votes: true } );
