@@ -9,7 +9,7 @@ Vue.use( Vuex );
 
 Vue.use(
 	VueSocketIOExt,
-	io( window.location.protocol + "//" + window.location.hostname + ":" + process.env.SOCKET_PORT + "" + window.location.pathname + "pokers",
+	io( window.location.protocol + "//" + window.location.hostname + ":" + window.location.port + "" + window.location.pathname + "pokers",
 	{
 		reconnection: true,
 		reconnectionDelay: 750,
