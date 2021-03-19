@@ -4,7 +4,6 @@
       <span
         v-for="vote of votes"
         class="resultContainer"
-        v-bind:key=vote
       >
         <button
           v-if="vote.initialValue !== vote.currentValue"
