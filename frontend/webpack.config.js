@@ -72,7 +72,13 @@ const config = {
 	devServer: {
 		contentBase: path.join( __dirname, "public" ),
 		compress: true,
-		port: 9000,
+		port: dotenv.parsed.DEV_SITE_PORT || 9000,
+		proxy: {
+			'/socket.io': {
+				target: 'http://localhost:' + dotenv.parsed.SERVER_PORT,
+				ws: true
+			}
+		}
 	},
 };
 
