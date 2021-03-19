@@ -10,6 +10,7 @@ export interface Member {
 	id: string;
 	type: MemberType;
 	connected: boolean;
+	disconnectTime?: number;
 }
 
 export interface Story {
@@ -264,9 +265,42 @@ export class PokerRoom {
 
 		if ( members[ memberId ] ) {
 			members[ memberId ].connected = false;
+			members[ memberId ].disconnectTime = Date.now();
 		}
 
 		this.recalculateCurrentStory();
+	}
+
+	/**
+	 * Removes timed out members.
+	 *
+	 * @returns {boolean} True if a member was removed.
+	 */
+	public cleanupMembers(): boolean {
+		const TIMEOUT = ( 5 * 60 * 1000 );
+
+		const members: MemberList = this.getMembers();
+		const now = Date.now();
+
+		let deleted = false;
+		
+		for( const memberId of Object.keys( members ) ) {
+			if ( members[ memberId ].connected ) {
+				continue;
+			}
+
+			// Kick after 5 minutes of inactivity.
+			if ( now - members[memberId].disconnectTime > TIMEOUT ) {
+				delete members[ memberId ];
+				deleted = true;
+			}
+		}
+
+		if ( deleted ) {
+			this.recalculateCurrentStory();
+		}
+
+		return deleted;
 	}
 
 	/**

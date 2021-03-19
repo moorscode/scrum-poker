@@ -1,3 +1,4 @@
+import { Interval } from "@nestjs/schedule";
 import { OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
 import { PointsService } from "../points/points.service";
@@ -47,6 +48,12 @@ export class PokersGateway implements OnGatewayInit {
 	constructor( private readonly pokersService: PokersService ) {
 	}
 
+	@Interval(30000)
+	handleInterval() {
+  		const changedRooms = this.pokersService.cleanupMembers();
+		changedRooms.map( ( room: string ) => this.send( room, { members: true, votes: true } ) );
+	}
+
 	/**
 	 * When the connection is initialized, run setup for the client socket.
 	 *
@@ -58,16 +65,16 @@ export class PokersGateway implements OnGatewayInit {
 			socket.emit( "userId", this.generateId() );
 			socket.emit( "points", PointsService.getPoints() );
 
-			// Clean up after disconnection.
 			socket.on( "disconnecting", () => {
 				for ( const room in socket.rooms ) {
 					if ( ! socket.rooms[ room ] ) {
 						continue;
 					}
-					if ( ! room.includes( "/pokers#" ) ) {
-						this.pokersService.disconnect( socket, room );
+					if ( room.includes( "/pokers#" ) ) {
+						continue;
 					}
 
+					this.pokersService.disconnect( socket, room );
 					this.send( room, { members: true, votes: true } );
 				}
 			} );
@@ -113,7 +120,7 @@ export class PokersGateway implements OnGatewayInit {
 			client.emit( "myVote", { currentVote: vote.currentValue, initialVote: vote.initialValue } );
 		}
 
-		this.send( message.poker, { members: true, votes: true } );
+		this.send( message.poker, { members: true, votes: true, history: true } );
 	}
 
 	@SubscribeMessage( "leave" )

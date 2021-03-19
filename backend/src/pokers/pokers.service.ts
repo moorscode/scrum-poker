@@ -48,6 +48,23 @@ export class PokersService {
 	}
 
 	/**
+	 * Remove timed out members.
+	 *
+	 * @returns {string[]} List of rooms that users were removed from.
+	 */
+	public cleanupMembers(): string[] {
+		const changedRooms = [];
+
+		for ( const room of Object.keys( this.rooms ) ) {
+			if ( this.rooms[ room ].cleanupMembers() ) {
+				changedRooms.push(room);
+			}
+		}
+
+		return changedRooms;
+	}
+
+	/**
 	 * Get the vote of a user.
 	 *
 	 * @param {Socket} socket The client.
