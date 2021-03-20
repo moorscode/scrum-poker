@@ -1,7 +1,6 @@
 export type MemberType = "voter" | "observer";
 
 export interface Member {
-	// eslint-disable-next-line no-use-before-define
 	name: string;
 	id: string;
 	type: MemberType;
