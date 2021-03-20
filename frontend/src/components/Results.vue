@@ -63,9 +63,9 @@ export default {
 		show( vote ) {
 			switch( vote.currentValue ) {
 				case '#':
-					return '<i class="fas fa-hat-wizard"></i>';
+					return '<i class="fas fa-hat-wizard" title="Busy creating the magic number..."></i>';
 				case '!':
-					return '<i class="fas fa-clipboard-check"></i>';
+					return '<i class="fas fa-clipboard-check" title="Voted!"></i>';
 				default:
 					return vote.currentValue;
 			}
