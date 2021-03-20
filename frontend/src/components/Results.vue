@@ -20,12 +20,7 @@
             v-if="vote.currentValue === 'coffee'"
             :class="['fas','fa-mug-hot']"
           />
-          <span v-if="vote.currentValue === '#'">
-            <i class="fas fa-spinner fa-pulse"></i>
-          </span>
-          <span v-if="vote.currentValue !== '#'">
-            {{ vote.currentValue }}
-          </span>
+		  <span v-html="show( vote )"></span>
           <div
             v-if="getGroupedVoteNames(vote).length > 0"
             class="vote-names"
@@ -62,9 +57,19 @@ export default {
 		},
 		revealVotesButtonIconClass() {
 			return this.votesRevealed ? "fa-eye-slash" : "fa-eye";
-		},
+		}
 	},
 	methods: {
+		show( vote ) {
+			switch( vote.currentValue ) {
+				case '#':
+					return '<i class="fas fa-hat-wizard"></i>';
+				case '!':
+					return '<i class="fas fa-clipboard-check"></i>';
+				default:
+					return vote.currentValue;
+			}
+		},
 		getGroupedVoteNames( vote ) {
 			if ( ! this.groupedVoterNames ) {
 				return [];

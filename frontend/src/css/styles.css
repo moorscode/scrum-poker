@@ -344,6 +344,10 @@ button.result:focus {
 	outline: 0;
 }
 
+button.result .fas {
+	font-size: 20px;
+}
+
 p.final > button.result,
 p.final > button.result:active {
 	font-weight: bold;
