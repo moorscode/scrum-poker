@@ -1,7 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import { Socket } from "socket.io";
-import { PointsService } from "../points/points.service";
-import { Member, PokerRoom, Story, Vote } from "./poker-room";
+import PointsService from "../points/points.service";
+import { Member } from "./poker.members.service";
+import PokerRoomService from "./poker.room.service";
+import { Vote, Story } from "./poker.story.service";
 
 export interface GroupVoteNames {
 	[ group: string ]: string[];
@@ -14,7 +16,7 @@ interface CurrentVotes {
 }
 
 export interface Rooms {
-	[ room: string ]: PokerRoom;
+	[ room: string ]: PokerRoomService;
 }
 
 export interface Users {
@@ -176,12 +178,12 @@ export class PokersService {
 	 *
 	 * @param {string} poker Room to get.
 	 *
-	 * @returns {PokerRoom} The room.
+	 * @returns {PokerRoomService} The room.
 	 *
 	 * @private
 	 */
-	private getRoom( poker: string ): PokerRoom {
-		return this.rooms[ poker ] || new PokerRoom();
+	private getRoom( poker: string ): PokerRoomService {
+		return this.rooms[ poker ] || new PokerRoomService();
 	}
 
 	/**
@@ -299,9 +301,10 @@ export class PokersService {
 	 * @returns {CurrentVotes} Votes in that room. Obfuscated if not all votes are in yet.
 	 */
 	public getVotes( poker: string ): CurrentVotes {
-		const room: PokerRoom = this.getRoom( poker );
+		const room: PokerRoomService = this.getRoom( poker );
 		const voted: Member[] = room.getVotedClients();
-		const votes           = room.getCurrentVotes();
+		const votes: Vote[] = room.getCurrentVotes();
+
 		const groupedVoterNames: GroupVoteNames = voted.reduce( ( accumulator, member: Member ) => {
 			const vote                  = room.getCurrentVote( member.id );
 			const voteGroupKey: string  = vote.initialValue + "/" + vote.currentValue;
@@ -358,8 +361,8 @@ export class PokersService {
 	 *
 	 * @returns {Story} The story.
 	 */
-	public getCurrentStory( poker: string ): Story {
-		return this.getRoom( poker ).getCurrentStory();
+	public getStory( poker: string ): Story {
+		return this.getRoom( poker ).getStory();
 	}
 
 	/**
@@ -380,8 +383,8 @@ export class PokersService {
 	 *
 	 * @returns {void}
 	 */
-	public popHistory( poker: string ): void {
-		this.getRoom( poker ).popHistory();
+	public removeLastHistoryEntry( poker: string ): void {
+		this.getRoom( poker ).removeLastHistoryEntry();
 	}
 
 	/**

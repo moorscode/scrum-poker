@@ -1,8 +1,9 @@
 import { Interval } from "@nestjs/schedule";
 import { OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
-import { PointsService } from "../points/points.service";
-import { Member, Story, Vote, VoteValue } from "./poker-room";
+import PointsService from "../points/points.service";
+import { Member } from "./poker.members.service";
+import { VoteValue, Vote, Story } from "./poker.story.service";
 import { PokersService, MemberGroups, GroupVoteNames } from "./pokers.service";
 
 interface VoteResponse {
@@ -112,7 +113,7 @@ export class PokersGateway implements OnGatewayInit {
 
 		client.emit( "joined", { poker: message.poker } );
 
-		const story = this.pokersService.getCurrentStory( message.poker );
+		const story = this.pokersService.getStory( message.poker );
 		client.emit( "story", story.name );
 
 		const vote = this.pokersService.getVote( client, message.poker );
@@ -175,7 +176,7 @@ export class PokersGateway implements OnGatewayInit {
 
 	@SubscribeMessage( "popHistory" )
 	popHistory( client: Socket, message: { poker: string } ): void {
-		this.pokersService.popHistory( message.poker );
+		this.pokersService.removeLastHistoryEntry( message.poker );
 
 		this.send( message.poker, { history: true } );
 	}
@@ -245,7 +246,7 @@ export class PokersGateway implements OnGatewayInit {
 	 */
 	private sendVotes( poker: string ): void {
 		const { voteCount, votes, groupedVoterNames } = this.pokersService.getVotes( poker );
-		const story: Story = this.pokersService.getCurrentStory( poker );
+		const story: Story = this.pokersService.getStory( poker );
 
 		const data: VotesResponse = {
 			votes: this.formatVoteResponseList( votes ),
@@ -298,7 +299,7 @@ export class PokersGateway implements OnGatewayInit {
 	 * @private
 	 */
 	private sendCurrentStory( room: string ): void {
-		const story = this.pokersService.getCurrentStory( room );
+		const story = this.pokersService.getStory( room );
 		this.server.to( room ).emit( "story", story.name );
 	}
 

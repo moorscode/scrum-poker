@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
 import { PokersModule } from "./pokers/pokers.module";
-import { PointsService } from "./points/points.service";
+import PointsService from "./points/points.service";
 import { ConfigModule } from "@nestjs/config";
 import { ScheduleModule } from "@nestjs/schedule";
 
