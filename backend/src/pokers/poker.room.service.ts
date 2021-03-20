@@ -50,8 +50,6 @@ export default class PokerRoomService {
 	 * Lists clients in a room.
 	 *
 	 * @returns {MemberList[]} List of clients.
-	 *
-	 * @private
 	 */
 	public getMembers(): MemberList {
 		return this.membersService.getMembers();
@@ -82,26 +80,6 @@ export default class PokerRoomService {
 	 */
 	public getDisconnected(): Member[] {
 		return this.membersService.getDisconnected();
-	}
-
-	/**
-	 * Lists all poker voters.
-	 *
-	 * @returns {number} Number of voters.
-	 *
-	 * @private
-	 */
-	public getVoterCount(): number {
-		return this.membersService.getVoterCount();
-	}
-
-	/**
-	 * Lists the active members of the room.
-	 *
-	 * @returns {Member[]} List of active members.
-	 */
-	public getActiveMembers(): Member[] {
-		return this.membersService.getActiveMembers();
 	}
 
 	/**

@@ -30,10 +30,20 @@ export default class PokerStoryService {
 	private story: Story = { name: "", votes: [], voters: 0, votesRevealed: false };
 	private readonly membersService: PokerMembersService;
 
+	/**
+	 * Creates a new Poker Story.
+	 *
+	 * @param membersService The members service to use.
+	 */
 	public constructor( membersService: PokerMembersService ) {
 		this.membersService = membersService;
 	}
 
+	/**
+	 * Retrieves the story.
+	 *
+	 * @returns {Story} The story.
+	 */
 	public getStory(): Story {
 		return this.story;
 	}
@@ -163,8 +173,6 @@ export default class PokerStoryService {
 	 * @param {string} memberId User ID to remove the vote of.
 	 *
 	 * @returns {void}
-	 *
-	 * @private
 	 */
 	public removeVote( memberId: string ): void {
 		// Remove client's current votes.
@@ -182,8 +190,6 @@ export default class PokerStoryService {
 	 * @param {VoteValue} voteValue The vote.
 	 *
 	 * @returns {void}
-	 *
-	 * @private
 	 */
 	private addVote( memberId: string, voteValue: VoteValue ): void {
 		const vote: Vote = {

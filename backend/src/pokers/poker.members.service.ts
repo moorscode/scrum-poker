@@ -61,8 +61,6 @@ export default class PokerMembersService {
 	 * Lists all poker voters.
 	 *
 	 * @returns {number} Number of voters.
-	 *
-	 * @private
 	 */
 	public getVoterCount(): number {
 		return this.getActiveMembers().length;
@@ -182,7 +180,7 @@ export default class PokerMembersService {
 			}
 
 			// Kick after 5 minutes of inactivity.
-			if ( now - this.members[id].disconnectTime > TIMEOUT ) {
+			if ( now - this.members[ id ].disconnectTime > TIMEOUT ) {
 				delete this.members[ id ];
 				deleted = true;
 			}

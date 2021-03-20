@@ -15,6 +15,8 @@ export default class PokerHistoryService {
 	/**
 	 * Adds a history entry.
 	 *
+	 * @param {Story} story The story to add.
+	 *
 	 * @returns {void}
 	 */
 	public addStory( story: Story ): void {

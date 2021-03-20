@@ -2,37 +2,11 @@ import { Interval } from "@nestjs/schedule";
 import { OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
 import PointsService from "../points/points.service";
-import { Member } from "./poker.members.service";
-import { VoteValue, Vote, Story } from "./poker.story.service";
-import { PokersService, MemberGroups, GroupVoteNames } from "./pokers.service";
-
-interface VoteResponse {
-	voterName: string;
-	currentValue: VoteValue;
-	initialValue: VoteValue;
-}
-
-interface VotesResponse {
-	votes: VoteResponse[];
-	voteCount: number;
-	groupedVoterNames: GroupVoteNames;
-	votedNames: string[];
-	voteAverage?: number | string;
-	nearestPointAverage?: VoteValue;
-	votesRevealed: boolean;
-}
-
-interface StoryHistoryResponse {
-	name: string;
-	votes: VoteResponse[];
-	voteAverage?: number | string;
-}
-
-interface MembersResponse {
-	voters: string[];
-	observers: string[];
-	disconnected: string[];
-}
+import HistoryResponseFormattingService from "./history.response.formatting.service";
+import MembersResponseFormattingService from "./members.response.formatting.service";
+import { Vote } from "./poker.story.service";
+import { PokersService } from "./pokers.service";
+import VoteResponseFormattingService from "./vote.response.formatting.service";
 
 @WebSocketGateway( { namespace: "/pokers" } )
 /**
@@ -46,8 +20,12 @@ export class PokersGateway implements OnGatewayInit {
 	 *
 	 * @param {PokersService} pokersService The Poker service.
 	 */
-	constructor( private readonly pokersService: PokersService ) {
-	}
+	constructor(
+		private readonly pokersService: PokersService,
+		private readonly voteResponseFormattingService: VoteResponseFormattingService,
+		private readonly historyResponseFormattingService: HistoryResponseFormattingService,
+		private readonly membersResponseFormattingService: MembersResponseFormattingService,
+	) {}
 
 	@Interval(30000)
 	handleInterval() {
@@ -219,167 +197,19 @@ export class PokersGateway implements OnGatewayInit {
 		all = false,
 	} = {} ) {
 		if ( all || story ) {
-			this.sendCurrentStory( poker );
+			this.server.to( poker ).emit( "story", this.pokersService.getStory( poker ).name );
 		}
 
 		if ( all || members ) {
-			this.sendMembers( poker );
+			this.server.to( poker ).emit( "memberList", this.membersResponseFormattingService.formatMembersResponse( poker ) );
 		}
 
 		if ( all || votes ) {
-			this.sendVotes( poker );
+			this.server.to( poker ).emit( "votes", this.voteResponseFormattingService.formatVotesResponse( poker ) );
 		}
 
 		if ( all || history ) {
-			this.sendHistory( poker );
+			this.server.to( poker ).emit( "history", this.historyResponseFormattingService.formatHistoryResponse( poker ) );
 		}
-	}
-
-	/**
-	 * Sends all votes to a room.
-	 *
-	 * @param {string} poker Room to send the votes for.
-	 *
-	 * @returns {void}
-	 *
-	 * @private
-	 */
-	private sendVotes( poker: string ): void {
-		const { voteCount, votes, groupedVoterNames } = this.pokersService.getVotes( poker );
-		const story: Story = this.pokersService.getStory( poker );
-
-		const data: VotesResponse = {
-			votes: this.formatVoteResponseList( votes ),
-			voteCount,
-			groupedVoterNames,
-			votedNames: this.pokersService.getVotedNames( poker ),
-			voteAverage: story.voteAverage,
-			nearestPointAverage: story.nearestPointAverage,
-			votesRevealed: story.votesRevealed,
-		};
-
-		this.server.to( poker ).emit( "votes", data );
-	}
-
-	/**
-	 * Sends an actual members count to a room.
-	 *
-	 * @param {string} room The room.
-	 *
-	 * @returns {void}
-	 *
-	 * @private
-	 */
-	private sendMembers( room: string ): void {
-		const data = this.formatMembersResponse( this.pokersService.getMembers( room ) );
-		this.server.to( room ).emit( "memberList", data );
-	}
-
-	/**
-	 * Sends the story-history to all clients in a room.
-	 *
-	 * @param {string} room The room.
-	 *
-	 * @returns {void}
-	 *
-	 * @private
-	 */
-	private sendHistory( room: string ): void {
-		const data = { stories: this.formatStoryHistoryResponseList( this.pokersService.getHistory( room ) ) };
-		this.server.to( room ).emit( "history", data );
-	}
-
-	/**
-	 * Sends the story name to all room members.
-	 *
-	 * @param {string} room The room.
-	 *
-	 * @returns {void}
-	 *
-	 * @private
-	 */
-	private sendCurrentStory( room: string ): void {
-		const story = this.pokersService.getStory( room );
-		this.server.to( room ).emit( "story", story.name );
-	}
-
-	/**
-	 * Formats the votes for the response.
-	 *
-	 * @param {Vote[]} votes The votes to format.
-	 *
-	 * @returns {VoteResponse[]} Formatted votes.
-	 */
-	private formatVoteResponseList( votes: Vote[] ): VoteResponse[] {
-		return votes.map( this.formatVoteResponse );
-	}
-
-	/**
-	 * Formats a vote for the response.
-	 *
-	 * @param {Vote} vote The vote.
-	 *
-	 * @returns {VoteResponse} The formatted vote.
-	 */
-	private formatVoteResponse( vote: Vote ): VoteResponse {
-		return {
-			currentValue: vote.currentValue,
-			initialValue: vote.initialValue,
-			voterName: vote.voter.name,
-		};
-	}
-
-	/**
-	 * Formats stories for response.
-	 *
-	 * @param {Story[]} stories The stories to format.
-	 *
-	 * @returns {StoryHistoryResponse[]} The formatted list.
-	 */
-	private formatStoryHistoryResponseList( stories: Story[] ): StoryHistoryResponse[] {
-		return stories.map( this.formatStoryHistoryResponse.bind( this ) );
-	}
-
-	/**
-	 * Formats a story for response.
-	 *
-	 * @param {Story} story The story to format.
-	 *
-	 * @returns {StoryHistoryResponse} The formatted story.
-	 */
-	private formatStoryHistoryResponse( story: Story ): StoryHistoryResponse {
-		return {
-			name: story.name,
-			votes: this.formatVoteResponseList( story.votes ),
-			voteAverage: story.voteAverage,
-		};
-	}
-
-	/**
-	 * Formats the members in a room for response.
-	 *
-	 * @param {MemberGroups} memberGroups The members in their groups.
-	 *
-	 * @returns {MembersResponse} The formatted list.
-	 */
-	private formatMembersResponse( memberGroups: MemberGroups ): MembersResponse {
-		const mapCallback = this.formatClientResponse;
-
-		return {
-			voters: memberGroups.voters.map( mapCallback ),
-			observers: memberGroups.observers.map( mapCallback ),
-			disconnected: memberGroups.disconnected.map( mapCallback ),
-		};
-	}
-
-	/**
-	 * Formats a client for response.
-	 *
-	 * @param {Member} member The client to format.
-	 *
-	 * @returns {ClientResponse} The formatted client.
-	 */
-	private formatClientResponse( member: Member ): string {
-		return member.name;
 	}
 }
