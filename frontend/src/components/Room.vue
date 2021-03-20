@@ -71,10 +71,9 @@ export default {
 			this.joinRoom();
 		},
 		joined( msg ) {
-			const currentPoker = this.activePoker;
 			this.joinPoker = msg.poker;
 
-			if ( currentPoker !== false && currentPoker !== msg.poker ) {
+			if ( msg.poker !== false && this.activePoker !== msg.poker ) {
 				const url = new URL( window.location );
 				url.searchParams.set( "room", msg.poker );
 				window.history.pushState( { room: msg.poker }, "", url );
