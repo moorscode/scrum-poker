@@ -39,7 +39,7 @@
 		</section>
 	</section>
 
-	<feature-list v-if="this.activePoker === '' && this.loading === false" />
+	<feature-list v-if="this.activePoker === false && this.loading === false" />
 
 	<credits />
   </main>
