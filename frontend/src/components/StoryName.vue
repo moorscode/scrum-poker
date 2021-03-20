@@ -43,7 +43,6 @@ export default {
 			const nameChanged = ( this.storyName !== name );
 
 			this.editStoryName = name;
-			this.$store.commit( "storyName", name );
 
 			if ( nameChanged ) {
 				this.storyNameUpdated = true;

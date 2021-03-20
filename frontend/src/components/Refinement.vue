@@ -25,10 +25,5 @@ export default {
 			this.$socket.client.emit( "finish", { poker: this.activePoker } );
 		},
 	},
-	sockets: {
-		finished() {
-			this.$store.commit( "refinementFinished", true );
-		},
-	},
 };
 </script>

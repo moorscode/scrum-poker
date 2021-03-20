@@ -24,12 +24,6 @@ export default {
 		...mapState( [ "members" ] ),
 	},
 	sockets: {
-		disconnect() {
-			this.$store.commit( "serverConnection", false );
-		},
-		connect() {
-			this.$store.commit( "serverConnection", true );
-		},
 		userId( clientId ) {
 			if ( ! this.$data.clientId ) {
 				this.$data.clientId = clientId;
@@ -37,29 +31,7 @@ export default {
 			}
 			this.$socket.client.emit( "identify", { id: this.$data.clientId } );
 		},
-		welcome() {
-			this.$store.commit( "loadingFinished" );
-		},
-		memberList( msg ) {
-			this.$store.commit( "members", msg );
-		},
-		points( msg ) {
-			this.$store.commit( "points", msg );
-		},
-		story( msg ) {
-			this.$store.commit( "votesRevealed", msg.votesRevealed );
-		},
 		votes( msg ) {
-			const votes = msg.votes.sort( ( a, b ) => a.currentValue - b.currentValue ) || [];
-
-			this.$store.commit( "votes", votes );
-			this.$store.commit( "voteCount", msg.voteCount );
-			this.$store.commit( "votedNames", msg.votedNames );
-			this.$store.commit( "groupedVoterNames", msg.groupedVoterNames );
-			this.$store.commit( "nearestPointAverage", msg.nearestPointAverage );
-			this.$store.commit( "voteAverage", msg.voteAverage );
-			this.$store.commit( "votesRevealed", msg.votesRevealed );
-
 			document.title = this.$data.baseTitle + " " + msg.voteCount + "/" + this.members.voters.length;
 		},
 	},

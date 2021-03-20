@@ -73,7 +73,6 @@ export default {
 		joined( msg ) {
 			const currentPoker = this.activePoker;
 			this.joinPoker = msg.poker;
-			this.$store.commit( "activePoker", msg.poker );
 
 			if ( currentPoker !== false && currentPoker !== msg.poker ) {
 				const url = new URL( window.location );
