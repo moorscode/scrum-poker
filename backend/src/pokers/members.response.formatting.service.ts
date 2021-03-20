@@ -27,25 +27,14 @@ export default class MembersResponseFormattingService {
 	 * @returns {MembersResponse} The formatted list.
 	 */
 	public formatMembersResponse( room: string ): MembersResponse {
-		const memberGroups = this.pokersService.getMembers( room );
+		const memberGroups: MemberGroups = this.pokersService.getMembers( room );
 
-		const mapCallback = this.formatClientResponse;
+		const mapCallback = ( ( member: Member ): string => member.name );
 
 		return {
 			voters: memberGroups.voters.map( mapCallback ),
 			observers: memberGroups.observers.map( mapCallback ),
 			disconnected: memberGroups.disconnected.map( mapCallback ),
 		};
-	}
-
-	/**
-	 * Formats a client for response.
-	 *
-	 * @param {Member} member The client to format.
-	 *
-	 * @returns {ClientResponse} The formatted client.
-	 */
-	private formatClientResponse( member: Member ): string {
-		return member.name;
 	}
 }

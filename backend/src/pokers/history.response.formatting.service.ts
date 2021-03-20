@@ -23,8 +23,7 @@ export default class HistoryResponseFormattingService {
 	constructor(
 		private readonly pokersService: PokersService,
 		private readonly voteResponseFormattingService: VoteResponseFormattingService,
-	) {
-	}
+	) {}
 
 	/**
 	 * 

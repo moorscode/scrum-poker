@@ -25,8 +25,7 @@ export default class VoteResponseFormattingService {
 	 *
 	 * @param {PokersService} pokersService The Poker service.
 	 */
-	 constructor( private readonly pokersService: PokersService ) {
-	}
+	constructor( private readonly pokersService: PokersService ) {}
 
 	/**
 	 * Formats the votes response.
