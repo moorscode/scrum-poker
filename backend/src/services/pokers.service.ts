@@ -4,7 +4,7 @@ import PointsService from "./points.service";
 import { Member } from "./poker.members.service";
 import PokerRoomService from "./poker.room.service";
 import { Vote, Story } from "./poker.story.service";
-import SocketUsersService from "./user.sockets.service";
+import SocketUsersService from "./socket.users.service";
 
 export interface GroupVoteNames {
 	[ group: string ]: string[];
