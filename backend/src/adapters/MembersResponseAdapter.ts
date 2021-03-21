@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
-import { Member } from "../services/poker.members.service";
-import PokersService, { MemberGroups } from "../services/pokers.service";
+import { Member } from "../services/PokerMembersService";
+import PokersService, { MemberGroups } from "../services/PokersService";
 
 export interface MembersResponse {
 	voters: string[];

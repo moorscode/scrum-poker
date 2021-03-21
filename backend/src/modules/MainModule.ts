@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
-import { PokersModule } from "./pokers.module";
-import PointsService from "../services/points.service";
+import { PokersModule } from "./PokersModule";
+import PointsService from "../services/PointsService";
 import { ConfigModule } from "@nestjs/config";
 import { ScheduleModule } from "@nestjs/schedule";
 
@@ -17,4 +17,4 @@ import { ScheduleModule } from "@nestjs/schedule";
 } )
 
 // eslint-disable-next-line require-jsdoc
-export class AppModule {}
+export class MainModule {}

@@ -1,12 +1,12 @@
 import { Interval } from "@nestjs/schedule";
 import { OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
-import PointsService from "../services/points.service";
-import { Vote } from "../services/poker.story.service";
-import PokersService from "../services/pokers.service";
-import HistoryResponseAdapter from "../adapters/history.response.adapter";
-import MembersResponseAdapter from "../adapters/members.response.adapter";
-import VoteResponseAdapter from "../adapters/vote.response.adapter";
+import PointsService from "../services/PointsService";
+import { Vote } from "../services/PokerStoryService";
+import PokersService from "../services/PokersService";
+import HistoryResponseAdapter from "../adapters/HistoryResponseAdapter";
+import MembersResponseAdapter from "../adapters/MembersResponseAdapter";
+import VoteResponseAdapter from "../adapters/VoteResponseAdapter";
 
 @WebSocketGateway( { namespace: "/pokers" } )
 /**

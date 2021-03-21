@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
-import { Story } from "../services/poker.story.service";
-import PokersService from "../services/pokers.service";
-import VoteResponseAdapter, { VoteResponse } from "./vote.response.adapter";
+import { Story } from "../services/PokerStoryService";
+import PokersService from "../services/PokersService";
+import VoteResponseAdapter, { VoteResponse } from "./VoteResponseAdapter";
 
 export interface HistoryResponse {
 	name: string;

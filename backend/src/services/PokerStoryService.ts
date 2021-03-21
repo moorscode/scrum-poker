@@ -1,5 +1,5 @@
-import PointsService, { PointValue } from "services/points.service";
-import PokerMembersService, { Member } from "./poker.members.service";
+import PointsService, { PointValue } from "services/PointsService";
+import PokerMembersService, { Member } from "./PokerMembersService";
 
 export interface Story {
 	name: string;

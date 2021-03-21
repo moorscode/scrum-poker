@@ -1,4 +1,4 @@
-import { Story } from "./poker.story.service";
+import { Story } from "./PokerStoryService";
 
 export default class PokerHistoryService {
 	private readonly history: Story[] = [];

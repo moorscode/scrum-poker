@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
-import { Story, Vote, VoteValue } from "../services/poker.story.service";
-import PokersService, { GroupVoteNames } from "../services/pokers.service";
+import { Story, Vote, VoteValue } from "../services/PokerStoryService";
+import PokersService, { GroupVoteNames } from "../services/PokersService";
 
 export interface VoteResponse {
 	voterName: string;

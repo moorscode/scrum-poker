@@ -1,6 +1,6 @@
-import PokerHistoryService from "./poker.history.service";
-import PokerMembersService, { Member, MemberList } from "./poker.members.service";
-import PokerStoryService, { Story, Vote, VoteValue } from "./poker.story.service";
+import PokerHistoryService from "./PokerHistoryService";
+import PokerMembersService, { Member, MemberList } from "./PokerMembersService";
+import PokerStoryService, { Story, Vote, VoteValue } from "./PokerStoryService";
 
 /**
  * Poker Room
