@@ -24,9 +24,6 @@ export default {
 	},
 	computed: {
 		...mapState( [ "activePoker", "joinPoker", "nickname" ] ),
-		activePoker() {
-			return this.$store.state.activePoker;
-		},
 		observer: {
 			get() {
 				return this.$store.state.observer;
