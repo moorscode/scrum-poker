@@ -7,22 +7,22 @@ Vue.use( Vuex );
 export default new Vuex.Store( {
 	state: {
 		loading: true,
-		refinementFinished: false,
 		connected: false,
-		nickname: "", // Required globally because of socket calls.
-		activePoker: false, // Required globally because of socket calls.
 		points: {},
-		observer: false,
+		nickname: "", // Required globally because of socket calls.
+		observer: false, // Show or hide UI based on this state.
+		activePoker: false, // Required globally because of socket calls.
 		storyName: "",
 		myVote: "",
 		members: { voters: [], observers: [], disconnected: [] },
 		votes: [],
 		voteCount: 0,
-		votedNames: [],
-		groupedVoterNames: [],
-		votesRevealed: false,
-		nearestPointAverage: null,
 		voteAverage: null,
+		votedNames: [],
+		votesRevealed: false,
+		groupedVoterNames: [],
+		nearestPointAverage: null,
+		refinementFinished: false,
 	},
 	mutations: {
 		// Local state.
@@ -35,15 +35,10 @@ export default new Vuex.Store( {
 		observe( state, observer ) {
 			state.observer = observer;
 		},
-		showHistory( state ) {
-			state.showHistory = true;
-		},
-		hideHistory( state ) {
-			state.showHistory = false;
-		},
 		// Server state.
 		SOCKET_DISCONNECT( state ) {
 			state.connected = false;
+			state.loading = true;
 		},
 		SOCKET_CONNECT( state ) {
 			state.connected = true;
@@ -51,11 +46,17 @@ export default new Vuex.Store( {
 		SOCKET_WELCOME( state ) {
 			state.loading = false;
 		},
+		SOCKET_POINTS( state, points ) {
+			state.points = points;
+		},
+		SOCKET_JOINED( state, data ) {
+			state.activePoker = data.poker;
+		},
 		SOCKET_MEMBERLIST( state, members ) {
 			state.members = members;
 		},
-		SOCKET_POINTS( state, points ) {
-			state.points = points;
+		SOCKET_STORY( state, name ) {
+			state.storyName = name;
 		},
 		SOCKET_VOTES( state, data ) {
 			const votes = data.votes.sort( ( a, b ) => a.currentValue - b.currentValue ) || [];
@@ -69,14 +70,8 @@ export default new Vuex.Store( {
 			state.voteAverage = data.voteAverage;
 			state.votesRevealed = data.votesRevealed;
 		},
-		SOCKET_STORY( state, name ) {
-			state.storyName = name;
-		},
 		SOCKET_FINISHED( state ) {
 			state.refinementFinished = true;
-		},
-		SOCKET_JOINED( state, data ) {
-			state.activePoker = data.poker;
 		}
 	},
 } );
