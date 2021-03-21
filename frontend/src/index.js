@@ -2,8 +2,8 @@
 import Vue from "vue";
 import App from "./App.vue";
 import VueSocketIOExt from "vue-socket.io-extended";
-import store from "./store";
-import websocket from "./websocket";
+import store from "./services/store";
+import websocket from "./services/websocket";
 
 Vue.use(
 	VueSocketIOExt,
