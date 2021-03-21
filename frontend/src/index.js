@@ -1,6 +1,6 @@
 /* eslint-disable require-jsdoc */
 import Vue from "vue";
-import App from "./App.vue";
+import Index from "./Index.vue";
 import VueSocketIOExt from "vue-socket.io-extended";
 import store from "./services/store";
 import websocket from "./services/websocket";
@@ -14,6 +14,6 @@ Vue.use(
 // eslint-disable-next-line no-new
 new Vue( {
 	el: "#v-app",
-	render: h => h( App ),
+	render: h => h( Index ),
 	store,
 } );
