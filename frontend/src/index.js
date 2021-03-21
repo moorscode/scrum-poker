@@ -1,14 +1,9 @@
 /* eslint-disable require-jsdoc */
 import Vue from "vue";
-import Vuex from "vuex";
 import App from "./App.vue";
 import VueSocketIOExt from "vue-socket.io-extended";
-import storeConfig from "./store";
+import store from "./store";
 import websocket from "./websocket";
-
-Vue.use( Vuex );
-
-const store = new Vuex.Store( storeConfig );
 
 Vue.use(
 	VueSocketIOExt,

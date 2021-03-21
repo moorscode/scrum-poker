@@ -1,5 +1,10 @@
+import Vue from "vue";
+import Vuex from "vuex";
+
+Vue.use( Vuex );
+
 /* eslint-disable require-jsdoc */
-export default {
+export default new Vuex.Store( {
 	state: {
 		loading: true,
 		refinementFinished: false,
@@ -77,4 +82,4 @@ export default {
 		}
 	},
 
-};
+} );
