@@ -89,7 +89,7 @@ export default class PokersGateway implements OnGatewayInit {
 	join( client: Socket, message: { poker: string; name?: string } ): void {
 		this.pokersService.join( client, message.poker, message.name );
 
-		client.emit( "joined", { poker: message.poker } );
+		client.emit( "joined", message.poker );
 
 		const story = this.pokersService.getStory( message.poker );
 		client.emit( "story", story.name );

@@ -56,7 +56,7 @@ export default {
 		};
 	},
 	computed: {
-		...mapState( [ "observer", "activePoker" ] ),
+		...mapState( [ "observer", "room" ] ),
 	},
 	methods: {
 		toggleHistory() {
@@ -70,7 +70,7 @@ export default {
 			) {
 				return;
 			}
-			this.$socket.client.emit( "resetHistory", { poker: this.activePoker } );
+			this.$socket.client.emit( "resetHistory", { poker: this.room } );
 		},
 		popHistory() {
 			if ( ! window.confirm(
@@ -79,7 +79,7 @@ export default {
 			) {
 				return;
 			}
-			this.$socket.client.emit( "popHistory", { poker: this.activePoker } );
+			this.$socket.client.emit( "popHistory", { poker: this.room } );
 		},
 	},
 	sockets: {

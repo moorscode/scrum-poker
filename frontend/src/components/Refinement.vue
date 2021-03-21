@@ -12,7 +12,7 @@ import { mapState } from "vuex";
 export default {
 	name: "Refinement",
 	computed: {
-		...mapState( [ "voteCount", "members", "activePoker" ] ),
+		...mapState( [ "voteCount", "members", "room" ] ),
 	},
 	methods: {
 		done() {
@@ -22,7 +22,7 @@ export default {
 				}
 			}
 
-			this.$socket.client.emit( "finish", { poker: this.activePoker } );
+			this.$socket.client.emit( "finish", { poker: this.room } );
 		},
 	},
 };

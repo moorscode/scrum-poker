@@ -31,11 +31,11 @@ export default {
 		};
 	},
 	computed: {
-		...mapState( [ "activePoker", "storyName" ] ),
+		...mapState( [ "room", "storyName" ] ),
 	},
 	methods: {
 		setStoryName() {
-			this.$socket.client.emit( "changeStoryName", { poker: this.activePoker, name: this.editStoryName } );
+			this.$socket.client.emit( "changeStoryName", { poker: this.room, name: this.editStoryName } );
 		},
 	},
 	sockets: {

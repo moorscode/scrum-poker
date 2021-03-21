@@ -1,5 +1,5 @@
 <template>
-  <section v-if="activePoker">
+  <section v-if="room">
     <form
       class="username"
       :class="[!nickname ? 'hover' : '']"
@@ -29,7 +29,7 @@ export default {
 		};
 	},
 	computed: {
-		...mapState( [ "activePoker" ] ),
+		...mapState( [ "room" ] ),
 	},
 	methods: {
 		updateNickname() {
@@ -44,7 +44,7 @@ export default {
 			this.$store.commit( "nickname", this.nickname );
 
 			// Tell the server.
-			this.$socket.client.emit( "nickname", { name: this.nickname, poker: this.activePoker } );
+			this.$socket.client.emit( "nickname", { name: this.nickname, poker: this.room } );
 		},
 	},
 };

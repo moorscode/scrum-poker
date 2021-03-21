@@ -18,7 +18,7 @@
 import { mapState } from "vuex";
 export default {
 	computed: {
-		...mapState( [ "voteCount", "observer", "members", "activePoker" ] ),
+		...mapState( [ "voteCount", "observer", "members", "room" ] ),
 		allVoted() {
 			return this.members.voters.length && this.voteCount === this.members.voters.length;
 		},
@@ -36,7 +36,7 @@ export default {
 				}
 			}
 
-			this.$socket.client.emit( "newStory", { poker: this.activePoker } );
+			this.$socket.client.emit( "newStory", { poker: this.room } );
 		},
 	},
 };

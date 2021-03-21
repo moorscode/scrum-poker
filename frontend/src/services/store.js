@@ -11,15 +11,15 @@ export default new Vuex.Store( {
 		points: {},
 		nickname: "", // Required globally because of socket calls.
 		observer: false, // Show or hide UI based on this state.
-		activePoker: false, // Required globally because of socket calls.
+		room: false, // Required globally because of socket calls.
 		storyName: "",
 		myVote: "",
 		members: { voters: [], observers: [], disconnected: [] },
 		votes: [],
 		voteCount: 0,
 		voteAverage: null,
-		votedNames: [],
 		votesRevealed: false,
+		votedNames: [],
 		groupedVoterNames: [],
 		nearestPointAverage: null,
 		refinementFinished: false,
@@ -49,8 +49,8 @@ export default new Vuex.Store( {
 		SOCKET_POINTS( state, points ) {
 			state.points = points;
 		},
-		SOCKET_JOINED( state, data ) {
-			state.activePoker = data.poker;
+		SOCKET_JOINED( state, room ) {
+			state.room = room;
 		},
 		SOCKET_MEMBERLIST( state, members ) {
 			state.members = members;

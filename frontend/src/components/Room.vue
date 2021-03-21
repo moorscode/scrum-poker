@@ -1,5 +1,5 @@
 <template>
-  <section v-if="!activePoker" >
+  <section v-if="!room" >
     <p>Welcome to Pum Scroker!</p>
 
     <p>
@@ -10,13 +10,13 @@
 
     <form class="rooms">
       Room: <input
-        v-model="joinPoker"
+        v-model="joinRoom"
         type="text"
       >
       <input
         type="submit"
         value="Join room!"
-        @click.prevent="joinRoom"
+        @click.prevent="join"
       >
     </form>
 
@@ -34,49 +34,49 @@ export default {
 	name: "PickRoom",
 	data() {
 		return {
-			joinPoker: this.getFromURL( "room" ) || "",
+			joinRoom: this.getFromURL( "room" ) || "",
 		};
 	},
+	computed: {
+		...mapState( [ "room", "nickname" ] ),
+	},
 	methods: {
-		joinRoom() {
-			this.joinPoker = this.joinPoker.toLowerCase();
+		join() {
+			this.joinRoom = this.joinRoom.toLowerCase();
 
-			if ( this.joinPoker === "" ) {
-				this.$store.commit( "activePoker", "" );
+			if ( this.joinRoom === "" ) {
+				this.$store.commit( "room", "" );
 				return;
 			}
 
-			this.$socket.client.emit( "join", { poker: this.joinPoker, name: this.nickname } );
+			this.$socket.client.emit( "join", { poker: this.joinRoom, name: this.nickname } );
 		},
 		getFromURL( key ) {
 			return new URLSearchParams( window.location.search.substring( 1 ) ).get( key );
 		},
 	},
-	computed: {
-		...mapState( [ "activePoker", "nickname" ] ),
-	},
 	created() {
-		this.joinRoom();
+		this.join();
 
 		window.onpopstate = ( event ) => {
-			this.joinPoker = ( event.state && event.state.room ) || "";
-			if ( this.joinPoker !== this.activePoker ) {
-				this.$socket.client.emit( "leave", { poker: this.activePoker } );
+			this.joinRoom = ( event.state && event.state.room ) || "";
+			if ( this.joinRoom !== this.room ) {
+				this.$socket.client.emit( "leave", { poker: this.room } );
 			}
-			this.joinRoom();
+			this.join();
 		};
 	},
 	sockets: {
 		welcome() {
-			this.joinRoom();
+			this.join();
 		},
-		joined( msg ) {
-			this.joinPoker = msg.poker;
+		joined( room ) {
+			this.joinRoom = room;
 
-			if ( msg.poker !== false && this.activePoker !== msg.poker ) {
+			if ( room !== false && this.room !== room ) {
 				const url = new URL( window.location );
-				url.searchParams.set( "room", msg.poker );
-				window.history.pushState( { room: msg.poker }, "", url );
+				url.searchParams.set( "room", room );
+				window.history.pushState( { room }, "", url );
 			}
 		},
 	},

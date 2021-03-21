@@ -30,7 +30,7 @@ export default {
 		};
 	},
 	computed: {
-		...mapState( [ "points", "votes", "observer", "members", "voteCount", "activePoker", "myVote" ] ),
+		...mapState( [ "points", "votes", "observer", "members", "voteCount", "room", "myVote" ] ),
 		allVoted() {
 			return this.members.voters.length && this.voteCount === this.members.voters.length;
 		},
@@ -41,7 +41,7 @@ export default {
 				return;
 			}
 
-			this.$socket.client.emit( "vote", { poker: this.activePoker, vote } );
+			this.$socket.client.emit( "vote", { poker: this.room, vote } );
 		},
 		setVote( vote ) {
 			if ( this.allVoted && ! this.myInitialVote && this.myVote !== "coffee" ) {

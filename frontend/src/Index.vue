@@ -12,7 +12,7 @@
 	<section v-if="connected === true">
 		<room />
 
-		<div v-cloak v-if="activePoker" class="pokerMain">
+		<div v-cloak v-if="room" class="pokerMain">
 			<refinement-finished v-if="refinementFinished" />
 
 			<section v-if="!refinementFinished">
@@ -39,7 +39,7 @@
 		</section>
 	</section>
 
-	<feature-list v-if="this.activePoker === false && this.loading === false" />
+	<feature-list v-if="this.room === false && this.loading === false" />
 
 	<credits />
   </main>
@@ -94,7 +94,7 @@ export default Vue.extend( {
 		...mapState(
 			[
 				"loading",
-				"activePoker",
+				"room",
 				"refinementFinished",
 				"voteCount",
 				"members",

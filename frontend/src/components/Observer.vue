@@ -16,26 +16,26 @@ import { mapState } from "vuex";
 export default {
 	name: "observer",
 	created() {
-		const observing = window.localStorage.getItem( this.activePoker + "-observer" ) === "true";
+		const observing = window.localStorage.getItem( this.room + "-observer" ) === "true";
 		this.$store.commit( "observe", observing );
 		if ( observing ) {
-			this.$socket.client.emit( "observe", { poker: this.activePoker } );
+			this.$socket.client.emit( "observe", { poker: this.room } );
 		}
 	},
 	computed: {
-		...mapState( [ "activePoker", "joinPoker", "nickname" ] ),
+		...mapState( [ "room", "joinPoker", "nickname" ] ),
 		observer: {
 			get() {
 				return this.$store.state.observer;
 			},
 			set( observing ) {
-				window.localStorage.setItem( this.activePoker + "-observer", observing );
+				window.localStorage.setItem( this.room + "-observer", observing );
 				this.$store.commit( "observe", observing );
 
 				if ( observing ) {
-					this.$socket.client.emit( "observe", { poker: this.activePoker } );
+					this.$socket.client.emit( "observe", { poker: this.room } );
 				} else {
-					this.$socket.client.emit( "join", { poker: this.activePoker, name: this.nickname } );
+					this.$socket.client.emit( "join", { poker: this.room, name: this.nickname } );
 				}
 			},
 		},
@@ -46,7 +46,7 @@ export default {
 	sockets: {
 		joined() {
 			if ( this.observer ) {
-				this.$socket.client.emit( "observe", { poker: this.activePoker } );
+				this.$socket.client.emit( "observe", { poker: this.room } );
 			}
 		},
 	},
