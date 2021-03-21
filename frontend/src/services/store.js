@@ -13,7 +13,6 @@ export default new Vuex.Store( {
 		activePoker: false, // Required globally because of socket calls.
 		points: {},
 		observer: false,
-		pointSpread: null,
 		storyName: "",
 		myVote: "",
 		members: { voters: [], observers: [], disconnected: [] },
@@ -26,8 +25,12 @@ export default new Vuex.Store( {
 		voteAverage: null,
 	},
 	mutations: {
-		pointSpread( state, spread ) {
-			state.pointSpread = spread;
+		// Local state.
+		nickname( state, nickname ) {
+			state.nickname = nickname;
+		},
+		myVote( state, vote ) {
+			state.myVote = vote;
 		},
 		observe( state, observer ) {
 			state.observer = observer;
@@ -38,12 +41,7 @@ export default new Vuex.Store( {
 		hideHistory( state ) {
 			state.showHistory = false;
 		},
-		nickname( state, nickname ) {
-			state.nickname = nickname;
-		},
-		myVote( state, vote ) {
-			state.myVote = vote;
-		},
+		// Server state.
 		SOCKET_DISCONNECT( state ) {
 			state.connected = false;
 		},
@@ -81,5 +79,4 @@ export default new Vuex.Store( {
 			state.activePoker = data.poker;
 		}
 	},
-
 } );

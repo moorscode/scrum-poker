@@ -96,7 +96,6 @@ export default Vue.extend( {
 				"loading",
 				"activePoker",
 				"refinementFinished",
-				"pointSpread",
 				"voteCount",
 				"members",
 				"voteAverage",
