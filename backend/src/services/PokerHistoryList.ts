@@ -1,6 +1,6 @@
-import { Story } from "./PokerStoryService";
+import { Story } from "./PokerStoryHandler";
 
-export default class PokerHistoryService {
+export default class PokerHistoryList {
 	private readonly history: Story[] = [];
 
 	/**
@@ -10,17 +10,6 @@ export default class PokerHistoryService {
 	 */
 	 public getHistory(): Story[] {
 		return this.history;
-	}
-
-	/**
-	 * Adds a history entry.
-	 *
-	 * @param {Story} story The story to add.
-	 *
-	 * @returns {void}
-	 */
-	public addStory( story: Story ): void {
-		this.history.push( story );
 	}
 
 	/**

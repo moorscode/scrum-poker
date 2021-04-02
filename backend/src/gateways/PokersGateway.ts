@@ -1,12 +1,13 @@
 import { Interval } from "@nestjs/schedule";
 import { OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
-import PointsService from "../services/PointsService";
-import { Vote } from "../services/PokerStoryService";
+import PointsProvider from "../services/PointsProvider";
+import { Vote } from "../services/PokerStoryHandler";
 import PokersService from "../services/PokersService";
-import HistoryResponseAdapter from "../adapters/HistoryResponseAdapter";
+import HistoryResponseAdapter, { HistoryResponseList } from "../adapters/HistoryResponseAdapter";
 import MembersResponseAdapter from "../adapters/MembersResponseAdapter";
-import VoteResponseAdapter from "../adapters/VoteResponseAdapter";
+import VoteResponseAdapter, { VoteResponse } from "../adapters/VoteResponseAdapter";
+import PokersCleanupService from "services/PokersCleanupService";
 
 @WebSocketGateway( { namespace: "/pokers" } )
 /**
@@ -19,17 +20,25 @@ export default class PokersGateway implements OnGatewayInit {
 	 * Constructor
 	 *
 	 * @param {PokersService} pokersService The Poker service.
+	 * @param {PokersCleanupService} pokersCleanupService The Poker cleanup service.
+	 * @param {VoteResponseAdapter} voteResponseAdapter The Vote response Adapter.
+	 * @param {HistoryResponseAdapter} historyResponseAdapter The History response Adapter.
+	 * @param {MembersResponseAdapter} membersResponseAdapter The Members response Adapter.
 	 */
 	constructor(
 		private readonly pokersService: PokersService,
+		private readonly pokersCleanupService: PokersCleanupService,
 		private readonly voteResponseAdapter: VoteResponseAdapter,
 		private readonly historyResponseAdapter: HistoryResponseAdapter,
 		private readonly membersResponseAdapter: MembersResponseAdapter,
 	) {}
 
-	@Interval(30000)
-	handleInterval() {
-  		const changedRooms = this.pokersService.cleanupMembers();
+	@Interval(1000)
+	/**
+	 * Clean up the rooms periodically.
+	 */
+	cleanupInterval() {
+  		const changedRooms = this.pokersCleanupService.cleanup();
 		changedRooms.map( ( room: string ) => this.send( room, { members: true, votes: true } ) );
 	}
 
@@ -42,7 +51,7 @@ export default class PokersGateway implements OnGatewayInit {
 		this.server.on( "connection", ( socket ) => {
 			// Let the client know the points that can be chosen from.
 			socket.emit( "userId", this.generateId() );
-			socket.emit( "points", PointsService.getPoints() );
+			socket.emit( "points", PointsProvider.getPoints() );
 
 			socket.on( "disconnecting", () => {
 				for ( const room in socket.rooms ) {

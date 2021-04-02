@@ -12,7 +12,7 @@ export interface MemberList {
 	[ memberId: string ]: Member
 }
 
-export default class PokerMembersService {
+export default class PokerMembersHandler {
 	private readonly members: MemberList = {};
 
 	/**
@@ -158,33 +158,8 @@ export default class PokerMembersService {
 	 */
 	 public setDisconnected( id: string ): void {
 		if ( this.members[ id ] ) {
-			this.members[ id ].connected = false;
 			this.members[ id ].disconnectTime = Date.now();
+			this.members[ id ].connected = false;
 		}
-	}
-
-	/**
-	 * Removes timed out members.
-	 *
-	 * @returns {boolean} True if a member was removed.
-	 */
-	 public removeTimedOutMembers(): boolean {
-		const TIMEOUT = ( 5 * 60 * 1000 );
-		const now     = Date.now();
-		let deleted   = false;
-
-		for( const id of Object.keys( this.members ) ) {
-			if ( this.members[ id ].connected ) {
-				continue;
-			}
-
-			// Kick after 5 minutes of inactivity.
-			if ( now - this.members[ id ].disconnectTime > TIMEOUT ) {
-				delete this.members[ id ];
-				deleted = true;
-			}
-		}
-
-		return deleted;
 	}
 }

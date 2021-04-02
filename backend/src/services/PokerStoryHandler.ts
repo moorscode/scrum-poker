@@ -1,5 +1,5 @@
-import PointsService, { PointValue } from "services/PointsService";
-import PokerMembersService, { Member } from "./PokerMembersService";
+import PointsProvider, { PointValue } from "services/PointsProvider";
+import PokerMembersHandler, { Member } from "./PokerMembersHandler";
 
 export interface Story {
 	name: string;
@@ -26,16 +26,16 @@ export interface ObscuredVote extends Vote {
 	initialValue: ObscuredVoteValue;
 }
 
-export default class PokerStoryService {
+export default class PokerStoryHandler {
 	private story: Story = { name: "", votes: [], voters: 0, votesRevealed: false };
-	private readonly membersService: PokerMembersService;
+	private readonly membersService: PokerMembersHandler;
 
 	/**
 	 * Creates a new Poker Story.
 	 *
 	 * @param membersService The members service to use.
 	 */
-	public constructor( membersService: PokerMembersService ) {
+	public constructor( membersService: PokerMembersHandler ) {
 		this.membersService = membersService;
 	}
 
@@ -123,7 +123,7 @@ export default class PokerStoryService {
 		story.voteAverage = Math.fround( pointTotal / story.votes.length );
 
 		// Find the nearest available point. Always round up.
-		for ( const availablePoint of PointsService.getNumericPoints() ) {
+		for ( const availablePoint of PointsProvider.getNumericPoints() ) {
 			if ( story.voteAverage - availablePoint <= 0 ) {
 				story.nearestPointAverage = availablePoint as PointValue;
 				break;
