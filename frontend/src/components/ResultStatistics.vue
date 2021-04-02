@@ -39,8 +39,13 @@ export default {
 			}
 
 			// Find the difference between the lowest and the highest votes.
-			const lowestIndex = this.points.indexOf( this.votes[ 0 ].currentValue );
+			const lowestIndex  = this.points.indexOf( this.votes[ 0 ].currentValue );
 			const highestIndex = this.points.indexOf( this.votes[ this.votes.length - 1 ].currentValue );
+
+			const highestNumericPoint = this.points.filter( ( point ) => typeof point === 'number' ).length;
+			if ( highestIndex >= highestNumericPoint ) {
+				return "";
+			}
 
 			if ( highestIndex - lowestIndex > 2 ) {
 				return `Large gap between lowest and highest vote: ${ highestIndex - lowestIndex } cards!`;
