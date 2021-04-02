@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { Story } from "../services/PokerStoryService";
+import { Story } from "../services/PokerStoryHandler";
 import PokersService from "../services/PokersService";
 import VoteResponseAdapter, { VoteResponse } from "./VoteResponseAdapter";
 

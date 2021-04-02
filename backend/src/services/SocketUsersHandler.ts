@@ -6,7 +6,7 @@ interface SocketUsers {
 }
 
 @Injectable()
-export default class SocketUsersService {
+export default class SocketUsersHandler {
 	private socketUsers: SocketUsers = {};
 
 	/**
@@ -30,6 +30,11 @@ export default class SocketUsersService {
 		delete this.socketUsers[ socket.id ];
 	}
 
+	/**
+	 * Retrieves a list of all user IDs.
+	 *
+	 * @returns {string[]} List of all user IDs.
+	 */
 	public getUserIds(): string[] {
 		return Object.values( this.socketUsers );
 	}

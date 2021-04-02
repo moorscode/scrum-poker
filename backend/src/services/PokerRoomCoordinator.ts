@@ -1,14 +1,15 @@
-import PokerHistoryService from "./PokerHistoryService";
-import PokerMembersService, { Member, MemberList } from "./PokerMembersService";
-import PokerStoryService, { Story, Vote, VoteValue } from "./PokerStoryService";
+import PokerHistoryList from "./PokerHistoryList";
+import PokerMembersHandler, { Member, MemberList } from "./PokerMembersHandler";
+import { CurrentVotes, GroupVoteNames } from "./PokersService";
+import PokerStoryHandler, { Story, Vote, VoteValue } from "./PokerStoryHandler";
 
 /**
  * Poker Room
  */
-export default class PokerRoomService {
-	private readonly membersService: PokerMembersService = new PokerMembersService();
-	private readonly historyService: PokerHistoryService = new PokerHistoryService();
-	private storyService: PokerStoryService = new PokerStoryService( this.membersService );
+export default class PokerRoomCoordinator {
+	private readonly membersService: PokerMembersHandler = new PokerMembersHandler();
+	private readonly historyList: PokerHistoryList = new PokerHistoryList();
+	private storyService: PokerStoryHandler = new PokerStoryHandler( this.membersService );
 	
 	/**
 	 * Retrieves all stories for the room.
@@ -16,7 +17,7 @@ export default class PokerRoomService {
 	 * @returns {Story[]} The stories of the room.
 	 */
 	public getHistory(): Story[] {
-		return this.historyService.getHistory();
+		return this.historyList.getHistory();
 	}
 
 	/**
@@ -25,7 +26,7 @@ export default class PokerRoomService {
 	 * @returns {void}
 	 */
 	public resetHistory(): void {
-		this.historyService.reset();
+		this.historyList.reset();
 	}
 	
 	/**
@@ -34,7 +35,7 @@ export default class PokerRoomService {
 	 * @returns {void}
 	 */
 	public removeLastHistoryEntry(): void {
-		this.historyService.removeLastEntry();
+		this.historyList.removeLastEntry();
 	}
 
 	/**
@@ -106,6 +107,13 @@ export default class PokerRoomService {
 	public addClient( id: string, name: string ): void {
 		this.membersService.addMember( id, name );
 
+		this.recalculateStory();
+	}
+
+	/**
+	 * Recalculates the story.
+	 */
+	public recalculateStory() {
 		this.storyService.recalculate();
 	}
 
@@ -162,21 +170,6 @@ export default class PokerRoomService {
 		this.membersService.setDisconnected( id );
 
 		this.storyService.recalculate();
-	}
-
-	/**
-	 * Removes timed out members.
-	 *
-	 * @returns {boolean} True if a member was removed.
-	 */
-	public cleanupMembers(): boolean {
-		const deleted = this.membersService.removeTimedOutMembers();
-
-		if ( deleted ) {
-			this.storyService.recalculate();
-		}
-
-		return deleted;
 	}
 
 	/**
@@ -238,10 +231,10 @@ export default class PokerRoomService {
 		// If the averages is not a number, like "coffee", don't add to the history.
 		if ( typeof this.storyService.getStory().voteAverage === "number" ) {
 			// Save the current story to the history.
-			this.historyService.addStory( this.storyService.getStory() );
+			this.getHistory().push( this.storyService.getStory() )
 		}
 
-		this.storyService = new PokerStoryService( this.membersService );
+		this.storyService = new PokerStoryHandler( this.membersService );
 	}
 
 	/**
@@ -253,5 +246,31 @@ export default class PokerRoomService {
 	 */
 	public setStoryName( name: string ): void {
 		this.storyService.setName( name );
+	}
+
+	/**
+	 * Retrieves the votes for a room.
+	 *
+	 * @returns {CurrentVotes} Votes in that room. Obfuscated if not all votes are in yet.
+	 */
+	public getVotes(): CurrentVotes {
+		const voted: Member[] = this.getVotedClients();
+		const votes: Vote[] = this.getCurrentVotes();
+
+		const groupedVoterNames: GroupVoteNames = voted.reduce( ( accumulator, member: Member ) => {
+			const vote: Vote            = this.getCurrentVote( member.id );
+			const voteGroupKey: string  = vote.initialValue + "/" + vote.currentValue;
+
+			accumulator[ voteGroupKey ] = accumulator[ voteGroupKey ] || [];
+			accumulator[ voteGroupKey ].push( member.name );
+
+			return accumulator;
+		}, {} );
+
+		return {
+			voteCount: voted.length,
+			votes,
+			groupedVoterNames,
+		};
 	}
 }

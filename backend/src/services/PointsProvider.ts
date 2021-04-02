@@ -6,7 +6,7 @@ export type PointValue = 0 | 0.5 | 1 | 2 | 3 | 5 | 8 | 13 | 21 | 100 | "?" | "co
 /**
  * The points service.
  */
-export default class PointsService {
+export default class PointsProvider {
 	/**
 	 * Returns all available points.
 	 *

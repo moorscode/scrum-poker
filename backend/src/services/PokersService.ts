@@ -1,17 +1,17 @@
 import { Injectable } from "@nestjs/common";
 import { Socket } from "socket.io";
-import PointsService from "./PointsService";
-import { Member } from "./PokerMembersService";
-import PokerRoomService from "./PokerRoomService";
-import { Vote, Story } from "./PokerStoryService";
-import SocketUsersService from "./SocketUsersService";
+import PointsProvider from "./PointsProvider";
+import { Member } from "./PokerMembersHandler";
+import PokerRoomCoordinator from "./PokerRoomCoordinator";
+import { Vote, Story } from "./PokerStoryHandler";
+import SocketUsersHandler from "./SocketUsersHandler";
 
 export interface GroupVoteNames {
 	[ group: string ]: string[];
 }
 
 export interface Rooms {
-	[ room: string ]: PokerRoomService;
+	[ room: string ]: PokerRoomCoordinator;
 }
 
 export interface MemberGroups {
@@ -36,11 +36,9 @@ export default class PokersService {
 	/**
 	 * Constructs the poker service.
 	 *
-	 * @param {SocketUsersService} socketUsersService The user socket service.
+	 * @param {SocketUsersHandler} socketUsersService The user socket service.
 	 */
-	public constructor(
-		private readonly socketUsersService: SocketUsersService,
-	) {}
+	public constructor( private readonly socketUsersService: SocketUsersHandler ) {}
 
 	/**
 	 * Greets a new user.
@@ -52,23 +50,6 @@ export default class PokersService {
 	 */
 	public identify( socket: Socket, userId: string ): void {
 		this.socketUsersService.add( socket, userId );
-	}
-
-	/**
-	 * Remove timed out members.
-	 *
-	 * @returns {string[]} List of rooms that users were removed from.
-	 */
-	public cleanupMembers(): string[] {
-		const changedRooms = [];
-
-		for ( const room of Object.keys( this.rooms ) ) {
-			if ( this.rooms[ room ].cleanupMembers() ) {
-				changedRooms.push(room);
-			}
-		}
-
-		return changedRooms;
 	}
 
 	/**
@@ -124,7 +105,6 @@ export default class PokersService {
 	private removeUserFromRooms( userId: string ): void {
 		for ( const room of Object.keys( this.rooms ) ) {
 			this.rooms[ room ].removeClient( userId );
-			this.cleanupRoom( room );
 		}
 	}
 
@@ -166,8 +146,7 @@ export default class PokersService {
 
 		socket.join( poker );
 
-		this.rooms[ poker ] = this.getRoom( poker );
-		this.rooms[ poker ].addClient( this.getUserId( socket ), useName );
+		this.getRoom( poker ).addClient( this.getUserId( socket ), useName );
 	}
 
 	/**
@@ -175,12 +154,36 @@ export default class PokersService {
 	 *
 	 * @param {string} poker Room to get.
 	 *
-	 * @returns {PokerRoomService} The room.
+	 * @returns {PokerRoomCoordinator} The room.
 	 *
 	 * @private
 	 */
-	private getRoom( poker: string ): PokerRoomService {
-		return this.rooms[ poker ] || new PokerRoomService();
+	private getRoom( poker: string ): PokerRoomCoordinator {
+		this.rooms[ poker ] = this.rooms[ poker ] || new PokerRoomCoordinator();
+
+		return this.rooms[ poker ];
+	}
+
+	/**
+	 * Provides all the rooms. 
+	 *
+	 * @returns {Rooms} All the rooms.
+	 */
+	public getRooms(): Rooms {
+		return this.rooms;
+	}
+
+	/**
+	 * Removes a room.
+	 *
+	 * @param {string} poker Room to remove.
+	 *
+	 * @returns {void}
+	 */
+	public removeRoom( poker: string ): void {
+		if ( this.rooms[ poker ] ) {
+			delete this.rooms[ poker ];
+		}
 	}
 
 	/**
@@ -194,24 +197,7 @@ export default class PokersService {
 	public leave( socket: Socket, poker: string ): void {
 		this.getRoom( poker ).removeClient( this.getUserId( socket ) );
 
-		this.cleanupRoom( poker );
-
 		socket.leave( poker );
-	}
-
-	/**
-	 * Cleans up a room if it's empty.
-	 *
-	 * @param {string} room The room.
-	 *
-	 * @returns {void}
-	 *
-	 * @private
-	 */
-	private cleanupRoom( room: string ): void {
-		if ( this.getRoom( room ).getClientCount( false ) === 0 ) {
-			delete this.rooms[ room ];
-		}
 	}
 
 	/**
@@ -252,6 +238,7 @@ export default class PokersService {
 	 */
 	public getMembers( poker: string ): MemberGroups {
 		const room = this.getRoom( poker );
+
 		return {
 			voters: room.getVoters(),
 			observers: room.getObservers(),
@@ -283,7 +270,7 @@ export default class PokersService {
 	 */
 	public castVote( socket: Socket, poker: string, vote ): void {
 		// Prevent cheaters from entering bogus point totals.
-		if ( ! PointsService.getPoints().includes( vote ) ) {
+		if ( ! PointsProvider.getPoints().includes( vote ) ) {
 			return;
 		}
 
@@ -298,26 +285,7 @@ export default class PokersService {
 	 * @returns {CurrentVotes} Votes in that room. Obfuscated if not all votes are in yet.
 	 */
 	public getVotes( poker: string ): CurrentVotes {
-		const room: PokerRoomService = this.getRoom( poker );
-
-		const voted: Member[] = room.getVotedClients();
-		const votes: Vote[] = room.getCurrentVotes();
-
-		const groupedVoterNames: GroupVoteNames = voted.reduce( ( accumulator, member: Member ) => {
-			const vote: Vote            = room.getCurrentVote( member.id );
-			const voteGroupKey: string  = vote.initialValue + "/" + vote.currentValue;
-
-			accumulator[ voteGroupKey ] = accumulator[ voteGroupKey ] || [];
-			accumulator[ voteGroupKey ].push( member.name );
-
-			return accumulator;
-		}, {} );
-
-		return {
-			voteCount: voted.length,
-			votes,
-			groupedVoterNames,
-		};
+		return this.getRoom( poker ).getVotes();
 	}
 
 	/**

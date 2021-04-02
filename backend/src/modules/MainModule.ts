@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
 import { PokersModule } from "./PokersModule";
-import PointsService from "../services/PointsService";
+import PointsProvider from "../services/PointsProvider";
 import { ConfigModule } from "@nestjs/config";
 import { ScheduleModule } from "@nestjs/schedule";
 
@@ -12,7 +12,7 @@ import { ScheduleModule } from "@nestjs/schedule";
 	],
 	controllers: [],
 	providers: [
-		PointsService,
+		PointsProvider,
 	],
 } )
 

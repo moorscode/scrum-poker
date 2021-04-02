@@ -1,19 +1,21 @@
 import { Module } from "@nestjs/common";
 import PokersService from "../services/PokersService";
 import PokersGateway from "../gateways/PokersGateway";
-import SocketUsersService from "../services/SocketUsersService";
+import SocketUsersHandler from "../services/SocketUsersHandler";
 import HistoryResponseAdapter from "../adapters/HistoryResponseAdapter";
 import MembersResponseAdapter from "../adapters/MembersResponseAdapter";
 import VoteResponseAdapter from "../adapters/VoteResponseAdapter";
+import PokersCleanupService from "services/PokersCleanupService";
 
 @Module( {
 	providers: [
 		PokersGateway,
 		PokersService,
+		PokersCleanupService,
 		VoteResponseAdapter,
 		MembersResponseAdapter,
 		HistoryResponseAdapter,
-		SocketUsersService,
+		SocketUsersHandler,
 	],
 } )
 
