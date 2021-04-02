@@ -50,19 +50,17 @@ $ yarn
 
 ```bash
 # development
-$ yarn frontend:watch
-$ yarn run start
+$ yarn watch:frontend
+$ yarn start
 
 # watch mode - in two separate terminals
-$ yarn frontend:watch
-$ yarn run start:dev
+$ yarn watch:frontend
+$ yarn start:dev
 
 # production mode
 $ yarn build
-$ yarn run start:prod
+$ yarn start:prod
 ```
-
-Currently there is no method to 
 
 ## License
 
