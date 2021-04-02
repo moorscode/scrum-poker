@@ -1,4 +1,9 @@
-<template></template>
+<template>
+	<div v-if="debug">
+		<button v-on:click="connect()">connect</button>
+		<button v-on:click="disconnect()">disconnect</button>
+	</div>
+</template>
 
 <script>
 import { mapState } from "vuex";
@@ -7,6 +12,7 @@ export default {
 	name: "ServerConnection",
 	data() {
 		return {
+			debug: false,
 			clientId: window.localStorage.getItem( "clientId" ) || false,
 			nickname: window.localStorage.getItem( "nickname" ),
 			baseTitle: document.title,
@@ -19,6 +25,14 @@ export default {
 		window.onbeforeunload = () => {
 			this.$socket.client.emit( "exit" );
 		};
+	},
+	methods: {
+		connect() {
+			this.$socket.client.connect();
+		},
+		disconnect() {
+			this.$socket.client.disconnect();
+		},
 	},
 	computed: {
 		...mapState( [ "members" ] ),
