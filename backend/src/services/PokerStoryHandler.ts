@@ -31,16 +31,17 @@ export interface ObscuredVote extends Vote {
  */
 export default class PokerStoryHandler {
 	private story: Story = { name: "", votes: [], voters: 0, votesRevealed: false };
-	private readonly membersService: PokerMembersHandler;
 
 	/**
 	 * Creates a new Poker Story.
 	 *
 	 * @param {PokerMembersHandler} membersService The members service to use.
+	 * @param {PointsProvider} pointsProvider The points provider.
 	 */
-	public constructor( membersService: PokerMembersHandler ) {
-		this.membersService = membersService;
-	}
+	public constructor(
+		private readonly membersService: PokerMembersHandler,
+		private readonly pointsProvider: PointsProvider,
+	) {}
 
 	/**
 	 * Retrieves the story.
@@ -126,7 +127,7 @@ export default class PokerStoryHandler {
 		story.voteAverage = Math.fround( pointTotal / story.votes.length );
 
 		// Find the nearest available point. Always round up.
-		for ( const availablePoint of PointsProvider.getNumericPoints() ) {
+		for ( const availablePoint of this.pointsProvider.getNumericPoints() ) {
 			if ( story.voteAverage - availablePoint <= 0 ) {
 				story.nearestPointAverage = availablePoint as PointValue;
 				break;

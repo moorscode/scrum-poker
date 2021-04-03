@@ -37,8 +37,12 @@ export default class PokersService {
 	 * Constructs the poker service.
 	 *
 	 * @param {SocketUsersHandler} socketUsersService The user socket service.
+	 * @param {PointsProvider} pointsProvider The points provider.
 	 */
-	public constructor( private readonly socketUsersService: SocketUsersHandler ) {}
+	public constructor(
+		private readonly socketUsersService: SocketUsersHandler,
+		private readonly pointsProvider: PointsProvider,
+	) {}
 
 	/**
 	 * Greets a new user.
@@ -159,7 +163,12 @@ export default class PokersService {
 	 * @private
 	 */
 	private getRoom( poker: string ): PokerRoomCoordinator {
-		this.rooms[ poker ] = this.rooms[ poker ] || new PokerRoomCoordinator();
+		if ( ! this.rooms[ poker ] ) {
+			const room = new PokerRoomCoordinator( this.pointsProvider );
+			room.newStory();
+
+			this.rooms[ poker ] = room;
+		}
 
 		return this.rooms[ poker ];
 	}
@@ -270,7 +279,7 @@ export default class PokersService {
 	 */
 	public castVote( socket: Socket, poker: string, vote ): void {
 		// Prevent cheaters from entering bogus point totals.
-		if ( ! PointsProvider.getPoints().includes( vote ) ) {
+		if ( ! this.pointsProvider.getPoints().includes( vote ) ) {
 			return;
 		}
 

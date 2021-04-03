@@ -20,6 +20,7 @@ export default class PokersGateway implements OnGatewayInit {
 	 * Constructor
 	 *
 	 * @param {PokersService} pokersService The Poker service.
+	 * @param {PointsProvider} pointsProvider The points provider service.
 	 * @param {PokersCleanupService} pokersCleanupService The Poker cleanup service.
 	 * @param {VoteResponseAdapter} voteResponseAdapter The Vote response Adapter.
 	 * @param {HistoryResponseAdapter} historyResponseAdapter The History response Adapter.
@@ -27,6 +28,7 @@ export default class PokersGateway implements OnGatewayInit {
 	 */
 	constructor(
 		private readonly pokersService: PokersService,
+		private readonly pointsProvider: PointsProvider,
 		private readonly pokersCleanupService: PokersCleanupService,
 		private readonly voteResponseAdapter: VoteResponseAdapter,
 		private readonly historyResponseAdapter: HistoryResponseAdapter,
@@ -53,7 +55,7 @@ export default class PokersGateway implements OnGatewayInit {
 		this.server.on( "connection", ( socket ) => {
 			// Let the client know the points that can be chosen from.
 			socket.emit( "userId", this.generateId() );
-			socket.emit( "points", PointsProvider.getPoints() );
+			socket.emit( "points", this.pointsProvider.getPoints() );
 
 			socket.on( "disconnecting", () => {
 				for ( const room in socket.rooms ) {

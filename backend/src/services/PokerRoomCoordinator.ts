@@ -1,3 +1,4 @@
+import PointsProvider from "./PointsProvider";
 import PokerHistoryList from "./PokerHistoryList";
 import PokerMembersHandler, { Member, MemberList } from "./PokerMembersHandler";
 import { CurrentVotes, GroupVoteNames } from "./PokersService";
@@ -9,7 +10,14 @@ import PokerStoryHandler, { Story, Vote, VoteValue } from "./PokerStoryHandler";
 export default class PokerRoomCoordinator {
 	private readonly membersService: PokerMembersHandler = new PokerMembersHandler();
 	private readonly historyList: PokerHistoryList = new PokerHistoryList();
-	private storyService: PokerStoryHandler = new PokerStoryHandler( this.membersService );
+	private storyService: PokerStoryHandler;
+
+	/**
+	 * Poker Room coordinator constructor.
+	 *
+	 * @param {PointsProvider} pointsProvider The points provider.
+	 */
+	constructor( private readonly pointsProvider: PointsProvider ) {}
 
 	/**
 	 * Retrieves all stories for the room.
@@ -231,12 +239,12 @@ export default class PokerRoomCoordinator {
 	 */
 	public newStory(): void {
 		// If the averages is not a number, like "coffee", don't add to the history.
-		if ( typeof this.storyService.getStory().voteAverage === "number" ) {
+		if ( this.storyService && typeof this.storyService.getStory().voteAverage === "number" ) {
 			// Save the current story to the history.
 			this.getHistory().push( this.storyService.getStory() );
 		}
 
-		this.storyService = new PokerStoryHandler( this.membersService );
+		this.storyService = new PokerStoryHandler( this.membersService, this.pointsProvider );
 	}
 
 	/**
