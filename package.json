@@ -10,7 +10,7 @@
     "prebuild:backend": "rimraf dist/backend",
     "build": "yarn build:backend && yarn build:frontend",
     "build:backend": "nest build",
-    "build:frontend": "webpack -p --mode production --config ./frontend/webpack.config.js",
+    "build:frontend": "webpack --mode production --config ./frontend/webpack.config.js",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
