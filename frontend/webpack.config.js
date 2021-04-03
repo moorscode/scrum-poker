@@ -74,11 +74,11 @@ const config = {
 		compress: true,
 		port: dotenv.parsed.DEV_SITE_PORT || 9000,
 		proxy: {
-			'/socket.io': {
-				target: 'http://localhost:' + dotenv.parsed.SERVER_PORT,
-				ws: true
-			}
-		}
+			"/socket.io": {
+				target: "http://localhost:" + dotenv.parsed.SERVER_PORT,
+				ws: true,
+			},
+		},
 	},
 };
 
