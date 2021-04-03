@@ -2836,7 +2836,7 @@ escodegen@^2.0.0:
 
 "eslint-config-yoast-typescript@github:moorscode/eslint-config-yoast-typescript":
   version "1.0.0"
-  resolved "https://codeload.github.com/moorscode/eslint-config-yoast-typescript/tar.gz/a5487552f315e7b4c65ba066606524e43775d008"
+  resolved "https://codeload.github.com/moorscode/eslint-config-yoast-typescript/tar.gz/9bcb959c21d6f467301bab2c69a4183c9c088844"
   dependencies:
     js-yaml "^3.6.0"
 
