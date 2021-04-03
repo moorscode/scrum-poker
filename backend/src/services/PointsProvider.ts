@@ -12,7 +12,7 @@ export default class PointsProvider {
 	 *
 	 * @returns {PointValue[]} The points.
 	 */
-	public static getPoints(): PointValue[] {
+	public getPoints(): PointValue[] {
 		return [ 0, 0.5, 1, 2, 3, 5, 8, 13, 21, 100, "?", "coffee" ];
 	}
 
@@ -21,7 +21,7 @@ export default class PointsProvider {
 	 *
 	 * @returns {number[]} The numeric points.
 	 */
-	public static getNumericPoints(): number[] {
+	public getNumericPoints(): number[] {
 		return this.getPoints().filter(
 			( x: PointValue ) => parseFloat( x as string ) === x,
 		) as number[];

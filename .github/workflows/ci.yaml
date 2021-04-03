@@ -9,3 +9,5 @@ jobs:
       run: yarn
     - name: Run ESLint
       run: yarn cs
+    - name: Run tests
+      run: yarn test

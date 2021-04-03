@@ -79,7 +79,7 @@
       "json",
       "ts"
     ],
-    "rootDir": "backend/src",
+    "rootDir": "backend/tests",
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
