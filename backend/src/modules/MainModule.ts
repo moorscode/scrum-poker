@@ -8,7 +8,7 @@ import { ScheduleModule } from "@nestjs/schedule";
 	imports: [
 		ConfigModule.forRoot(),
 		PokersModule,
-		ScheduleModule.forRoot()
+		ScheduleModule.forRoot(),
 	],
 	controllers: [],
 	providers: [

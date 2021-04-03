@@ -12,6 +12,9 @@ export interface MemberList {
 	[ memberId: string ]: Member
 }
 
+/**
+ * The poker members handler.
+ */
 export default class PokerMembersHandler {
 	private readonly members: MemberList = {};
 

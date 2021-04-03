@@ -10,7 +10,7 @@ export default class PokerRoomCoordinator {
 	private readonly membersService: PokerMembersHandler = new PokerMembersHandler();
 	private readonly historyList: PokerHistoryList = new PokerHistoryList();
 	private storyService: PokerStoryHandler = new PokerStoryHandler( this.membersService );
-	
+
 	/**
 	 * Retrieves all stories for the room.
 	 *
@@ -28,7 +28,7 @@ export default class PokerRoomCoordinator {
 	public resetHistory(): void {
 		this.historyList.reset();
 	}
-	
+
 	/**
 	 * Removes the last history item.
 	 *
@@ -112,8 +112,10 @@ export default class PokerRoomCoordinator {
 
 	/**
 	 * Recalculates the story.
+	 *
+	 * @returns {void}
 	 */
-	public recalculateStory() {
+	public recalculateStory(): void {
 		this.storyService.recalculate();
 	}
 
@@ -162,7 +164,7 @@ export default class PokerRoomCoordinator {
 	/**
 	 * Sets a user as an observer.
 	 *
-	 * @param {string} memberId The user.
+	 * @param {string} id The user ID.
 	 *
 	 * @returns {void}
 	 */
@@ -231,7 +233,7 @@ export default class PokerRoomCoordinator {
 		// If the averages is not a number, like "coffee", don't add to the history.
 		if ( typeof this.storyService.getStory().voteAverage === "number" ) {
 			// Save the current story to the history.
-			this.getHistory().push( this.storyService.getStory() )
+			this.getHistory().push( this.storyService.getStory() );
 		}
 
 		this.storyService = new PokerStoryHandler( this.membersService );

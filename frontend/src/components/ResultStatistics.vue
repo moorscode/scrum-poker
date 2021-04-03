@@ -42,7 +42,7 @@ export default {
 			const lowestIndex  = this.points.indexOf( this.votes[ 0 ].currentValue );
 			const highestIndex = this.points.indexOf( this.votes[ this.votes.length - 1 ].currentValue );
 
-			const highestNumericPoint = this.points.filter( ( point ) => typeof point === 'number' ).length;
+			const highestNumericPoint = this.points.filter( ( point ) => typeof point === "number" ).length;
 			if ( highestIndex >= highestNumericPoint ) {
 				return "";
 			}

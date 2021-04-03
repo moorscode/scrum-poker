@@ -1,6 +1,9 @@
 import PointsProvider, { PointValue } from "services/PointsProvider";
 import PokerMembersHandler, { Member } from "./PokerMembersHandler";
 
+export type ObscuredVoteValue = "#" | "!";
+export type VoteValue = PointValue | ObscuredVoteValue;
+
 export interface Story {
 	name: string;
 	voteAverage?: number | string;
@@ -18,14 +21,14 @@ export interface Vote {
 	initialValue: VoteValue;
 }
 
-export type ObscuredVoteValue = "#" | "!";
-export type VoteValue = PointValue | ObscuredVoteValue;
-
 export interface ObscuredVote extends Vote {
 	currentValue: ObscuredVoteValue;
 	initialValue: ObscuredVoteValue;
 }
 
+/**
+ * Poker story handler.
+ */
 export default class PokerStoryHandler {
 	private story: Story = { name: "", votes: [], voters: 0, votesRevealed: false };
 	private readonly membersService: PokerMembersHandler;
@@ -33,7 +36,7 @@ export default class PokerStoryHandler {
 	/**
 	 * Creates a new Poker Story.
 	 *
-	 * @param membersService The members service to use.
+	 * @param {PokerMembersHandler} membersService The members service to use.
 	 */
 	public constructor( membersService: PokerMembersHandler ) {
 		this.membersService = membersService;
@@ -292,7 +295,6 @@ export default class PokerStoryHandler {
 	/**
 	 * Gets an obscured vote representing an hidden cast vote ("X") or a missing vote ("?").
 	 *
-	 * @param {Story} story The story to get the obscured vote for.
 	 * @param {Member} member The client to get the obscured vote for.
 	 *
 	 * @returns {ObscuredVote} The obscured vote representing an hidden cast vote ("X") or a missing vote ("?").

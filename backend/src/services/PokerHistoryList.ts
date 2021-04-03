@@ -1,5 +1,8 @@
 import { Story } from "./PokerStoryHandler";
 
+/**
+ * The poker history list.
+ */
 export default class PokerHistoryList {
 	private readonly history: Story[] = [];
 

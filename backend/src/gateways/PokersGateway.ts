@@ -4,9 +4,9 @@ import { Server, Socket } from "socket.io";
 import PointsProvider from "../services/PointsProvider";
 import { Vote } from "../services/PokerStoryHandler";
 import PokersService from "../services/PokersService";
-import HistoryResponseAdapter, { HistoryResponseList } from "../adapters/HistoryResponseAdapter";
+import HistoryResponseAdapter from "../adapters/HistoryResponseAdapter";
 import MembersResponseAdapter from "../adapters/MembersResponseAdapter";
-import VoteResponseAdapter, { VoteResponse } from "../adapters/VoteResponseAdapter";
+import VoteResponseAdapter from "../adapters/VoteResponseAdapter";
 import PokersCleanupService from "services/PokersCleanupService";
 
 @WebSocketGateway( { namespace: "/pokers" } )
@@ -33,12 +33,14 @@ export default class PokersGateway implements OnGatewayInit {
 		private readonly membersResponseAdapter: MembersResponseAdapter,
 	) {}
 
-	@Interval(1000)
 	/**
 	 * Clean up the rooms periodically.
+	 *
+	 * @returns {void}
 	 */
-	cleanupInterval() {
-  		const changedRooms = this.pokersCleanupService.cleanup();
+	@Interval( 1000 )
+	cleanupInterval(): void {
+		const changedRooms = this.pokersCleanupService.cleanup();
 		changedRooms.map( ( room: string ) => this.send( room, { members: true, votes: true } ) );
 	}
 

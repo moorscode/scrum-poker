@@ -9,6 +9,9 @@ export interface MembersResponse {
 }
 
 @Injectable()
+/**
+ * The members response adapter.
+ */
 export default class MembersResponseAdapter {
 	/**
 	 * Constructor
@@ -17,18 +20,25 @@ export default class MembersResponseAdapter {
 	 */
 	 constructor(
 		private readonly pokersService: PokersService,
-	 ) {};
+	 ) {}
 
 	/**
 	 * Formats the members in a room for response.
 	 *
-	 * @param {MemberGroups} memberGroups The members in their groups.
+	 * @param {string} room The room to format the members of.
 	 *
 	 * @returns {MembersResponse} The formatted list.
 	 */
 	public format( room: string ): MembersResponse {
 		const memberGroups: MemberGroups = this.pokersService.getMembers( room );
 
+		/**
+		 * Lists the names of the members.
+		 *
+		 * @param {Member} member The member.
+		 *
+		 * @returns {string} The name of the member.
+		 */
 		const mapCallback = ( ( member: Member ): string => member.name );
 
 		return {

@@ -14,6 +14,9 @@ export interface HistoryResponseList {
 }
 
 @Injectable()
+/**
+ * The history response adapter.
+ */
 export default class HistoryResponseAdapter {
 	/**
 	 * Constructor
@@ -26,8 +29,9 @@ export default class HistoryResponseAdapter {
 	) {}
 
 	/**
-	 * 
-	 * @param room The room to format the response for.
+	 * Formats the response.
+	 *
+	 * @param {string} room The room to format the response for.
 	 *
 	 * @returns {HistoryResponseList} The history list.
 	 */

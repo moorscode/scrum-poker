@@ -19,6 +19,9 @@ export interface VotesResponse {
 }
 
 @Injectable()
+/**
+ * The vote reponse adapter.
+ */
 export default class VoteResponseAdapter {
 	/**
 	 * Constructor
@@ -30,7 +33,7 @@ export default class VoteResponseAdapter {
 	/**
 	 * Formats the votes response.
 	 *
-	 * @param poker The room to create the response for.
+	 * @param {string} poker The room to create the response for.
 	 *
 	 * @returns {VotesResponse} The response.
 	 */

@@ -57,14 +57,14 @@ export default {
 		},
 		revealVotesButtonIconClass() {
 			return this.votesRevealed ? "fa-eye-slash" : "fa-eye";
-		}
+		},
 	},
 	methods: {
 		show( vote ) {
-			switch( vote.currentValue ) {
-				case '#':
+			switch ( vote.currentValue ) {
+				case "#":
 					return '<i class="fas fa-hat-wizard" title="Busy creating the magic number..."></i>';
-				case '!':
+				case "!":
 					return '<i class="fas fa-clipboard-check" title="Voted!"></i>';
 				default:
 					return vote.currentValue;

@@ -165,7 +165,7 @@ export default class PokersService {
 	}
 
 	/**
-	 * Provides all the rooms. 
+	 * Provides all the rooms.
 	 *
 	 * @returns {Rooms} All the rooms.
 	 */

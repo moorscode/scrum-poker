@@ -6,6 +6,9 @@ interface SocketUsers {
 }
 
 @Injectable()
+/**
+ * Socket Users Handler
+ */
 export default class SocketUsersHandler {
 	private socketUsers: SocketUsers = {};
 
@@ -25,6 +28,8 @@ export default class SocketUsersHandler {
 	 * Removes a socket connection.
 	 *
 	 * @param {Socket} socket The socket that needs to be removed.
+	 *
+	 * @returns {void}
 	 */
 	public remove( socket: Socket ): void {
 		delete this.socketUsers[ socket.id ];
