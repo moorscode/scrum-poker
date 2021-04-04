@@ -9,19 +9,19 @@ interface SocketUsers {
 /**
  * Socket Users Handler
  */
-export default class SocketUsersHandler {
-	private socketUsers: SocketUsers = {};
+export default class SocketUserHandler {
+	private users: SocketUsers = {};
 
 	/**
 	 * Greets a new user socket connection.
 	 *
 	 * @param {Socket} socket The client socket.
-	 * @param {string} userId The user Id.
+	 * @param {string} memberId The user Id.
 	 *
 	 * @returns {void}
 	 */
-	public add( socket: Socket, userId: string ): void {
-		this.socketUsers[ socket.id ] = userId;
+	public add( socket: Socket, memberId: string ): void {
+		this.users[ socket.id ] = memberId;
 	}
 
 	/**
@@ -32,7 +32,7 @@ export default class SocketUsersHandler {
 	 * @returns {void}
 	 */
 	public remove( socket: Socket ): void {
-		delete this.socketUsers[ socket.id ];
+		delete this.users[ socket.id ];
 	}
 
 	/**
@@ -40,8 +40,8 @@ export default class SocketUsersHandler {
 	 *
 	 * @returns {string[]} List of all user IDs.
 	 */
-	public getUserIds(): string[] {
-		return Object.values( this.socketUsers );
+	public getMemberIds(): string[] {
+		return Object.values( this.users );
 	}
 
 	/**
@@ -53,22 +53,22 @@ export default class SocketUsersHandler {
 	 *
 	 * @private
 	 */
-	 public getUserId( socket: Socket ): string {
-		return this.socketUsers[ socket.id ];
+	 public getMemberId( socket: Socket ): string {
+		return this.users[ socket.id ];
 	}
 
 	/**
-	 * Retrieves the sockets the userId is connected with.
+	 * Retrieves the sockets the member is connected with.
 	 *
-	 * @param {string} userId The user to get the sockets for.
+	 * @param {string} memberId The member to get the sockets for.
 	 *
-	 * @returns {string[]} List of sockets with the userId.
+	 * @returns {string[]} List of socket IDs of the member.
 	 */
-	public getUserSockets( userId: string ): string[] {
+	public getUserSockets( memberId: string ): string[] {
 		const socketIds = [];
 
-		for ( const socketId of Object.keys( this.socketUsers ) ) {
-			if ( this.socketUsers[ socketId ] === userId ) {
+		for ( const socketId of Object.keys( this.users ) ) {
+			if ( this.users[ socketId ] === memberId ) {
 				socketIds.push( socketId );
 			}
 		}

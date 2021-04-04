@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import PokersService from "../services/PokersService";
 import PokersGateway from "../gateways/PokersGateway";
-import SocketUsersHandler from "../services/SocketUsersHandler";
+import SocketUserHandler from "../services/SocketUsersHandler";
 import HistoryResponseAdapter from "../adapters/HistoryResponseAdapter";
 import MembersResponseAdapter from "../adapters/MembersResponseAdapter";
 import VoteResponseAdapter from "../adapters/VoteResponseAdapter";
@@ -17,7 +17,7 @@ import PointsProvider from "services/PointsProvider";
 		VoteResponseAdapter,
 		MembersResponseAdapter,
 		HistoryResponseAdapter,
-		SocketUsersHandler,
+		SocketUserHandler,
 	],
 } )
 

@@ -1,6 +1,6 @@
 import PointsProvider from "./PointsProvider";
 import PokerHistoryList from "./PokerHistoryList";
-import PokerMembersManager, { Member, MemberList } from "./PokerMembersManager";
+import PokerMemberManager, { Member, MemberList } from "./PokerMemberManager";
 import { CurrentVotes, GroupVoteNames } from "./PokersService";
 import PokerStoryHandler, { Story, Vote, VoteValue } from "./PokerStoryHandler";
 
@@ -8,7 +8,7 @@ import PokerStoryHandler, { Story, Vote, VoteValue } from "./PokerStoryHandler";
  * Poker Room
  */
 export default class PokerRoomCoordinator {
-	private readonly membersManager: PokerMembersManager;
+	private readonly membersManager: PokerMemberManager;
 	private readonly historyList: PokerHistoryList;
 	private storyService: PokerStoryHandler;
 
@@ -18,7 +18,7 @@ export default class PokerRoomCoordinator {
 	 * @param {PointsProvider} pointsProvider The points provider.
 	 */
 	constructor( private readonly pointsProvider: PointsProvider ) {
-		this.membersManager = new PokerMembersManager();
+		this.membersManager = new PokerMemberManager();
 		this.historyList = new PokerHistoryList();
 		this.storyService = new PokerStoryHandler( this.membersManager, this.pointsProvider );
 	}

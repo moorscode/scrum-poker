@@ -1,5 +1,5 @@
 import PointsProvider, { PointValue } from "services/PointsProvider";
-import PokerMembersManager, { Member } from "./PokerMembersManager";
+import PokerMemberManager, { Member } from "./PokerMemberManager";
 
 export type ObscuredVoteValue = "#" | "!";
 export type VoteValue = PointValue | ObscuredVoteValue;
@@ -35,11 +35,11 @@ export default class PokerStoryHandler {
 	/**
 	 * Creates a new Poker Story.
 	 *
-	 * @param {PokerMembersManager} membersService The members service to use.
+	 * @param {PokerMemberManager} membersService The members service to use.
 	 * @param {PointsProvider} pointsProvider The points provider.
 	 */
 	public constructor(
-		private readonly membersService: PokerMembersManager,
+		private readonly membersService: PokerMemberManager,
 		private readonly pointsProvider: PointsProvider,
 	) {
 		this.story = { name: "", votes: [], voters: 0, votesRevealed: false };
@@ -274,7 +274,7 @@ export default class PokerStoryHandler {
 	 * @returns {ObscuredVote[]} List of obscured votes.
 	 */
 	private getObscuredVotes(): ObscuredVote[] {
-		return this.membersService.getActiveMembers()
+		return this.membersService.getVoters()
 			.map( ( member: Member ): ObscuredVote => this.getObscuredVote( member ) )
 			.sort( ( a, b ) => {
 				if ( a.currentValue === b.currentValue ) {
@@ -309,7 +309,7 @@ export default class PokerStoryHandler {
 	 * @returns {Member[]} List of voted voters.
 	 */
 	public getVotedClients(): Member[] {
-		return this.membersService.getActiveMembers()
+		return this.membersService.getVoters()
 			.filter( ( member: Member ) => this.story.votes.map( ( vote: Vote ) => vote.voter.id ).includes( member.id ) );
 	}
 
@@ -319,7 +319,7 @@ export default class PokerStoryHandler {
 	 * @returns {Member[]} List of voters that haven't voted yet.
 	 */
 	private getVotePendingClients(): Member[] {
-		return this.membersService.getActiveMembers()
+		return this.membersService.getVoters()
 			.filter( ( member: Member ) => ! this.story.votes.map( ( vote: Vote ) => vote.voter.id ).includes( member.id ) );
 	}
 }

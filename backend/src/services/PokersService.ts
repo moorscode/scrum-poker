@@ -1,10 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import { Socket } from "socket.io";
 import PointsProvider from "./PointsProvider";
-import { Member } from "./PokerMembersManager";
+import { Member } from "./PokerMemberManager";
 import PokerRoomCoordinator from "./PokerRoomCoordinator";
 import { Vote, Story } from "./PokerStoryHandler";
-import SocketUsersHandler from "./SocketUsersHandler";
+import SocketUserHandler from "./SocketUsersHandler";
 
 export interface GroupVoteNames {
 	[ group: string ]: string[];
@@ -36,11 +36,11 @@ export default class PokersService {
 	/**
 	 * Constructs the poker service.
 	 *
-	 * @param {SocketUsersHandler} socketUsersService The user socket service.
+	 * @param {SocketUserHandler} socketUsersService The user socket service.
 	 * @param {PointsProvider} pointsProvider The points provider.
 	 */
 	public constructor(
-		private readonly socketUsersService: SocketUsersHandler,
+		private readonly socketUsersService: SocketUserHandler,
 		private readonly pointsProvider: PointsProvider,
 	) {}
 
@@ -80,7 +80,7 @@ export default class PokersService {
 
 		this.socketUsersService.remove( socket );
 
-		if ( ! this.socketUsersService.getUserIds().includes( userId ) ) {
+		if ( ! this.socketUsersService.getMemberIds().includes( userId ) ) {
 			this.removeUserFromRooms( userId );
 		}
 	}
@@ -122,7 +122,7 @@ export default class PokersService {
 	 * @private
 	 */
 	public getUserId( socket: Socket ): string {
-		return this.socketUsersService.getUserId( socket );
+		return this.socketUsersService.getMemberId( socket );
 	}
 
 	/**
