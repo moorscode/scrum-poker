@@ -7,7 +7,7 @@ import PokersService from "../services/PokersService";
 import HistoryResponseAdapter from "../adapters/HistoryResponseAdapter";
 import MembersResponseAdapter from "../adapters/MembersResponseAdapter";
 import VoteResponseAdapter from "../adapters/VoteResponseAdapter";
-import PokersCleanupService from "services/PokersCleanupService";
+import PokersCleanupService from "../services/PokersCleanupService";
 
 @WebSocketGateway( { namespace: "/pokers" } )
 /**

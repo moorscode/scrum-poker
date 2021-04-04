@@ -1,4 +1,4 @@
-import PointsProvider, { PointValue } from "services/PointsProvider";
+import PointsProvider, { PointValue } from "./PointsProvider";
 import PokerMemberManager, { Member } from "./PokerMemberManager";
 
 export type ObscuredVoteValue = "#" | "!";
