@@ -1,5 +1,5 @@
 import { Socket } from "socket.io";
-import SocketUserHandler from "../../src/services/SocketUsersHandler";
+import SocketUserHandler from "../../../backend/src/services/SocketUsersHandler";
 
 describe( "SocketUserHandler", () => {
 	let socketUserHandler: SocketUserHandler;
@@ -21,10 +21,10 @@ describe( "SocketUserHandler", () => {
 
 	describe( "remove", () => {
 		it( "removes a socket - memberId pair", () => {
-			const socket = {} as unknown as Socket;
+			const socket = { id: "socket-id" } as unknown as Socket;
 
 			socketUserHandler.add( socket, "1" );
-			socketUserHandler.remove( socket );
+			socketUserHandler.remove( "socket-id" );
 
 			expect( socketUserHandler.getMemberIds() ).toStrictEqual( [] );
 		} );

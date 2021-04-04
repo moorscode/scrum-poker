@@ -1,4 +1,4 @@
-export type MemberType = "voter" | "observer";
+export type MemberType = "voter" | "observer" | "invalid";
 
 export interface Member {
 	name: string;
@@ -123,6 +123,28 @@ export default class PokerMemberManager {
 	 */
 	public getMembers(): MemberList {
 		return this.members;
+	}
+
+	/**
+	 * Lists clients in a room.
+	 *
+	 * @param {string} memberId The ID of the member.
+	 *
+	 * @returns {Member} The requested member.
+	 *
+	 * @private
+	 */
+	 public getMember( memberId: string ): Member {
+		 if ( this.members[ memberId ] ) {
+			return this.members[ memberId ];
+		 }
+
+		 return {
+			 name: "Invalid",
+			 id: "0",
+			 type: "invalid",
+			 connected: false,
+		 };
 	}
 
 	/**

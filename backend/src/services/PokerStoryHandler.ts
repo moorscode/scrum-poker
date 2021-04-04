@@ -35,11 +35,11 @@ export default class PokerStoryHandler {
 	/**
 	 * Creates a new Poker Story.
 	 *
-	 * @param {PokerMemberManager} membersService The members service to use.
+	 * @param {PokerMemberManager} membersManager The members manager to use.
 	 * @param {PointsProvider} pointsProvider The points provider.
 	 */
 	public constructor(
-		private readonly membersService: PokerMemberManager,
+		private readonly membersManager: PokerMemberManager,
 		private readonly pointsProvider: PointsProvider,
 	) {
 		this.story = { name: "", votes: [], voters: 0, votesRevealed: false };
@@ -76,7 +76,7 @@ export default class PokerStoryHandler {
 		const story = this.story;
 
 		story.votesRevealed = false;
-		story.voters = this.membersService.getVoterCount();
+		story.voters = this.membersManager.getVoterCount();
 
 		if ( story.votes.length === 0 ) {
 			delete story.voteAverage;
@@ -143,7 +143,7 @@ export default class PokerStoryHandler {
 	 * @returns {boolean} True if every client has voted.
 	 */
 	private hasAllVotes(): boolean {
-		return this.story.votes.length === this.membersService.getVoterCount();
+		return this.story.votes.length === this.membersManager.getVoterCount();
 	}
 
 	/**
@@ -189,7 +189,7 @@ export default class PokerStoryHandler {
 	private addVote( memberId: string, voteValue: VoteValue ): void {
 		const vote: Vote = {
 			story: this.story,
-			voter: this.membersService.getMembers()[ memberId ],
+			voter: this.membersManager.getMember( memberId ),
 			initialValue: voteValue,
 			currentValue: voteValue,
 		};
@@ -274,7 +274,7 @@ export default class PokerStoryHandler {
 	 * @returns {ObscuredVote[]} List of obscured votes.
 	 */
 	private getObscuredVotes(): ObscuredVote[] {
-		return this.membersService.getVoters()
+		return this.membersManager.getVoters()
 			.map( ( member: Member ): ObscuredVote => this.getObscuredVote( member ) )
 			.sort( ( a, b ) => {
 				if ( a.currentValue === b.currentValue ) {
@@ -309,7 +309,7 @@ export default class PokerStoryHandler {
 	 * @returns {Member[]} List of voted voters.
 	 */
 	public getVotedClients(): Member[] {
-		return this.membersService.getVoters()
+		return this.membersManager.getVoters()
 			.filter( ( member: Member ) => this.story.votes.map( ( vote: Vote ) => vote.voter.id ).includes( member.id ) );
 	}
 
@@ -319,7 +319,7 @@ export default class PokerStoryHandler {
 	 * @returns {Member[]} List of voters that haven't voted yet.
 	 */
 	private getVotePendingClients(): Member[] {
-		return this.membersService.getVoters()
+		return this.membersManager.getVoters()
 			.filter( ( member: Member ) => ! this.story.votes.map( ( vote: Vote ) => vote.voter.id ).includes( member.id ) );
 	}
 }

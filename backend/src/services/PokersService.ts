@@ -78,7 +78,7 @@ export default class PokersService {
 	public exit( socket: Socket ): void {
 		const userId = this.getUserId( socket );
 
-		this.socketUsersService.remove( socket );
+		this.socketUsersService.remove( socket.id );
 
 		if ( ! this.socketUsersService.getMemberIds().includes( userId ) ) {
 			this.removeUserFromRooms( userId );
