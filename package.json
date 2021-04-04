@@ -90,7 +90,7 @@
     "coverageDirectory": "coverage",
     "testEnvironment": "node",
 	"setupFiles": [
-		"tests/bootstrap.ts"
+		"./tests/bootstrap.ts"
 	]
   }
 }
