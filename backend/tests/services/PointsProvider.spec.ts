@@ -1,15 +1,10 @@
 import PointsProvider from "../../src/services/PointsProvider";
-import { Test } from "@nestjs/testing";
 
 describe( "PointsProvider", () => {
 	let pointsProvider: PointsProvider;
 
 	beforeEach( async () => {
-		const moduleRef = await Test.createTestingModule( {
-			controllers: [ PointsProvider ],
-		} ).compile();
-
-		pointsProvider = moduleRef.get<PointsProvider>( PointsProvider );
+		pointsProvider = new PointsProvider();
 	} );
 
 	describe( "getPoints", () => {
