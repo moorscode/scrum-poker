@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { Member } from "./PokerMembersHandler";
+import { Member } from "./PokerMembersManager";
 import PokerRoomCoordinator from "./PokerRoomCoordinator";
 import PokersService, { Rooms } from "./PokersService";
 

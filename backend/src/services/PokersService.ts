@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { Socket } from "socket.io";
 import PointsProvider from "./PointsProvider";
-import { Member } from "./PokerMembersHandler";
+import { Member } from "./PokerMembersManager";
 import PokerRoomCoordinator from "./PokerRoomCoordinator";
 import { Vote, Story } from "./PokerStoryHandler";
 import SocketUsersHandler from "./SocketUsersHandler";
@@ -163,11 +163,9 @@ export default class PokersService {
 	 * @private
 	 */
 	private getRoom( poker: string ): PokerRoomCoordinator {
+		// Create a room if it doesn't exist already.
 		if ( ! this.rooms[ poker ] ) {
-			const room = new PokerRoomCoordinator( this.pointsProvider );
-			room.newStory();
-
-			this.rooms[ poker ] = room;
+			this.rooms[ poker ] = new PokerRoomCoordinator( this.pointsProvider );
 		}
 
 		return this.rooms[ poker ];

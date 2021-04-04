@@ -1,5 +1,5 @@
 import PointsProvider, { PointValue } from "services/PointsProvider";
-import PokerMembersHandler, { Member } from "./PokerMembersHandler";
+import PokerMembersManager, { Member } from "./PokerMembersManager";
 
 export type ObscuredVoteValue = "#" | "!";
 export type VoteValue = PointValue | ObscuredVoteValue;
@@ -30,18 +30,20 @@ export interface ObscuredVote extends Vote {
  * Poker story handler.
  */
 export default class PokerStoryHandler {
-	private story: Story = { name: "", votes: [], voters: 0, votesRevealed: false };
+	private story: Story;
 
 	/**
 	 * Creates a new Poker Story.
 	 *
-	 * @param {PokerMembersHandler} membersService The members service to use.
+	 * @param {PokerMembersManager} membersService The members service to use.
 	 * @param {PointsProvider} pointsProvider The points provider.
 	 */
 	public constructor(
-		private readonly membersService: PokerMembersHandler,
+		private readonly membersService: PokerMembersManager,
 		private readonly pointsProvider: PointsProvider,
-	) {}
+	) {
+		this.story = { name: "", votes: [], voters: 0, votesRevealed: false };
+	}
 
 	/**
 	 * Retrieves the story.
@@ -71,21 +73,10 @@ export default class PokerStoryHandler {
 	 * @returns {Story} The modified story.
 	 */
 	 public recalculate(): void {
-		this.story.votesRevealed = false;
-		this.story.voters = this.membersService.getVoterCount();
-
-		this.setStoryAverage();
-	}
-
-	/**
-	 * Calculates and sets the story average value.
-	 *
-	 * @param {Story} story The story.
-	 *
-	 * @returns {Story} The adjusted story.
-	 */
-	 private setStoryAverage(): void {
 		const story = this.story;
+
+		story.votesRevealed = false;
+		story.voters = this.membersService.getVoterCount();
 
 		if ( story.votes.length === 0 ) {
 			delete story.voteAverage;
@@ -119,7 +110,7 @@ export default class PokerStoryHandler {
 			return;
 		}
 
-		const pointTotal  = story.votes.reduce<number>(
+		const pointTotal = story.votes.reduce<number>(
 			( accumulator: number, vote: Vote ) =>
 				accumulator + ( vote.currentValue as number ),
 			0,

@@ -1,6 +1,6 @@
 import PointsProvider from "./PointsProvider";
 import PokerHistoryList from "./PokerHistoryList";
-import PokerMembersHandler, { Member, MemberList } from "./PokerMembersHandler";
+import PokerMembersManager, { Member, MemberList } from "./PokerMembersManager";
 import { CurrentVotes, GroupVoteNames } from "./PokersService";
 import PokerStoryHandler, { Story, Vote, VoteValue } from "./PokerStoryHandler";
 
@@ -8,8 +8,8 @@ import PokerStoryHandler, { Story, Vote, VoteValue } from "./PokerStoryHandler";
  * Poker Room
  */
 export default class PokerRoomCoordinator {
-	private readonly membersService: PokerMembersHandler = new PokerMembersHandler();
-	private readonly historyList: PokerHistoryList = new PokerHistoryList();
+	private readonly membersManager: PokerMembersManager;
+	private readonly historyList: PokerHistoryList;
 	private storyService: PokerStoryHandler;
 
 	/**
@@ -17,7 +17,53 @@ export default class PokerRoomCoordinator {
 	 *
 	 * @param {PointsProvider} pointsProvider The points provider.
 	 */
-	constructor( private readonly pointsProvider: PointsProvider ) {}
+	constructor( private readonly pointsProvider: PointsProvider ) {
+		this.membersManager = new PokerMembersManager();
+		this.historyList = new PokerHistoryList();
+		this.storyService = new PokerStoryHandler( this.membersManager, this.pointsProvider );
+	}
+
+	/**
+	 * Starts a new story.
+	 *
+	 * @returns {void}
+	 */
+	 public newStory(): void {
+		this.historyList.addStory( this.storyService.getStory() );
+
+		// Create a new story.
+		this.storyService = new PokerStoryHandler( this.membersManager, this.pointsProvider );
+	}
+
+	/**
+	 * Gets the current story.
+	 *
+	 * @returns {Story} The current story.
+	 */
+	 public getStory(): Story {
+		return this.storyService.getStory();
+	}
+
+
+	/**
+	 * Recalculates the story.
+	 *
+	 * @returns {void}
+	 */
+	 public recalculateStory(): void {
+		this.storyService.recalculate();
+	}
+
+	/**
+	 * Sets the storyName name.
+	 *
+	 * @param {string} name The name.
+	 *
+	 * @returns {void}
+	 */
+	public setStoryName( name: string ): void {
+		this.storyService.setName( name );
+	}
 
 	/**
 	 * Retrieves all stories for the room.
@@ -47,21 +93,12 @@ export default class PokerRoomCoordinator {
 	}
 
 	/**
-	 * Gets the current story.
-	 *
-	 * @returns {Story} The current story.
-	 */
-	public getStory(): Story {
-		return this.storyService.getStory();
-	}
-
-	/**
 	 * Lists clients in a room.
 	 *
 	 * @returns {MemberList[]} List of clients.
 	 */
 	public getMembers(): MemberList {
-		return this.membersService.getMembers();
+		return this.membersManager.getMembers();
 	}
 
 	/**
@@ -70,7 +107,7 @@ export default class PokerRoomCoordinator {
 	 * @returns {Member[]} List of voters.
 	 */
 	public getVoters(): Member[] {
-		return this.membersService.getVoters();
+		return this.membersManager.getVoters();
 	}
 
 	/**
@@ -79,7 +116,7 @@ export default class PokerRoomCoordinator {
 	 * @returns {Member[]} List of observers.
 	 */
 	public getObservers(): Member[] {
-		return this.membersService.getObservers();
+		return this.membersManager.getObservers();
 	}
 
 	/**
@@ -88,7 +125,7 @@ export default class PokerRoomCoordinator {
 	 * @returns {Member[]} List of disconnected members.
 	 */
 	public getDisconnected(): Member[] {
-		return this.membersService.getDisconnected();
+		return this.membersManager.getDisconnected();
 	}
 
 	/**
@@ -99,7 +136,7 @@ export default class PokerRoomCoordinator {
 	 * @returns {number} The total number of clients connected.
 	 */
 	public getClientCount( includeDisconnected = true ): number {
-		return this.membersService.getClientCount( includeDisconnected );
+		return this.membersManager.getClientCount( includeDisconnected );
 	}
 
 	/**
@@ -113,18 +150,9 @@ export default class PokerRoomCoordinator {
 	 * @private
 	 */
 	public addClient( id: string, name: string ): void {
-		this.membersService.addMember( id, name );
+		this.membersManager.addMember( id, name );
 
 		this.recalculateStory();
-	}
-
-	/**
-	 * Recalculates the story.
-	 *
-	 * @returns {void}
-	 */
-	public recalculateStory(): void {
-		this.storyService.recalculate();
 	}
 
 	/**
@@ -138,7 +166,7 @@ export default class PokerRoomCoordinator {
 	 * @private
 	 */
 	public setClientName( id: string, name: string ): void {
-		this.membersService.setMemberName( id, name );
+		this.membersManager.setMemberName( id, name );
 	}
 
 	/**
@@ -151,7 +179,7 @@ export default class PokerRoomCoordinator {
 	 * @private
 	 */
 	public removeClient( id: string ): void {
-		this.membersService.removeMember( id );
+		this.membersManager.removeMember( id );
 
 		this.storyService.removeVote( id );
 	}
@@ -164,7 +192,7 @@ export default class PokerRoomCoordinator {
 	 * @returns {void}
 	 */
 	public makeObserver( id: string ): void {
-		this.membersService.makeObserver( id );
+		this.membersManager.makeObserver( id );
 
 		this.storyService.removeVote( id );
 	}
@@ -177,7 +205,7 @@ export default class PokerRoomCoordinator {
 	 * @returns {void}
 	 */
 	public setDisconnected( id: string ): void {
-		this.membersService.setDisconnected( id );
+		this.membersManager.setDisconnected( id );
 
 		this.storyService.recalculate();
 	}
@@ -230,32 +258,6 @@ export default class PokerRoomCoordinator {
 	 */
 	public toggleRevealVotes(): void {
 		this.storyService.toggleRevealVotes();
-	}
-
-	/**
-	 * Starts a new story.
-	 *
-	 * @returns {void}
-	 */
-	public newStory(): void {
-		// If the averages is not a number, like "coffee", don't add to the history.
-		if ( this.storyService && typeof this.storyService.getStory().voteAverage === "number" ) {
-			// Save the current story to the history.
-			this.getHistory().push( this.storyService.getStory() );
-		}
-
-		this.storyService = new PokerStoryHandler( this.membersService, this.pointsProvider );
-	}
-
-	/**
-	 * Sets the storyName name.
-	 *
-	 * @param {string} name The name.
-	 *
-	 * @returns {void}
-	 */
-	public setStoryName( name: string ): void {
-		this.storyService.setName( name );
 	}
 
 	/**

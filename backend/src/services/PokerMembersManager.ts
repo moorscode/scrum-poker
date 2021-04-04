@@ -15,7 +15,7 @@ export interface MemberList {
 /**
  * The poker members handler.
  */
-export default class PokerMembersHandler {
+export default class PokerMembersManager {
 	private readonly members: MemberList = {};
 
 	/**
