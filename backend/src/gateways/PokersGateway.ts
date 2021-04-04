@@ -210,19 +210,39 @@ export default class PokersGateway implements OnGatewayInit {
 		all = false,
 	} = {} ) {
 		if ( all || story ) {
-			this.server.to( poker ).emit( "story", this.pokersService.getStory( poker ).name );
+			this.server.to( poker ).emit(
+				"story",
+				this.pokersService.getStory( poker ).name,
+			);
 		}
 
 		if ( all || members ) {
-			this.server.to( poker ).emit( "memberList", this.membersResponseAdapter.format( poker ) );
+			this.server.to( poker ).emit(
+				"memberList",
+				this.membersResponseAdapter.format(
+					this.pokersService.getMembers( poker ),
+				),
+			);
 		}
 
 		if ( all || votes ) {
-			this.server.to( poker ).emit( "votes", this.voteResponseAdapter.format( poker ) );
+			this.server.to( poker ).emit(
+				"votes",
+				this.voteResponseAdapter.format(
+					this.pokersService.getVotes( poker ),
+					this.pokersService.getVotedNames( poker ),
+					this.pokersService.getStory( poker ),
+				),
+			);
 		}
 
 		if ( all || history ) {
-			this.server.to( poker ).emit( "history", this.historyResponseAdapter.format( poker ) );
+			this.server.to( poker ).emit(
+				"history",
+				this.historyResponseAdapter.format(
+					this.pokersService.getHistory( poker ),
+				),
+			);
 		}
 	}
 }

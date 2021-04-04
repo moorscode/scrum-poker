@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { Member } from "../services/PokerMemberManager";
-import PokersService, { MemberGroups } from "../services/PokersService";
+import { MemberGroups } from "../services/PokersService";
 
 export interface MembersResponse {
 	voters: string[];
@@ -14,24 +14,13 @@ export interface MembersResponse {
  */
 export default class MembersResponseAdapter {
 	/**
-	 * Constructor
-	 *
-	 * @param {PokersService} pokersService The Poker service.
-	 */
-	 constructor(
-		private readonly pokersService: PokersService,
-	 ) {}
-
-	/**
 	 * Formats the members in a room for response.
 	 *
-	 * @param {string} room The room to format the members of.
+	 * @param {MemberGroups} memberGroups The members groups to format.
 	 *
 	 * @returns {MembersResponse} The formatted list.
 	 */
-	public format( room: string ): MembersResponse {
-		const memberGroups: MemberGroups = this.pokersService.getMembers( room );
-
+	public format( memberGroups: MemberGroups ): MembersResponse {
 		/**
 		 * Lists the names of the members.
 		 *

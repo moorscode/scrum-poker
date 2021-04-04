@@ -1,7 +1,7 @@
 import { NestFactory } from "@nestjs/core";
 import { MainModule } from "./modules/MainModule";
 import { NestExpressApplication } from "@nestjs/platform-express";
-import { join } from "path";
+import { dirname, join } from "path";
 
 /**
  * Bootstraps the application.
@@ -10,7 +10,7 @@ import { join } from "path";
  */
 async function bootstrap() {
 	const app = await NestFactory.create <NestExpressApplication>( MainModule );
-	app.useStaticAssets( join( __dirname, "..", "..", "dist/frontend" ) );
+	app.useStaticAssets( join( dirname( dirname( __dirname ) ), "dist/frontend" ) );
 	await app.listen( process.env.SERVER_PORT || 3000 );
 }
 

@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { Story, Vote, VoteValue } from "../services/PokerStoryHandler";
-import PokersService, { GroupVoteNames } from "../services/PokersService";
+import { CurrentVotes, GroupVoteNames } from "../services/PokersService";
 
 export interface VoteResponse {
 	voterName: string;
@@ -24,24 +24,16 @@ export interface VotesResponse {
  */
 export default class VoteResponseAdapter {
 	/**
-	 * Constructor
-	 *
-	 * @param {PokersService} pokersService The Poker service.
-	 */
-	constructor( private readonly pokersService: PokersService ) {}
-
-	/**
 	 * Formats the votes response.
 	 *
-	 * @param {string} poker The room to create the response for.
+	 * @param {CurrentVotes} curentVotes The votes to format.
+	 * @param {string[]} votedNames The names of the voters.
+	 * @param { Story} story The story.
 	 *
 	 * @returns {VotesResponse} The response.
 	 */
-	public format( poker: string ): VotesResponse {
-		const { voteCount, votes, groupedVoterNames } = this.pokersService.getVotes( poker );
-		const votedNames = this.pokersService.getVotedNames( poker );
-
-		const story: Story = this.pokersService.getStory( poker );
+	public format( curentVotes: CurrentVotes, votedNames: string[], story: Story ): VotesResponse {
+		const { voteCount, votes, groupedVoterNames } = curentVotes;
 
 		return {
 			votes: this.formatVoteList( votes ),

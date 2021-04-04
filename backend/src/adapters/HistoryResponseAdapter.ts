@@ -1,6 +1,5 @@
 import { Injectable } from "@nestjs/common";
 import { Story } from "../services/PokerStoryHandler";
-import PokersService from "../services/PokersService";
 import VoteResponseAdapter, { VoteResponse } from "./VoteResponseAdapter";
 
 export interface HistoryResponse {
@@ -21,22 +20,21 @@ export default class HistoryResponseAdapter {
 	/**
 	 * Constructor
 	 *
-	 * @param {PokersService} pokersService The Poker service.
+	 * @param {VoteResponseAdapter} voteResponseFormattingService The vote repsonse formatting service.
 	 */
 	constructor(
-		private readonly pokersService: PokersService,
 		private readonly voteResponseFormattingService: VoteResponseAdapter,
 	) {}
 
 	/**
 	 * Formats the response.
 	 *
-	 * @param {string} room The room to format the response for.
+	 * @param {Story[]} history The room history.
 	 *
 	 * @returns {HistoryResponseList} The history list.
 	 */
-	public format( room: string ): HistoryResponseList {
-		return { stories: this.formatHistoryList( this.pokersService.getHistory( room ) ) };
+	public format( history: Story[] ): HistoryResponseList {
+		return { stories: this.formatHistoryList( history ) };
 	}
 
 	/**
