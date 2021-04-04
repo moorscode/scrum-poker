@@ -8,7 +8,7 @@ import websocket from "./services/websocket";
 Vue.use(
 	VueSocketIOExt,
 	websocket,
-	{ store }
+	{ store },
 );
 
 // eslint-disable-next-line no-new

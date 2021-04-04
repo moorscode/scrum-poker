@@ -9,9 +9,9 @@ export default new Vuex.Store( {
 		loading: true,
 		connected: false,
 		points: {},
-		nickname: "", // Required globally because of socket calls.
-		observer: false, // Show or hide UI based on this state.
-		room: false, // Required globally because of socket calls.
+		nickname: "",
+		observer: false,
+		room: false,
 		storyName: "",
 		myVote: "",
 		members: { voters: [], observers: [], disconnected: [] },
@@ -72,6 +72,6 @@ export default new Vuex.Store( {
 		},
 		SOCKET_FINISHED( state ) {
 			state.refinementFinished = true;
-		}
+		},
 	},
 } );
