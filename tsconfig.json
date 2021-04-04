@@ -9,6 +9,6 @@
     "target": "es2017",
     "sourceMap": false,
     "outDir": "./dist/backend/",
-    "include": [ "backend/src/**/*" ]
+    "baseUrl": "./backend/src/"
   }
 }
