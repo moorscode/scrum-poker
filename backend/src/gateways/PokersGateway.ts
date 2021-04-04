@@ -220,7 +220,7 @@ export default class PokersGateway implements OnGatewayInit {
 			this.server.to( poker ).emit(
 				"memberList",
 				this.membersResponseAdapter.format(
-					this.pokersService.getMembers( poker ),
+					this.pokersService.getGroupedMembers( poker ),
 				),
 			);
 		}

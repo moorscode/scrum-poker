@@ -14,7 +14,7 @@ export interface Rooms {
 	[ room: string ]: PokerRoomCoordinator;
 }
 
-export interface MemberGroups {
+export interface GroupedMembers {
 	voters: Member[];
 	observers: Member[];
 	disconnected: Member[];
@@ -243,7 +243,7 @@ export default class PokersService {
 	 *
 	 * @returns {MemberList} All clients in a room.
 	 */
-	public getMembers( poker: string ): MemberGroups {
+	public getGroupedMembers( poker: string ): GroupedMembers {
 		const room = this.getRoom( poker );
 
 		return {

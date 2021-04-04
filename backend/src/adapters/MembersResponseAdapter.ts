@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { Member } from "../services/PokerMemberManager";
-import { MemberGroups } from "../services/PokersService";
+import { GroupedMembers } from "../services/PokersService";
 
 export interface MembersResponse {
 	voters: string[];
@@ -16,11 +16,11 @@ export default class MembersResponseAdapter {
 	/**
 	 * Formats the members in a room for response.
 	 *
-	 * @param {MemberGroups} memberGroups The members groups to format.
+	 * @param {GroupedMembers} groupedMembers The members groups to format.
 	 *
 	 * @returns {MembersResponse} The formatted list.
 	 */
-	public format( memberGroups: MemberGroups ): MembersResponse {
+	public format( groupedMembers: GroupedMembers ): MembersResponse {
 		/**
 		 * Lists the names of the members.
 		 *
@@ -31,9 +31,9 @@ export default class MembersResponseAdapter {
 		const mapCallback = ( ( member: Member ): string => member.name );
 
 		return {
-			voters: memberGroups.voters.map( mapCallback ),
-			observers: memberGroups.observers.map( mapCallback ),
-			disconnected: memberGroups.disconnected.map( mapCallback ),
+			voters: groupedMembers.voters.map( mapCallback ),
+			observers: groupedMembers.observers.map( mapCallback ),
+			disconnected: groupedMembers.disconnected.map( mapCallback ),
 		};
 	}
 }
