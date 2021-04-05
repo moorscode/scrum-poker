@@ -45,18 +45,20 @@ describe( "PokerHistoryList", () => {
 		} );
 	} );
 
-	describe( "reset", () => {
-		it( "resets the history", () => {
-			story.voteAverage = 1;
+	describe( "removeLastEntry", () => {
+		it( "removes the last history entry", () => {
+			const story1 = { voteAverage: 1 } as unknown as Story;
+			const story2 = { voteAverage: 2 } as unknown as Story;
 
-			pokerHistoryList.addStory( story );
-			pokerHistoryList.addStory( story );
+			pokerHistoryList.addStory( story1 );
+			pokerHistoryList.addStory( story2 );
 
 			expect( pokerHistoryList.getHistory() ).toHaveLength( 2 );
 
 			pokerHistoryList.removeLastEntry();
 
 			expect( pokerHistoryList.getHistory() ).toHaveLength( 1 );
+			expect( pokerHistoryList.getHistory()[ 0 ] ).toStrictEqual( story1 );
 		} );
 	} );
 } );
