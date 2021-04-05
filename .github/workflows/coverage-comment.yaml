@@ -1,5 +1,5 @@
-name: CI
-on: push
+name: PR Checks
+on: pull_request
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -10,11 +10,7 @@ jobs:
         fetch-depth: 0
     - name: Install modules
       run: yarn
-    - name: Check code coverage
-      run: yarn cs
-#    - name: Run unit tests
-#      run: yarn test
-    - name: Comment with Test Coverage
+    - name: Comment with test coverage relative to main
       uses: dkershner6/jest-coverage-commenter-action@v1
       with:
         github_token: "${{ secrets.GITHUB_TOKEN }}"
