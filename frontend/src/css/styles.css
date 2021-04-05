@@ -557,7 +557,7 @@ hr {
 }
 
 @media (prefers-color-scheme: dark) {
-	main {
+	main, main.normal-spread {
 		background-color: #111;
 	}
 	.poker {
@@ -565,13 +565,19 @@ hr {
 		background-color: #333;
 	}
 	h1,h2,h3{
-		color: #2882a4;
+		color: #2ca0cc;
+	}
+	a {
+		color: #2ca0cc;
 	}
 	hr {
-		border-top-color: #2882a4;
+		border-top-color: #2ca0cc;
+	}
+	div.voted {
+		color: #79b924;
 	}
 	div.unvoted {
-		color: #2882a4;
+		color: #2ca0cc;
 	}
 	html,body{
 		color: #ddd;
@@ -582,12 +588,14 @@ hr {
 	input[type=text] {
 		background-color: #222;
 		color: #ddd;
+		border-color: #444;
 	}
 	.members-list-container {
 		background-color: transparent;
 	}
 	.members-list {
 		background-color: rgba(10,10,10,0.7);
+		border-color: #2ca0cc;
 	}
 
 	main.no-spread {
