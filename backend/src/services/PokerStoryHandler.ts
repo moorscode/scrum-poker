@@ -99,17 +99,6 @@ export default class PokerStoryHandler {
 			return;
 		}
 
-		const valueIsHidden = story.votes.some(
-			( vote: Vote ) => vote.currentValue === "!" || vote.currentValue === "#",
-		);
-
-		if ( valueIsHidden ) {
-			story.voteAverage         = "unknown";
-			story.nearestPointAverage = "#";
-
-			return;
-		}
-
 		const pointTotal = story.votes.reduce<number>(
 			( accumulator: number, vote: Vote ) =>
 				accumulator + ( vote.currentValue as number ),
@@ -133,17 +122,6 @@ export default class PokerStoryHandler {
 	 */
 	 public toggleRevealVotes(): void {
 		this.story.votesRevealed = ! this.story.votesRevealed;
-	}
-
-	/**
-	 * Checks if everybody has voted.
-	 *
-	 * @param {Story} story The story.
-	 *
-	 * @returns {boolean} True if every client has voted.
-	 */
-	private hasAllVotes(): boolean {
-		return this.story.votes.length === this.membersManager.getVoterCount();
 	}
 
 	/**
@@ -179,6 +157,30 @@ export default class PokerStoryHandler {
 	}
 
 	/**
+	 * Gets the vote that a user has cast for the current
+	 *
+	 * @param {string} memberId The ID of the user.
+	 *
+	 * @returns {Vote} The vote of the user.
+	 */
+	 public getCurrentVote( memberId: string ): Vote | undefined {
+		return this.story.votes.filter( ( vote: Vote ) => vote.voter.id === memberId )[ 0 ];
+	}
+
+	/**
+	 * Lists the votes in a room for the current story.
+	 *
+	 * @returns {Vote[]} List of votes.
+	 */
+	public getVotes(): Vote[] {
+		if ( this.story.votesRevealed || this.hasAllVotes() ) {
+			return this.getUnobscuredVotes();
+		}
+
+		return this.getObscuredVotes();
+	}
+
+	/**
 	 * Adds a vote to the current story.
 	 *
 	 * @param {string} memberId The user Id.
@@ -186,7 +188,7 @@ export default class PokerStoryHandler {
 	 *
 	 * @returns {void}
 	 */
-	private addVote( memberId: string, voteValue: VoteValue ): void {
+	 private addVote( memberId: string, voteValue: VoteValue ): void {
 		const vote: Vote = {
 			story: this.story,
 			voter: this.membersManager.getMember( memberId ),
@@ -213,7 +215,7 @@ export default class PokerStoryHandler {
 		if ( ! this.hasAllVotes() ) {
 			currentVote.initialValue = vote;
 		}
-		if ( currentVote.initialValue === "coffee" ) {
+		if ( currentVote.initialValue === "coffee" || currentVote.initialValue === "?" ) {
 			currentVote.initialValue = vote;
 		}
 		currentVote.currentValue = vote;
@@ -222,27 +224,23 @@ export default class PokerStoryHandler {
 	}
 
 	/**
-	 * Gets the vote that a user has cast for the current
+	 * Retrieves the voted voters.
 	 *
-	 * @param {string} memberId The ID of the user.
-	 *
-	 * @returns {Vote} The vote of the user.
+	 * @returns {Member[]} List of voted voters.
 	 */
-	 public getCurrentVote( memberId: string ): Vote | undefined {
-		return this.story.votes.filter( ( vote: Vote ) => vote.voter.id === memberId )[ 0 ];
+	public getVotedClients(): Member[] {
+		return this.membersManager.getVoters()
+			.filter( ( member: Member ) => this.story.votes.map( ( vote: Vote ) => vote.voter.id ).includes( member.id ) );
 	}
 
 	/**
-	 * Lists the votes in a room for the current story.
+	 * Retrieves the voters that haven't voted yet.
 	 *
-	 * @returns {Vote[]} List of votes.
+	 * @returns {Member[]} List of voters that haven't voted yet.
 	 */
-	public getVotes(): Vote[] {
-		if ( this.story.votesRevealed || this.hasAllVotes() ) {
-			return this.getUnobscuredVotes();
-		}
-
-		return this.getObscuredVotes();
+	private getVotePendingClients(): Member[] {
+		return this.membersManager.getVoters()
+			.filter( ( member: Member ) => ! this.story.votes.map( ( vote: Vote ) => vote.voter.id ).includes( member.id ) );
 	}
 
 	/**
@@ -273,7 +271,7 @@ export default class PokerStoryHandler {
 	 *
 	 * @returns {ObscuredVote[]} List of obscured votes.
 	 */
-	private getObscuredVotes(): ObscuredVote[] {
+	 private getObscuredVotes(): ObscuredVote[] {
 		return this.membersManager.getVoters()
 			.map( ( member: Member ): ObscuredVote => this.getObscuredVote( member ) )
 			.sort( ( a, b ) => {
@@ -304,22 +302,13 @@ export default class PokerStoryHandler {
 	}
 
 	/**
-	 * Retrieves the voted voters.
+	 * Checks if everybody has voted.
 	 *
-	 * @returns {Member[]} List of voted voters.
-	 */
-	public getVotedClients(): Member[] {
-		return this.membersManager.getVoters()
-			.filter( ( member: Member ) => this.story.votes.map( ( vote: Vote ) => vote.voter.id ).includes( member.id ) );
-	}
-
-	/**
-	 * Retrieves the voters that haven't voted yet.
+	 * @param {Story} story The story.
 	 *
-	 * @returns {Member[]} List of voters that haven't voted yet.
+	 * @returns {boolean} True if every client has voted.
 	 */
-	private getVotePendingClients(): Member[] {
-		return this.membersManager.getVoters()
-			.filter( ( member: Member ) => ! this.story.votes.map( ( vote: Vote ) => vote.voter.id ).includes( member.id ) );
+	 private hasAllVotes(): boolean {
+		return this.story.votes.length === this.membersManager.getVoterCount();
 	}
 }
