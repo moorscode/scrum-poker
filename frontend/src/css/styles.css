@@ -555,3 +555,50 @@ hr {
 		background-position: 0 82%
 	}
 }
+
+@media (prefers-color-scheme: dark) {
+	main {
+		background-color: #111;
+	}
+	.poker {
+		border-color: #222;
+		background-color: #333;
+	}
+	h1,h2,h3{
+		color: #2882a4;
+	}
+	hr {
+		border-top-color: #2882a4;
+	}
+	div.unvoted {
+		color: #2882a4;
+	}
+	html,body{
+		color: #ddd;
+	}
+	form.username .fas {
+		color: #ddd;
+	}
+	input[type=text] {
+		background-color: #222;
+		color: #ddd;
+	}
+	.members-list-container {
+		background-color: transparent;
+	}
+	.members-list {
+		background-color: rgba(10,10,10,0.7);
+	}
+
+	main.no-spread {
+		background-color: #4e5d3b;
+	}
+	main.high-spread {
+		background-color: #792323;
+	}
+
+	button.result > .vote-names {
+		background-color: #111;
+    	color: #ccc;
+	}
+}
