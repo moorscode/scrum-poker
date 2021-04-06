@@ -67,6 +67,27 @@ describe( "PokerStoryHandler", () => {
 			expect( votes[ 0 ].currentValue ).toStrictEqual( 2 );
 		} );
 
+		it( "changes the initial vote when one has already been cast and not all members have voted", () => {
+			membersManager.addMember( "member1", "Member 1" );
+			membersManager.addMember( "member2", "Member 2" );
+
+			pokerStoryHandler.castVote( "member1", 1 );
+			// Change the vote.
+			pokerStoryHandler.castVote( "member1", 2 );
+
+			// Make it so all members have voted now.
+			pokerStoryHandler.castVote( "member2", 3 );
+
+			const votes = pokerStoryHandler.getVotes();
+
+			expect( votes ).toHaveLength( 2 );
+
+			expect( votes[ 0 ].initialValue ).toStrictEqual( 2 );
+			expect( votes[ 0 ].currentValue ).toStrictEqual( 2 );
+
+			expect( votes[ 1 ].currentValue ).toStrictEqual( 3 );
+		} );
+
 		it( "changes the initial vote when the first vote was coffee", () => {
 			membersManager.addMember( "member1", "Member 1" );
 			membersManager.addMember( "member2", "Member 2" );
@@ -99,7 +120,7 @@ describe( "PokerStoryHandler", () => {
 			expect( votes[ 0 ].currentValue ).toStrictEqual( 2 );
 		} );
 
-		it( "changes a vote when one has already been cast", () => {
+		it( "changes a vote when one has already been cast and all members have voted", () => {
 			membersManager.addMember( "member1", "Member 1" );
 
 			pokerStoryHandler.castVote( "member1", 1 );
@@ -108,6 +129,22 @@ describe( "PokerStoryHandler", () => {
 			const votes = pokerStoryHandler.getVotes();
 
 			expect( votes ).toHaveLength( 1 );
+			expect( votes[ 0 ].initialValue ).toStrictEqual( 1 );
+			expect( votes[ 0 ].currentValue ).toStrictEqual( 2 );
+		} );
+
+		it( "changes a vote when one has already been cast and votes are revealed", () => {
+			membersManager.addMember( "member1", "Member 1" );
+			membersManager.addMember( "member2", "Member 1" );
+
+			pokerStoryHandler.toggleRevealVotes();
+
+			pokerStoryHandler.castVote( "member1", 1 );
+			pokerStoryHandler.castVote( "member1", 2 );
+
+			const votes = pokerStoryHandler.getVotes();
+
+			expect( votes ).toHaveLength( 2 );
 			expect( votes[ 0 ].initialValue ).toStrictEqual( 1 );
 			expect( votes[ 0 ].currentValue ).toStrictEqual( 2 );
 		} );
