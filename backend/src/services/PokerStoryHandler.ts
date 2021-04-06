@@ -211,7 +211,7 @@ export default class PokerStoryHandler {
 	private changeVote( memberId: string, vote: VoteValue ): void {
 		const currentVote: Vote = this.getCurrentVote( memberId );
 
-		if ( ! this.hasAllVotes() ) {
+		if ( ! this.hasAllVotes() && ! this.story.votesRevealed ) {
 			currentVote.initialValue = vote;
 		}
 
