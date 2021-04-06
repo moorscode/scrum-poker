@@ -112,7 +112,7 @@ export default Vue.extend( {
 					return "";
 				case this.pointSpread === 0:
 					return "no-spread";
-				case this.pointSpread > 2:
+				case this.pointSpread >= 2:
 					return "high-spread";
 				default:
 					return "normal-spread";
