@@ -75,7 +75,6 @@ export default class PokerStoryHandler {
 	 public recalculate(): void {
 		const story = this.story;
 
-		story.votesRevealed = false;
 		story.voters = this.membersManager.getVoterCount();
 
 		if ( story.votes.length === 0 ) {
@@ -215,9 +214,11 @@ export default class PokerStoryHandler {
 		if ( ! this.hasAllVotes() ) {
 			currentVote.initialValue = vote;
 		}
+
 		if ( currentVote.initialValue === "coffee" || currentVote.initialValue === "?" ) {
 			currentVote.initialValue = vote;
 		}
+
 		currentVote.currentValue = vote;
 
 		this.recalculate();
