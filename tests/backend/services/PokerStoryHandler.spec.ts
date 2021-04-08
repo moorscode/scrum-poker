@@ -60,7 +60,7 @@ describe( "PokerStoryHandler", () => {
 			pokerStoryHandler.castVote( "member1", 1 );
 			pokerStoryHandler.castVote( "member1", 2 );
 
-			pokerStoryHandler.toggleRevealVotes();
+			pokerStoryHandler.setRevealVotes( true );
 			const votes = pokerStoryHandler.getVotes();
 
 			expect( votes[ 0 ].initialValue ).toStrictEqual( 2 );
@@ -97,7 +97,6 @@ describe( "PokerStoryHandler", () => {
 
 			pokerStoryHandler.castVote( "member1", 2 );
 
-			pokerStoryHandler.toggleRevealVotes();
 			const votes = pokerStoryHandler.getVotes();
 
 			expect( votes[ 0 ].initialValue ).toStrictEqual( 2 );
@@ -113,7 +112,6 @@ describe( "PokerStoryHandler", () => {
 
 			pokerStoryHandler.castVote( "member1", 2 );
 
-			pokerStoryHandler.toggleRevealVotes();
 			const votes = pokerStoryHandler.getVotes();
 
 			expect( votes[ 0 ].initialValue ).toStrictEqual( 2 );
@@ -137,7 +135,7 @@ describe( "PokerStoryHandler", () => {
 			membersManager.addMember( "member1", "Member 1" );
 			membersManager.addMember( "member2", "Member 1" );
 
-			pokerStoryHandler.toggleRevealVotes();
+			pokerStoryHandler.setRevealVotes( true );
 
 			pokerStoryHandler.castVote( "member1", 1 );
 			pokerStoryHandler.castVote( "member1", 2 );
@@ -202,7 +200,7 @@ describe( "PokerStoryHandler", () => {
 			pokerStoryHandler.castVote( "member1", 1 );
 			pokerStoryHandler.castVote( "member3", 2 );
 
-			pokerStoryHandler.toggleRevealVotes();
+			pokerStoryHandler.setRevealVotes( true );
 			const votes = pokerStoryHandler.getVotes();
 
 			expect( votes ).toHaveLength( 3 );

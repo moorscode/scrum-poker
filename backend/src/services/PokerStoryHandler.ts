@@ -115,12 +115,23 @@ export default class PokerStoryHandler {
 	}
 
 	/**
+	 * Sets reveal votes to the provided state.
+	 *
+	 * @param {boolean} state The state to set reveal votes to.
+	 *
+	 * @returns {void}
+	 */
+	public setRevealVotes( state: boolean ): void {
+		this.story.votesRevealed = state;
+	}
+
+	/**
 	 * Toggles between showing and or hiding the current votes.
 	 *
 	 * @returns {void} Nothing.
 	 */
 	 public toggleRevealVotes(): void {
-		this.story.votesRevealed = ! this.story.votesRevealed;
+		this.setRevealVotes( ! this.story.votesRevealed );
 	}
 
 	/**
