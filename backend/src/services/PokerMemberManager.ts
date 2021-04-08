@@ -1,3 +1,5 @@
+import { from } from "rxjs";
+
 export type MemberType = "voter" | "observer" | "invalid";
 
 export interface Member {
@@ -12,11 +14,48 @@ export interface MemberList {
 	[ memberId: string ]: Member
 }
 
+interface EventManager {
+	on(event: string, execute: CallableFunction): void;
+}
+
+interface Event {
+	[ identifier: string ]: CallableFunction;
+}
+
 /**
  * The poker members handler.
  */
-export default class PokerMemberManager {
+export default class PokerMemberManager implements EventManager {
 	private readonly members: MemberList = {};
+	private events: Event[] = [];
+
+	/**
+	 * Hooks a function onto an event.
+	 *
+	 * @param event The event to hook onto.
+	 * @param execute The method that needs to be executed on the event.
+	 *
+	 * @returns {void}
+	 */
+	public on( event: string, execute: CallableFunction ): void {
+		this.events[ event ] = this.events[ event ] || [];
+		this.events[ event ].push( execute );
+	}
+
+	/**
+	 * Triggers an event.
+	 *
+	 * @param {string} event The event identifier.
+	 * @param {object} context Optional. Context of the event.
+	 * @returns {void}
+	 */
+	private trigger( event: string, context?: any ): void {
+		if ( ! this.events[ event ] ) {
+			return;
+		}
+
+		this.events[ event ].map( ( callable: CallableFunction ) => callable( context ) );
+	}
 
 	/**
 	 * Adds a member.
@@ -36,7 +75,16 @@ export default class PokerMemberManager {
 			connected: true,
 		};
 
+		let from: string = "";
+
+		if ( this.members[ id ] ) {
+			from = this.members[ id ].type;
+			from = this.members[ id ].connected === false ? "disconnected" : from;
+		}
+
 		this.members[ id ] = member;
+	
+		this.trigger( 'member-state', { from, to: "voter" } );
 	}
 
 	/**
@@ -64,6 +112,9 @@ export default class PokerMemberManager {
 	 */
 	 public removeMember( id: string ): void {
 		delete this.members[ id ];
+
+		this.trigger( 'member-state', { from, to: "removed" } );
+		this.trigger( 'member-removed', id );
 	}
 
 	/**
@@ -75,8 +126,13 @@ export default class PokerMemberManager {
 	 */
 	 public makeObserver( id: string ): void {
 		if ( this.members[ id ] ) {
+			const from = this.members[ id ].type;
+
 			this.members[ id ].type = "observer";
 			this.members[ id ].connected = true;
+
+			this.trigger( 'member-state', { from, to: "observer" } );
+			this.trigger( 'member-removed', id );
 		}
 	}
 
@@ -91,6 +147,8 @@ export default class PokerMemberManager {
 		if ( this.members[ id ] ) {
 			this.members[ id ].disconnectTime = Date.now();
 			this.members[ id ].connected = false;
+
+			this.trigger( 'member-state', { from: this.members[ id ].type, to: "disconnected" } );
 		}
 	}
 

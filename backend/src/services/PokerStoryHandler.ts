@@ -43,6 +43,9 @@ export default class PokerStoryHandler {
 		private readonly pointsProvider: PointsProvider,
 	) {
 		this.story = { name: "", votes: [], voters: 0, votesRevealed: false };
+
+		this.membersManager.on( "member-state", this.recalculate.bind( this ) );
+		this.membersManager.on( "member-removed", this.removeVote.bind( this ) );
 	}
 
 	/**
