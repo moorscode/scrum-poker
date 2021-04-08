@@ -44,8 +44,6 @@ export default class PokersCleanupService {
 			if ( members.length > 0 ) {
 				members.forEach( ( member ) => rooms[ room ].removeClient( member.id ) );
 
-				rooms[ room ].recalculateStory();
-
 				changedRooms.push( room );
 			}
 		}

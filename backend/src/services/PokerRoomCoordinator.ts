@@ -44,16 +44,6 @@ export default class PokerRoomCoordinator {
 		return this.storyService.getStory();
 	}
 
-
-	/**
-	 * Recalculates the story.
-	 *
-	 * @returns {void}
-	 */
-	 public recalculateStory(): void {
-		this.storyService.recalculate();
-	}
-
 	/**
 	 * Sets the storyName name.
 	 *
@@ -152,7 +142,7 @@ export default class PokerRoomCoordinator {
 	public addClient( id: string, name: string ): void {
 		this.membersManager.addMember( id, name );
 
-		this.recalculateStory();
+		this.storyService.recalculate();
 	}
 
 	/**
