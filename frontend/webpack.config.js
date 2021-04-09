@@ -28,16 +28,16 @@ const config = {
 				loader: "vue-loader",
 			},
 			{
-                test: /\.scss$/,
-                exclude: /node_modules/,
-                use: [
-                    {
-                        loader: 'file-loader',
-                        options: { outputPath: 'css/', name: '[name].css'}
-                    },
-                    'sass-loader'
-                ]
-            },
+				test: /\.scss$/,
+				exclude: /node_modules/,
+				use: [
+					{
+						loader: "file-loader",
+						options: { outputPath: "css/", name: "[name].css" },
+					},
+					"sass-loader",
+				],
+			},
 		],
 	},
 	resolve: {
@@ -64,7 +64,7 @@ const config = {
 					to: "",
 					context: "src/html",
 				},
-			]
+			],
 		} ),
 	],
 	optimization: {

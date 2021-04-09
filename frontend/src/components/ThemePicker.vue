@@ -14,17 +14,17 @@ export default {
 	data() {
 		return {
 			theme: window.localStorage.getItem( "theme" ) || "default",
-		}
+		};
 	},
 	methods: {
 		onChange() {
 			window.localStorage.setItem( "theme", this.theme );
-		}
+		},
 	},
 	computed: {
 		styleSheetURL() {
-			return '/css/' + this.theme + '.css';
-		}
-	}
-}
+			return "/css/" + this.theme + ".css";
+		},
+	},
+};
 </script>
