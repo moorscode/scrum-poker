@@ -1,5 +1,3 @@
-import { from } from "rxjs";
-
 export type MemberType = "voter" | "observer" | "invalid";
 
 export interface Member {
@@ -14,12 +12,13 @@ export interface MemberList {
 	[ memberId: string ]: Member
 }
 
-interface EventManager {
-	on(event: string, execute: CallableFunction): void;
-}
-
 interface Event {
 	[ identifier: string ]: CallableFunction;
+}
+
+interface EventManager {
+	readonly events: Event[];
+	on( event: string, execute: CallableFunction ): void;
 }
 
 /**
@@ -27,13 +26,13 @@ interface Event {
  */
 export default class PokerMemberManager implements EventManager {
 	private readonly members: MemberList = {};
-	private events: Event[] = [];
+	readonly events: Event[] = [];
 
 	/**
 	 * Hooks a function onto an event.
 	 *
-	 * @param event The event to hook onto.
-	 * @param execute The method that needs to be executed on the event.
+	 * @param {string} event The event to hook onto.
+	 * @param {CallableFunction} execute The method that needs to be executed on the event.
 	 *
 	 * @returns {void}
 	 */
@@ -47,6 +46,7 @@ export default class PokerMemberManager implements EventManager {
 	 *
 	 * @param {string} event The event identifier.
 	 * @param {object} context Optional. Context of the event.
+	 *
 	 * @returns {void}
 	 */
 	private trigger( event: string, context?: any ): void {
@@ -75,7 +75,7 @@ export default class PokerMemberManager implements EventManager {
 			connected: true,
 		};
 
-		let from: string = "";
+		let from = "";
 
 		if ( this.members[ id ] ) {
 			from = this.members[ id ].type;
@@ -83,8 +83,9 @@ export default class PokerMemberManager implements EventManager {
 		}
 
 		this.members[ id ] = member;
-	
-		this.trigger( 'member-state', { from, to: "voter" } );
+
+		this.trigger( "member-added", id );
+		this.trigger( "member-state", { from, to: "voter", id } );
 	}
 
 	/**
@@ -113,8 +114,7 @@ export default class PokerMemberManager implements EventManager {
 	 public removeMember( id: string ): void {
 		delete this.members[ id ];
 
-		this.trigger( 'member-state', { from, to: "removed" } );
-		this.trigger( 'member-removed', id );
+		this.trigger( "member-removed", id );
 	}
 
 	/**
@@ -131,8 +131,8 @@ export default class PokerMemberManager implements EventManager {
 			this.members[ id ].type = "observer";
 			this.members[ id ].connected = true;
 
-			this.trigger( 'member-state', { from, to: "observer" } );
-			this.trigger( 'member-removed', id );
+			this.trigger( "member-state", { from, to: "observer", id } );
+			this.trigger( "member-removed", id );
 		}
 	}
 
@@ -148,7 +148,7 @@ export default class PokerMemberManager implements EventManager {
 			this.members[ id ].disconnectTime = Date.now();
 			this.members[ id ].connected = false;
 
-			this.trigger( 'member-state', { from: this.members[ id ].type, to: "disconnected" } );
+			this.trigger( "member-state", { from: this.members[ id ].type, to: "disconnected", id } );
 		}
 	}
 
