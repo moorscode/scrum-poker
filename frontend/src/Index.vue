@@ -1,6 +1,7 @@
 <template>
   <main :class="backgroundColor">
 	<server-connection />
+	<theme-picker />
 
 	<section v-if="loading === false" class="poker">
 	<h1>Pum Scroker</h1>
@@ -66,6 +67,7 @@ import FeatureList from "./components/FeatureList.vue";
 import Credits from "./components/Credits.vue";
 import ServerConnection from "./components/ServerConnection.vue";
 import Connecting from "./components/Connecting.vue";
+import ThemePicker from "./components/ThemePicker.vue";
 
 export default Vue.extend( {
 	components: {
@@ -86,6 +88,7 @@ export default Vue.extend( {
 		Credits,
 		ServerConnection,
 		Connecting,
+		ThemePicker,
 	},
 	created() {
 		this.$socket.client.open();

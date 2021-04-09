@@ -4,6 +4,7 @@ const webpack = require( "webpack" );
 const VueLoaderPlugin = require( "vue-loader/lib/plugin" );
 const HtmlPlugin = require( "html-webpack-plugin" );
 const CopyWebpackPlugin = require( "copy-webpack-plugin" );
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const dotenv = require( "dotenv" ).config( {
 	path: path.join( __dirname, "..", ".env" ),
@@ -11,7 +12,11 @@ const dotenv = require( "dotenv" ).config( {
 
 const config = {
 	context: __dirname,
-	entry: "./src/index.js",
+	entry: [
+		"./src/index.js",
+		"./src/css/default.scss",
+		"./src/css/default-dark.scss",
+	],
 	output: {
 		path: path.resolve( process.cwd(), "dist/frontend" ),
 		filename: "[name].[contenthash].js",
@@ -23,6 +28,17 @@ const config = {
 				test: /\.vue$/,
 				loader: "vue-loader",
 			},
+			{
+                test: /\.scss$/,
+                exclude: /node_modules/,
+                use: [
+                    {
+                        loader: 'file-loader',
+                        options: { outputPath: 'css/', name: '[name].css'}
+                    },
+                    'sass-loader'
+                ]
+            },
 		],
 	},
 	resolve: {
@@ -31,6 +47,7 @@ const config = {
 			".vue",
 			".tsx",
 			".ts",
+			".scss",
 		],
 	},
 	plugins: [
@@ -43,19 +60,20 @@ const config = {
 		new VueLoaderPlugin(),
 		new CopyWebpackPlugin( {
 			 patterns: [
+				// {
+				// 	// Wildcard is specified hence will copy only css files
+				// 	from: "*.css",
+				// 	to: "css",
+				// 	context: "src/css",
+				// },
 				{
-					// Wildcard is specified hence will copy only css files
-					from: "*.css",
-					to: "css",
-					context: "src/css",
-				},
-				{
-					// Wildcard is specified hence will copy only css files
+					// Wildcard is specified hence will copy only ico files
 					from: "*.ico",
 					to: "",
 					context: "src/html",
 				},
-			] } ),
+			]
+		} ),
 	],
 	optimization: {
 		runtimeChunk: "single",
