@@ -30,7 +30,6 @@
     "@nestjs/platform-socket.io": "^7.6.15",
     "@nestjs/schedule": "^0.4.3",
     "@nestjs/websockets": "^7.6.15",
-    "mini-css-extract-plugin": "^1.4.1",
     "reflect-metadata": "^0.1.12",
     "rxjs": "^6.0.0",
     "sass": "^1.32.8",

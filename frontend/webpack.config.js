@@ -4,7 +4,6 @@ const webpack = require( "webpack" );
 const VueLoaderPlugin = require( "vue-loader/lib/plugin" );
 const HtmlPlugin = require( "html-webpack-plugin" );
 const CopyWebpackPlugin = require( "copy-webpack-plugin" );
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const dotenv = require( "dotenv" ).config( {
 	path: path.join( __dirname, "..", ".env" ),
@@ -60,14 +59,7 @@ const config = {
 		new VueLoaderPlugin(),
 		new CopyWebpackPlugin( {
 			 patterns: [
-				// {
-				// 	// Wildcard is specified hence will copy only css files
-				// 	from: "*.css",
-				// 	to: "css",
-				// 	context: "src/css",
-				// },
 				{
-					// Wildcard is specified hence will copy only ico files
 					from: "*.ico",
 					to: "",
 					context: "src/html",
