@@ -249,7 +249,6 @@ export default class PokerRoomCoordinator {
 	 */
 	public getVotes(): CurrentVotes {
 		const voted: Member[] = this.getVotedClients();
-		const votes: Vote[] = this.getCurrentVotes();
 
 		const groupedVoterNames: GroupVoteNames = voted.reduce( ( accumulator, member: Member ) => {
 			const vote: Vote            = this.getCurrentVote( member.id );
@@ -263,7 +262,7 @@ export default class PokerRoomCoordinator {
 
 		return {
 			voteCount: voted.length,
-			votes,
+			votes: this.getCurrentVotes(),
 			groupedVoterNames,
 		};
 	}
