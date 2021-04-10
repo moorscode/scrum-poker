@@ -62,7 +62,8 @@ export default class PokersGateway implements OnGatewayInit {
 					if ( ! socket.rooms[ room ] ) {
 						continue;
 					}
-					if ( room.includes( "/pokers#" ) ) {
+
+					if ( ! room.includes( "/pokers#" ) ) {
 						continue;
 					}
 
