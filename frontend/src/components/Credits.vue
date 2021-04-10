@@ -1,5 +1,5 @@
 <template>
-  <section class="credits">
+  <section class="credits container">
     Build using <a
       href="https://nestjs.com/"
       target="_blank"

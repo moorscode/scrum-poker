@@ -1,5 +1,5 @@
 <template>
-	<div class="theme">
+	<div class="theme container">
 		<link :href=styleSheetURL type="text/css" rel="stylesheet" />
 		Theme: <select @change="onChange($event)" v-model="theme">
 		    <option v-for="entry in themes" :value="entry.value" v-bind:key="entry.value">{{entry.text}}</option>

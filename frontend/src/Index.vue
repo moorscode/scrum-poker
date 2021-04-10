@@ -3,7 +3,7 @@
 	<server-connection />
 	<theme-picker />
 
-	<section v-if="loading === false" class="poker">
+	<section v-if="loading === false" class="poker container">
 	<h1>Pum Scroker</h1>
 
 	<section v-if="connected === false">
@@ -22,12 +22,10 @@
 			<observer />
 			<story /> <refinement />
 
-			<hr>
-
-			<story-name />
-			<poker-choices />
-
-			<hr>
+			<section class="storyControls">
+				<story-name />
+				<poker-choices />
+			</section>
 
 			<results />
 			<result-statistics />

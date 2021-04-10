@@ -6,6 +6,9 @@
 
 	--font: 'Press Start 2P', sans-serif;
 	--font-title: 'Press Start 2P', serif;
+
+	--section-border-style: double;
+	--section-border-color: #ddd;
 }
 
 [data-theme="dark"] {
@@ -16,6 +19,8 @@
 	
 	--no-spread-background-color: #556441;
 	--high-spread-background-color: #6e2828;
+
+	--section-border-color: #ddd;
 }
 
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
@@ -109,6 +114,10 @@ button.result {
 			border: var( --button-border-color );
 		}
 	}
+}
+
+button.newStory {
+	margin-bottom: 4px;
 }
 
 form.username {

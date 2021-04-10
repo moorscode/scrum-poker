@@ -38,6 +38,9 @@
 
 	--text-input-background-color: white;
 	--text-input-border-color: #eee;
+
+	--section-border-style: dashed;
+	--section-border-color: var( --main-accent-color );
 }
 
 [data-theme="dark"] {
@@ -64,6 +67,7 @@
 	--high-spread-background-color: #792323;
 
 	--status-disconnected: #792323;
+	--section-border-color: var( --main-accent-color );
 }
 
 * {
@@ -104,6 +108,17 @@ main {
 	
 		animation: rainbow 18s ease infinite;
 	}
+
+	&.finished,
+	&.no-spread,
+	&.high-spread {
+		& .credits {
+			&,
+			& a {
+				color: black;
+			}
+		}
+	}
 }
 
 h1, h2, h3 {
@@ -127,15 +142,6 @@ h2 {
 
 label {
 	cursor: pointer;
-}
-
-hr {
-	padding: 0;
-	width: 100%;
-	height: 0;
-	margin: 16px 0;
-	border: none;
-	border-top: 1px dashed var( --main-accent-color );
 }
 
 .fas {
@@ -193,24 +199,37 @@ input[type=text] {
 	}
 }
 
-button .fas {
-	color: black;
-	margin-right: 3px;
-}
+button {
+	& .fas {
+		color: black;
+		margin-right: 3px;
+	}
 
-button[disabled],
-button[disabled] .fas {
-	color: darkgrey;
+	&[disabled] {
+		&,
+		& .fas {
+			color: darkgrey;
+		}
+	}
 }
 
 a {
 	color: var( --main-accent-color );
 }
 
-.poker, .credits {
+p.results {
+	margin-bottom: 1em;
+}
+
+.container {
 	max-width: 800px;
 	margin: 0 auto 20px;
 	position: relative;
+	box-sizing: border-box;
+
+	&:last-child {
+		margin-bottom: 0;
+	}
 }
 
 .credits {
@@ -218,24 +237,27 @@ a {
 	font-size: 16px;
 	font-variant: all-small-caps;
 	text-align: center;
-	padding-bottom: 20px;
-}
-
-main.finished .credits,
-main.finished .credits a,
-main.no-spread .credits,
-main.no-spread .credits a,
-main.high-spread .credits,
-main.high-spread .credits a {
-	color: black;
 }
 
 .poker {
-	padding: 20px;
+	padding: 16px 24px 0;
 	border: 1px solid var( --poker-border-color );
 	border-radius: 4px;
 	background-color: var( --poker-background-color );
 	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+section.storyControls {
+	margin: 1em -24px;
+	padding: 1em 26px 0.5em;
+	border-top: 1px var( --section-border-style ) var( --section-border-color );
+	border-bottom: 1px var( --section-border-style ) var( --section-border-color );
+}
+
+.storyHistory {
+	padding: 0 26px;
+	margin: 1em -24px 0;
+	border-top: 1px var( --section-border-style ) var( --section-border-color );
 }
 
 .members-list-container {
@@ -296,28 +318,36 @@ main.high-spread .credits a {
 	}
 }
 
-.rooms {
+form.rooms {
 	margin-bottom: 1em;
 }
 
+div.pokerMain {
+	margin-top: 1em;
+}
+
 form.storyName {
-	margin-bottom: 16px;
+	margin-bottom: 1em;
 }
 
 div.observe {
 	margin-left: 5px;
-	margin-bottom: 14px;
+	margin-bottom: 1em;
 }
 
 div.reveal-votes {
-    margin-bottom: 2em;
+    margin-bottom: 1.2em;
+}
+
+strong {
+	color: var( --main-accent-color );
 }
 
 /* USERNAME */
 form.username {
 	margin-bottom: 6px;
 	margin-left: 6px;
-	min-height: 30px;
+	min-height: 2em;
 
 	& .fas {
 		color: var( --text-color );
@@ -366,13 +396,13 @@ button.choice {
 	height: 40px;
 	border-radius: 4px;
 	border-width: 0;
-	margin: 0 4px 8px;
+	margin: 0 6px 6px 0;
 	cursor: pointer;
 	outline: 0;
 	user-select: none;
 
-	&:first-child {
-		margin-left: 0;
+	&:last-child {
+		min-width: 86px;
 	}
 
 	&:active,
@@ -409,10 +439,6 @@ button.highlighted {
 	& .fas {
 		color: var( --main-accent-color-contrast );
 	}
-}
-
-p.results {
-	margin-bottom: 1em;
 }
 
 button.result {
@@ -519,14 +545,30 @@ span.resultContainer {
 div.voting {
 	display: flex;
 
-	div.voted {
-		flex: 50%;
+	& .voted {
 		color: var( --voted-color );
 	}
 	
-	div.unvoted {
-		flex: 50%;
+	& .unvoted {
 		color: var( --not-voted-color );
+	}
+
+	& .voted,
+	& .unvoted {
+		flex: 50%;
+
+		& .far {
+			margin-right: 2px;
+		}
+	}
+}
+
+[data-theme="dark"] .voting {
+	& .voted,
+	& .unvoted {
+		& .far {
+			font-weight: bold;
+		}
 	}
 }
 
@@ -534,10 +576,6 @@ span.allVoted {
 	padding: 6px;
 	position: relative;
 	top: 1px;
-}
-
-div.pokerMain {
-	margin-top: 14px;
 }
 
 .storyHistory {
@@ -604,8 +642,12 @@ div.pokerMain {
 		margin-top: 0;
 	}
 
-	.poker, .credits {
-		padding: 10px 15px;
+	.poker {
+		padding: 10px 15px 0;
+	}
+
+	.credits {
+		padding: 0 15px;
 	}
 
 	h1 {
@@ -614,6 +656,15 @@ div.pokerMain {
 
 	input[type=text] {
 		width: 120px;
+	}
+
+	.storyHistory,
+	section.storyControls {
+		margin-left: -15px;
+		margin-right: -15px;
+
+		padding-left: 1em;
+		padding-right: 1em;
 	}
 }
 
