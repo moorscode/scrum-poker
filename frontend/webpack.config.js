@@ -14,7 +14,8 @@ const config = {
 	entry: [
 		"./src/index.js",
 		"./src/css/default.scss",
-		"./src/css/default-dark.scss",
+		"./src/css/old-skool.scss",
+		"./src/css/rounded.scss",
 	],
 	output: {
 		path: path.resolve( process.cwd(), "dist/frontend" ),

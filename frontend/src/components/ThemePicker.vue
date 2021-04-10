@@ -2,8 +2,8 @@
 	<div class="theme">
 		<link :href=styleSheetURL type="text/css" rel="stylesheet" />
 		Theme: <select @change="onChange($event)" v-model="theme">
-			<option value="default">Default</option>
-			<option value="default-dark">Default (dark)</option>
+		    <option v-for="entry in themes" :value="entry.value" v-bind:key="entry.value">{{entry.text}}</option>
+		    <option v-for="entry in themes" :value="entry.value + ':dark'" v-bind:key="entry.value + ':dark'">{{entry.text}} (dark)</option>
 		</select>
 	</div>
 </template>
@@ -14,16 +14,33 @@ export default {
 	data() {
 		return {
 			theme: window.localStorage.getItem( "theme" ) || "default",
+			themes: [
+				{ value: "default", text: "Default" },
+				{ value: "rounded", text: "Rounded" },
+				{ value: "old-skool", text: "Old Skool" },
+			],
 		};
+	},
+	created() {
+		this.onChange();
 	},
 	methods: {
 		onChange() {
 			window.localStorage.setItem( "theme", this.theme );
+
+			const parts = this.theme.split( ":" );
+			if ( parts[ 1 ] ) {
+				document.body.setAttribute( "data-theme", parts[ 1 ] );
+			} else {
+				document.body.removeAttribute( "data-theme" );
+			}
 		},
 	},
 	computed: {
 		styleSheetURL() {
-			return "/css/" + this.theme + ".css";
+			const parts = this.theme.split( ":" );
+
+			return "/css/" + parts[ 0 ] + ".css";
 		},
 	},
 };
