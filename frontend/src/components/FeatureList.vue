@@ -1,7 +1,7 @@
 <template>
   <section
     v-cloak
-    class="poker"
+    class="poker container"
   >
     <h2>Features</h2>
     <h3>Voting</h3>

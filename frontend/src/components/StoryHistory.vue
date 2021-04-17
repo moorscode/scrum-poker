@@ -22,12 +22,12 @@
         />
         Delete last result
       </button>
-      <section v-for="story of storyHistory">
+      <section v-for="(story, index) of storyHistory" v-bind:key="'story' + index">
         <strong>Story {{ story.name || 'result' }}: {{ story.nearestPointAverage }}</strong>
 		<br>
         Votes:
         <ul>
-          <li v-for="vote of story.votes">
+          <li v-for="(vote, index) of story.votes" v-bind:key="'vote' + index">
             {{ vote.voterName }}:
             <span
               v-if="vote.initialValue !== vote.currentValue"

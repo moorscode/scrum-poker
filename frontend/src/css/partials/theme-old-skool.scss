@@ -1,0 +1,146 @@
+:root {
+	--box-shadow: inset -2px -2px rgba( 85,85,85, 0.8 );
+	--border-color: 1px solid #ddd;
+	--box-shadow-flipped: inset 2px 2px rgba( 85,85,85, 0.8 );
+	--button-border-color: 1px solid #aaa;
+
+	--font: 'Press Start 2P', sans-serif;
+	--font-title: 'Press Start 2P', serif;
+
+	--section-border-style: double;
+	--section-border-color: #ddd;
+}
+
+[data-theme="dark"] {
+	--box-shadow: inset -2px -2px #000;
+	--border-color: 1px solid #333;
+	--box-shadow-flipped: inset 2px 2px #000;
+	--button-border-color: 1px solid #333;
+	
+	--no-spread-background-color: #556441;
+	--high-spread-background-color: #6e2828;
+
+	--section-border-color: #ddd;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+* {
+	line-height: 1.2;
+}
+
+.fas {
+	position: relative;
+	top: -2px;
+}
+
+main {
+	&.finished {
+		background: linear-gradient(90deg, #ff2400 0 12%, #e81d1d 12% 24%, #e8b71d 24% 36%, #e3e81d 36% 49%, #1de840 49% 62%, #1ddde8 62% 74%, #2b1de8 74% 86%, #dd00f3 86% 100%);
+	}
+}
+
+.poker {
+	border-radius: 0;
+	border-color: transparent;
+	box-shadow: none;
+}
+
+hr {
+	border-top-style: solid;
+	border-top-width: 1px;
+	border-top-color: var( --border-color );
+}
+
+button, input[type=submit] {
+	box-shadow: var( --box-shadow );
+	border: none;
+	padding: 10px;
+	border-radius: 0;
+}
+
+button:disabled {
+	box-shadow: none;
+}
+
+input[type=text] {
+	padding: 8px;
+	border-bottom: var( --border-color );
+	border-right: var( --border-color );
+	box-shadow: var( --box-shadow-flipped );
+}
+
+form.username {
+	& input[type=text] {
+		box-shadow: none;
+	}
+
+	&:active,
+	&:hover,
+	&.hover {
+		& input[type=text] {
+			box-shadow: var( --box-shadow );
+		}
+	}
+}
+
+button.choice {
+	border-radius: 0;
+	&:last-child {
+		padding: 0 16px;
+	}
+}
+
+button.result {
+	box-shadow: none;
+	border-radius: 0;
+
+	& .vote-names {
+		border: var( --button-border-color );
+		box-shadow: none;
+		border-radius: 0;
+		background-color: var( --main-background-color );
+		margin-top: 9px;
+		margin-left: -8px;
+	}
+
+	&.initialVote {
+		border: var( --button-border-color );
+		border-style: dashed;
+
+		& + button.result {
+			box-shadow: none;
+			border-radius: 0;
+			border: var( --button-border-color );
+		}
+	}
+}
+
+button.newStory {
+	margin-bottom: 4px;
+}
+
+form.username {
+	input[type=submit] {
+		display: none !important;
+	}
+}
+
+div.voting {
+	div.unvoted,
+	div.voted {
+		padding: 16px 16px 8px;
+	}
+
+	.far {
+		font-weight: bold;
+	}
+}
+
+.members-list {
+	background-color: var( --main-background-color );
+	border: none;
+	box-shadow: var( --box-shadow );
+	border-top: var( --button-border-color );
+	border-left: var( --button-border-color );
+}
