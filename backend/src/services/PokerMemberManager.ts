@@ -1,3 +1,5 @@
+import EventDispatcher, { EventDispatcherInterface } from "../base/EventDispatcher";
+
 export type MemberType = "voter" | "observer" | "invalid";
 
 export interface Member {
@@ -12,50 +14,37 @@ export interface MemberList {
 	[ memberId: string ]: Member
 }
 
-interface Event {
-	[ identifier: string ]: CallableFunction;
-}
+interface MemberEventDispatcherInterface extends EventDispatcherInterface {
+	/**
+	 * The member added event listener.
+	 *
+	 * @param {string} event The event being fired: "member-added".
+	 * @param {CallableFunction} callback A callback when the event is triggered, which takes a member id.
+	 */
+	on( event: "member-added", callback: ( id: string ) => void ): void;
 
-interface EventManager {
-	readonly events: Event[];
-	on( event: string, execute: CallableFunction ): void;
+	/**
+	 * The member removed event listener.
+	 *
+	 * @param {string} event The event being fired: "member-removed".
+	 * @param {CallableFunction} callback A callback when the event is triggered, which takes a member id.
+	 */
+	on( event: "member-removed", callback: ( id: string ) => void ): void;
+
+	/**
+	 * The member state changed event listener.
+	 *
+	 * @param {string} event The event being fired: "member-state".
+	 * @param {CallableFunction} callback A callback when the event is triggered, which takes from, to and an id.
+	 */
+	on( event: "member-state", callback: ( from: string, to: string, id: string ) => void ): void;
 }
 
 /**
  * The poker members handler.
  */
-export default class PokerMemberManager implements EventManager {
+export default class PokerMemberManager extends EventDispatcher implements MemberEventDispatcherInterface {
 	private readonly members: MemberList = {};
-	readonly events: Event[] = [];
-
-	/**
-	 * Hooks a function onto an event.
-	 *
-	 * @param {string} event The event to hook onto.
-	 * @param {CallableFunction} execute The method that needs to be executed on the event.
-	 *
-	 * @returns {void}
-	 */
-	public on( event: string, execute: CallableFunction ): void {
-		this.events[ event ] = this.events[ event ] || [];
-		this.events[ event ].push( execute );
-	}
-
-	/**
-	 * Triggers an event.
-	 *
-	 * @param {string} event The event identifier.
-	 * @param {object} context Optional. Context of the event.
-	 *
-	 * @returns {void}
-	 */
-	private trigger( event: string, context?: any ): void {
-		if ( ! this.events[ event ] ) {
-			return;
-		}
-
-		this.events[ event ].map( ( callable: CallableFunction ) => callable( context ) );
-	}
 
 	/**
 	 * Adds a member.
@@ -84,8 +73,8 @@ export default class PokerMemberManager implements EventManager {
 
 		this.members[ id ] = member;
 
-		this.trigger( "member-added", id );
-		this.trigger( "member-state", { from, to: "voter", id } );
+		this.dispatch( "member-added", id );
+		this.dispatch( "member-state", { from, to: "voter", id } );
 	}
 
 	/**
@@ -114,7 +103,7 @@ export default class PokerMemberManager implements EventManager {
 	 public removeMember( id: string ): void {
 		delete this.members[ id ];
 
-		this.trigger( "member-removed", id );
+		this.dispatch( "member-removed", id );
 	}
 
 	/**
@@ -131,8 +120,8 @@ export default class PokerMemberManager implements EventManager {
 			this.members[ id ].type = "observer";
 			this.members[ id ].connected = true;
 
-			this.trigger( "member-state", { from, to: "observer", id } );
-			this.trigger( "member-removed", id );
+			this.dispatch( "member-state", { from, to: "observer", id } );
+			this.dispatch( "member-removed", id );
 		}
 	}
 
@@ -148,7 +137,7 @@ export default class PokerMemberManager implements EventManager {
 			this.members[ id ].disconnectTime = Date.now();
 			this.members[ id ].connected = false;
 
-			this.trigger( "member-state", { from: this.members[ id ].type, to: "disconnected", id } );
+			this.dispatch( "member-state", { from: this.members[ id ].type, to: "disconnected", id } );
 		}
 	}
 

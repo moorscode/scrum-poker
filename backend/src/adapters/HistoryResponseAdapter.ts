@@ -22,9 +22,7 @@ export default class HistoryResponseAdapter {
 	 *
 	 * @param {VoteResponseAdapter} voteResponseFormattingService The vote repsonse formatting service.
 	 */
-	constructor(
-		private readonly voteResponseFormattingService: VoteResponseAdapter,
-	) {}
+	constructor( private readonly voteResponseFormattingService: VoteResponseAdapter ) {}
 
 	/**
 	 * Formats the response.
