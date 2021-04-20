@@ -23,7 +23,7 @@ export default {
 		this.$store.commit( "nickname", this.nickname );
 
 		window.onbeforeunload = () => {
-			this.$socket.client.emit( "exit" );
+			this.$socket.client.emit( "exit", this.room );
 		};
 	},
 	methods: {
@@ -35,7 +35,7 @@ export default {
 		},
 	},
 	computed: {
-		...mapState( [ "members" ] ),
+		...mapState( [ "members", "room" ] ),
 	},
 	sockets: {
 		userId( clientId ) {

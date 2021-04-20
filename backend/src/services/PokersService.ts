@@ -76,6 +76,7 @@ export default class PokersService {
 	 * @returns {void}
 	 */
 	public exit( socket: Socket ): void {
+		console.log('exit');
 		const userId = this.getUserId( socket );
 
 		this.socketUsersService.remove( socket.id );

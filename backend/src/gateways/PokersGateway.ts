@@ -63,7 +63,7 @@ export default class PokersGateway implements OnGatewayInit {
 						continue;
 					}
 
-					if ( ! room.includes( "/pokers#" ) ) {
+					if ( room.includes( "/pokers#" ) ) {
 						continue;
 					}
 
@@ -95,8 +95,11 @@ export default class PokersGateway implements OnGatewayInit {
 	}
 
 	@SubscribeMessage( "exit" )
-	exit( client: Socket ): void {
+	exit( client: Socket, message: { room: string } ): void {
 		this.pokersService.exit( client );
+		console.log(message);
+
+		this.send( message.room, { members: true, votes: true } );
 	}
 
 	@SubscribeMessage( "join" )

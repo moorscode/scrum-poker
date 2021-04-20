@@ -53,7 +53,7 @@ export default class SocketUserHandler {
 	 *
 	 * @private
 	 */
-	 public getMemberId( socket: Socket ): string {
+	public getMemberId( socket: Socket ): string {
 		return this.users[ socket.id ];
 	}
 

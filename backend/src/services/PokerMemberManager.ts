@@ -138,7 +138,7 @@ export default class PokerMemberManager extends EventDispatcher implements Membe
 	 *
 	 * @returns {void}
 	 */
-	 public setDisconnected( id: string ): void {
+	public setDisconnected( id: string ): void {
 		if ( this.members[ id ] ) {
 			this.members[ id ].disconnectTime = Date.now();
 			this.members[ id ].connected = false;
@@ -152,7 +152,7 @@ export default class PokerMemberManager extends EventDispatcher implements Membe
 	 *
 	 * @returns {Member[]} List of observers.
 	 */
-	 public getObservers(): Member[] {
+	public getObservers(): Member[] {
 		return Object.values( this.members )
 			.filter( ( member: Member ) => member.type === "observer" && member.connected );
 	}
@@ -187,7 +187,7 @@ export default class PokerMemberManager extends EventDispatcher implements Membe
 	 *
 	 * @private
 	 */
-	 public getMember( memberId: string ): Member {
+	public getMember( memberId: string ): Member {
 		 if ( this.members[ memberId ] ) {
 			return this.members[ memberId ];
 		 }
@@ -205,7 +205,7 @@ export default class PokerMemberManager extends EventDispatcher implements Membe
 	 *
 	 * @returns {Member[]} List of disconnected members.
 	 */
-	 public getDisconnected(): Member[] {
+	public getDisconnected(): Member[] {
 		return Object.values( this.members )
 			.filter( ( member: Member ) => ! member.connected );
 	}
@@ -226,8 +226,8 @@ export default class PokerMemberManager extends EventDispatcher implements Membe
 	 *
 	 * @returns {number} The total number of clients connected.
 	 */
-	 public getClientCount( includeDisconnected = true ): number {
+	public getClientCount( includeDisconnected = true ): number {
 		return Object.values( this.members )
 			.filter( member => member.connected || includeDisconnected ).length;
-	 }
+	}
 }
