@@ -14,6 +14,12 @@ export interface MemberList {
 	[ memberId: string ]: Member
 }
 
+export interface MemberState {
+	from: string;
+	to: string;
+	id: string;
+}
+
 interface MemberEventDispatcherInterface extends EventDispatcherInterface {
 	/**
 	 * The member added event listener.
@@ -35,9 +41,9 @@ interface MemberEventDispatcherInterface extends EventDispatcherInterface {
 	 * The member state changed event listener.
 	 *
 	 * @param {string} event The event being fired: "member-state".
-	 * @param {CallableFunction} callback A callback when the event is triggered, which takes from, to and an id.
+	 * @param {CallableFunction} callback A callback when the event is triggered, which receives a member-state.
 	 */
-	on( event: "member-state", callback: ( from: string, to: string, id: string ) => void ): void;
+	on( event: "member-state", callback: ( state: MemberState ) => void ): void;
 }
 
 /**
