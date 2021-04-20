@@ -16,11 +16,11 @@ export interface EventDispatcherInterface {
 	 * Dispatches an event.
 	 *
 	 * @param {string} event   The event identifier.
-	 * @param {object} context Optional. Context of the event.
+	 * @param {any}    context Optional. Context of the event.
 	 *
 	 * @returns {void}
 	 */
-	dispatch( event: string, context?: Record<string, unknown> ): void;
+	dispatch( event: string, context?: any ): void;
 }
 
 /**
@@ -46,7 +46,7 @@ export default class EventDispatcher implements EventDispatcherInterface {
 	 * Dispatches an event.
 	 *
 	 * @param {string} event   The event identifier.
-	 * @param {object} context Optional. Context of the event.
+	 * @param {any}    context Optional. Context of the event.
 	 *
 	 * @returns {void}
 	 */
