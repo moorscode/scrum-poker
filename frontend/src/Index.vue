@@ -1,7 +1,7 @@
 <template>
   <main :class="backgroundColor">
-	<server-connection />
 	<theme-picker />
+	<server-connection />
 
 	<section v-if="loading === false" class="poker container">
 	<h1>Pum Scroker</h1>

@@ -97,7 +97,6 @@ export default class PokersGateway implements OnGatewayInit {
 	@SubscribeMessage( "exit" )
 	exit( client: Socket, message: { room: string } ): void {
 		this.pokersService.exit( client );
-		console.log(message);
 
 		this.send( message.room, { members: true, votes: true } );
 	}

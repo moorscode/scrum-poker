@@ -1,8 +1,8 @@
 <template>
-	<div v-if="debug">
-		<button v-on:click="connect()">connect</button>
-		<button v-on:click="disconnect()">disconnect</button>
-	</div>
+	<section class="poker container" v-if="! $socket.connected">
+		<h1>Connecting to server</h1>
+		<p>Please be patient...</p>
+	</section>
 </template>
 
 <script>
@@ -12,7 +12,6 @@ export default {
 	name: "ServerConnection",
 	data() {
 		return {
-			debug: false,
 			clientId: window.localStorage.getItem( "clientId" ) || false,
 			nickname: window.localStorage.getItem( "nickname" ),
 			baseTitle: document.title,
