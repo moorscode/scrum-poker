@@ -43,6 +43,9 @@ export default class PokerStoryHandler {
 		private readonly pointsProvider: PointsProvider,
 	) {
 		this.story = { name: "", votes: [], voters: 0, votesRevealed: false };
+
+		this.membersManager.on( "member-state", this.recalculate.bind( this ) );
+		this.membersManager.on( "member-removed", this.removeVote.bind( this ) );
 	}
 
 	/**
@@ -61,7 +64,7 @@ export default class PokerStoryHandler {
 	 *
 	 * @returns {void}
 	 */
-	 public setName( name: string ): void {
+	public setName( name: string ): void {
 		this.story.name = name;
 	}
 
@@ -72,7 +75,7 @@ export default class PokerStoryHandler {
 	 *
 	 * @returns {Story} The modified story.
 	 */
-	 public recalculate(): void {
+	public recalculate(): void {
 		const story = this.story;
 
 		story.voters = this.membersManager.getVoterCount();
@@ -130,7 +133,7 @@ export default class PokerStoryHandler {
 	 *
 	 * @returns {void} Nothing.
 	 */
-	 public toggleRevealVotes(): void {
+	public toggleRevealVotes(): void {
 		this.setRevealVotes( ! this.story.votesRevealed );
 	}
 
@@ -173,7 +176,7 @@ export default class PokerStoryHandler {
 	 *
 	 * @returns {Vote} The vote of the user.
 	 */
-	 public getCurrentVote( memberId: string ): Vote | undefined {
+	public getCurrentVote( memberId: string ): Vote | undefined {
 		return this.story.votes.filter( ( vote: Vote ) => vote.voter.id === memberId )[ 0 ];
 	}
 
@@ -198,7 +201,7 @@ export default class PokerStoryHandler {
 	 *
 	 * @returns {void}
 	 */
-	 private addVote( memberId: string, voteValue: VoteValue ): void {
+	private addVote( memberId: string, voteValue: VoteValue ): void {
 		const vote: Vote = {
 			story: this.story,
 			voter: this.membersManager.getMember( memberId ),
@@ -262,7 +265,7 @@ export default class PokerStoryHandler {
 	 *
 	 * @returns {Vote[]} The actual votes with the backfilled missing votes.
 	 */
-	 private getUnobscuredVotes(): Vote[] {
+	private getUnobscuredVotes(): Vote[] {
 		const notVotedClients:Member[] = this.getVotePendingClients();
 		const notVoted = notVotedClients.map(
 			( client: Member ): ObscuredVote => this.getObscuredVote( client ),
@@ -283,7 +286,7 @@ export default class PokerStoryHandler {
 	 *
 	 * @returns {ObscuredVote[]} List of obscured votes.
 	 */
-	 private getObscuredVotes(): ObscuredVote[] {
+	private getObscuredVotes(): ObscuredVote[] {
 		return this.membersManager.getVoters()
 			.map( ( member: Member ): ObscuredVote => this.getObscuredVote( member ) )
 			.sort( ( a, b ) => {
@@ -320,7 +323,7 @@ export default class PokerStoryHandler {
 	 *
 	 * @returns {boolean} True if every client has voted.
 	 */
-	 private hasAllVotes(): boolean {
+	private hasAllVotes(): boolean {
 		return this.story.votes.length === this.membersManager.getVoterCount();
 	}
 }

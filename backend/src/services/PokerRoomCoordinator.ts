@@ -141,8 +141,6 @@ export default class PokerRoomCoordinator {
 	 */
 	public addClient( id: string, name: string ): void {
 		this.membersManager.addMember( id, name );
-
-		this.storyService.recalculate();
 	}
 
 	/**
@@ -170,8 +168,6 @@ export default class PokerRoomCoordinator {
 	 */
 	public removeClient( id: string ): void {
 		this.membersManager.removeMember( id );
-
-		this.storyService.removeVote( id );
 	}
 
 	/**
@@ -183,8 +179,6 @@ export default class PokerRoomCoordinator {
 	 */
 	public makeObserver( id: string ): void {
 		this.membersManager.makeObserver( id );
-
-		this.storyService.removeVote( id );
 	}
 
 	/**
@@ -196,8 +190,6 @@ export default class PokerRoomCoordinator {
 	 */
 	public setDisconnected( id: string ): void {
 		this.membersManager.setDisconnected( id );
-
-		this.storyService.recalculate();
 	}
 
 	/**
@@ -257,7 +249,6 @@ export default class PokerRoomCoordinator {
 	 */
 	public getVotes(): CurrentVotes {
 		const voted: Member[] = this.getVotedClients();
-		const votes: Vote[] = this.getCurrentVotes();
 
 		const groupedVoterNames: GroupVoteNames = voted.reduce( ( accumulator, member: Member ) => {
 			const vote: Vote            = this.getCurrentVote( member.id );
@@ -271,7 +262,7 @@ export default class PokerRoomCoordinator {
 
 		return {
 			voteCount: voted.length,
-			votes,
+			votes: this.getCurrentVotes(),
 			groupedVoterNames,
 		};
 	}

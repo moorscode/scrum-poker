@@ -1,3 +1,5 @@
+import EventDispatcher, { EventDispatcherInterface } from "../base/EventDispatcher";
+
 export type MemberType = "voter" | "observer" | "invalid";
 
 export interface Member {
@@ -12,10 +14,42 @@ export interface MemberList {
 	[ memberId: string ]: Member
 }
 
+export interface MemberState {
+	from: string;
+	to: string;
+	id: string;
+}
+
+interface MemberEventDispatcherInterface extends EventDispatcherInterface {
+	/**
+	 * The member added event listener.
+	 *
+	 * @param {string} event The event being fired: "member-added".
+	 * @param {CallableFunction} callback A callback when the event is triggered, which takes a member id.
+	 */
+	on( event: "member-added", callback: ( id: string ) => void ): void;
+
+	/**
+	 * The member removed event listener.
+	 *
+	 * @param {string} event The event being fired: "member-removed".
+	 * @param {CallableFunction} callback A callback when the event is triggered, which takes a member id.
+	 */
+	on( event: "member-removed", callback: ( id: string ) => void ): void;
+
+	/**
+	 * The member state changed event listener.
+	 *
+	 * @param {string} event The event being fired: "member-state".
+	 * @param {CallableFunction} callback A callback when the event is triggered, which receives a member-state.
+	 */
+	on( event: "member-state", callback: ( state: MemberState ) => void ): void;
+}
+
 /**
  * The poker members handler.
  */
-export default class PokerMemberManager {
+export default class PokerMemberManager extends EventDispatcher implements MemberEventDispatcherInterface {
 	private readonly members: MemberList = {};
 
 	/**
@@ -36,7 +70,17 @@ export default class PokerMemberManager {
 			connected: true,
 		};
 
+		let from = "";
+
+		if ( this.members[ id ] ) {
+			from = this.members[ id ].type;
+			from = this.members[ id ].connected === false ? "disconnected" : from;
+		}
+
 		this.members[ id ] = member;
+
+		this.dispatch( "member-added", id );
+		this.dispatch( "member-state", { from, to: "voter", id } );
 	}
 
 	/**
@@ -64,6 +108,8 @@ export default class PokerMemberManager {
 	 */
 	 public removeMember( id: string ): void {
 		delete this.members[ id ];
+
+		this.dispatch( "member-removed", id );
 	}
 
 	/**
@@ -75,8 +121,13 @@ export default class PokerMemberManager {
 	 */
 	 public makeObserver( id: string ): void {
 		if ( this.members[ id ] ) {
+			const from = this.members[ id ].type;
+
 			this.members[ id ].type = "observer";
 			this.members[ id ].connected = true;
+
+			this.dispatch( "member-state", { from, to: "observer", id } );
+			this.dispatch( "member-removed", id );
 		}
 	}
 
@@ -91,6 +142,8 @@ export default class PokerMemberManager {
 		if ( this.members[ id ] ) {
 			this.members[ id ].disconnectTime = Date.now();
 			this.members[ id ].connected = false;
+
+			this.dispatch( "member-state", { from: this.members[ id ].type, to: "disconnected", id } );
 		}
 	}
 
