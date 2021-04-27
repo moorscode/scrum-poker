@@ -277,6 +277,7 @@ section.storyControls {
 
 	.members-list {
 		border: 1px solid var( --main-accent-color );
+		backdrop-filter: blur( 1px );
 		margin-top: 10px;
 		min-width: 150px;
 		padding: 10px 10px 0 20px;
@@ -354,19 +355,21 @@ form.username {
 	}
 
 	& input[type=submit] {
-		display: none;
+		opacity: 0;
+		transition: opacity 100ms ease-in;
 	}
 
 	&:active,
  	&:hover,
 	&.hover {
 		& input[type=submit] {
-			display: inline-block;
+			opacity: 1;
 		}
 	}
 
 	& input[type=text] {
 		border: 1px solid transparent;
+		transition: border 100ms ease-in;
 	}
 
 	&:active,
@@ -495,6 +498,7 @@ button.result {
 
 	& > .vote-names {
 		position: absolute;
+		backdrop-filter: blur( 1px );
 		padding: 10px;
 		margin-top: 24px;
 		border-radius: 3px;
