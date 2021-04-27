@@ -20,6 +20,7 @@
 
 	--poker-border-color: #a4286a;
 	--poker-background-color: white;
+	--poker-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 
 	--choice-hover-background-color: darkgray;
 	--choice-hover-color: black;
@@ -67,6 +68,16 @@
 	--high-spread-background-color: #792323;
 
 	--status-disconnected: #792323;
+	--section-border-color: var( --main-accent-color );
+}
+
+main.observing {
+	--main-accent-color: #000;
+	--icon-color: #000;
+
+	--poker-border-color: #000;
+	--poker-shadow: none;
+
 	--section-border-color: var( --main-accent-color );
 }
 
@@ -244,7 +255,7 @@ p.results {
 	border: 1px solid var( --poker-border-color );
 	border-radius: 4px;
 	background-color: var( --poker-background-color );
-	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+	box-shadow: var( --poker-shadow );
 }
 
 section.storyControls {
@@ -332,7 +343,6 @@ form.storyName {
 }
 
 div.observe {
-	margin-left: 5px;
 	margin-bottom: 1em;
 }
 

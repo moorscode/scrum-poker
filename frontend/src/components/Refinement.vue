@@ -1,10 +1,11 @@
 <template>
-  <button
-    class="refinement-done"
-    @click="done()"
-  >
-    <i class="fas fa-clipboard-check" /> Finish refinement
-  </button>
+	<button
+		class="refinement-done"
+		@click="done()"
+		:disabled="observer"
+	>
+		<i class="fas fa-clipboard-check" /> Finish refinement
+	</button>
 </template>
 
 <script>
@@ -12,7 +13,7 @@ import { mapState } from "vuex";
 export default {
 	name: "Refinement",
 	computed: {
-		...mapState( [ "voteCount", "members", "room" ] ),
+		...mapState( [ "voteCount", "members", "room", "observer" ] ),
 	},
 	methods: {
 		done() {

@@ -1,10 +1,10 @@
 <template>
-  <main :class="backgroundColor">
+  <main :class="[ { observing: observer }, backgroundColor ]">
 	<theme-picker />
 	<server-connection />
 
 	<section v-if="loading === false" class="poker container">
-	<h1>Pum Scroker</h1>
+	<h1>{{ title }}</h1>
 
 	<section v-if="connected === false">
 		<connecting />
@@ -17,22 +17,22 @@
 			<refinement-finished v-if="refinementFinished" />
 
 			<section v-if="!refinementFinished">
-			<member-list />
-			<nickname />
-			<observer />
-			<story /> <refinement />
+				<member-list />
+				<nickname />
+				<observer />
+				<story /> <refinement />
 
-			<section class="storyControls">
-				<story-name />
-				<poker-choices />
-			</section>
+				<section class="storyControls">
+					<story-name />
+					<poker-choices />
+				</section>
 
-			<results />
-			<result-statistics />
+				<results />
+				<result-statistics />
 
-			<member-status />
+				<member-status />
 
-			<story-history />
+				<story-history />
 			</section>
 		</div>
 		</section>
@@ -103,6 +103,7 @@ export default Vue.extend( {
 				"points",
 				"votes",
 				"connected",
+				"observer",
 			],
 		),
 		backgroundColor() {
@@ -118,6 +119,9 @@ export default Vue.extend( {
 				default:
 					return "normal-spread";
 			}
+		},
+		title() {
+			return this.observer ? "Observer mode" : "Pum Scroker";
 		},
 		pointSpread() {
 			if ( this.voteCount === 0 || this.voteCount < this.members.voters.length || typeof this.voteAverage === "string" ) {

@@ -3,6 +3,7 @@
     <button
       v-for="point of points"
 	  v-bind:key="point"
+	  :disabled="observer"
       :class="[
         'choice',
         pointIsPickedClass(point),

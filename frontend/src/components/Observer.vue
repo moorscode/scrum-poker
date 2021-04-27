@@ -1,12 +1,10 @@
 <template>
   <div class="observe">
-    <label>
-      <input
-        v-model="observer"
-        type="checkbox"
-      >
-      {{ observing }}
-    </label>
+    <button v-on:click="toggleObserving()">
+		<i class="fas fa-binoculars" v-if="! observer"/>
+		<i class="fas fa-comments" v-if="observer"/>
+		{{ observing }}
+	</button>
   </div>
 </template>
 
@@ -21,6 +19,11 @@ export default {
 		if ( observing ) {
 			this.$socket.client.emit( "observe", { poker: this.room } );
 		}
+	},
+	methods: {
+		toggleObserving() {
+			this.observer = ! this.observer;
+		},
 	},
 	computed: {
 		...mapState( [ "room", "joinPoker", "nickname" ] ),
@@ -40,7 +43,7 @@ export default {
 			},
 		},
 		observing() {
-			return this.observer ? "Observing…" : "Observe";
+			return this.observer ? "Participate" : "Observe";
 		},
 	},
 	sockets: {
