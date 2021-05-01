@@ -6,21 +6,21 @@ import PokerRoomCoordinator from "./PokerRoomCoordinator";
 import { Vote, Story } from "./PokerStoryHandler";
 import SocketUserHandler from "./SocketUsersHandler";
 
-export interface GroupVoteNames {
+export type GroupVoteNames = {
 	[ group: string ]: string[];
 }
 
-export interface Rooms {
+export type Rooms = {
 	[ room: string ]: PokerRoomCoordinator;
 }
 
-export interface GroupedMembers {
+export type GroupedMembers = {
 	voters: Member[];
 	observers: Member[];
 	disconnected: Member[];
 }
 
-export interface CurrentVotes {
+export type CurrentVotes = {
 	voteCount: number;
 	votes: Vote[];
 	groupedVoterNames: GroupVoteNames;

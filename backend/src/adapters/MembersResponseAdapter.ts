@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { Member } from "../services/PokerMemberManager";
 import { GroupedMembers } from "../services/PokersService";
 
-export interface MembersResponse {
+export type MembersResponse = {
 	voters: string[];
 	observers: string[];
 	disconnected: string[];

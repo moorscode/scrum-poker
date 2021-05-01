@@ -2,13 +2,13 @@ import { Injectable } from "@nestjs/common";
 import { Story } from "../services/PokerStoryHandler";
 import VoteResponseAdapter, { VoteResponse } from "./VoteResponseAdapter";
 
-export interface HistoryResponse {
+export type HistoryResponse = {
 	name: string;
 	votes: VoteResponse[];
 	voteAverage?: number | string;
 }
 
-export interface HistoryResponseList {
+export type HistoryResponseList = {
 	stories: HistoryResponse[];
 }
 

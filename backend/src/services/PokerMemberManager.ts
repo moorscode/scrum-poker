@@ -2,7 +2,7 @@ import EventDispatcher, { EventDispatcherInterface } from "../base/EventDispatch
 
 export type MemberType = "voter" | "observer" | "invalid";
 
-export interface Member {
+export type Member = {
 	name: string;
 	id: string;
 	type: MemberType;
@@ -10,11 +10,11 @@ export interface Member {
 	disconnectTime?: number;
 }
 
-export interface MemberList {
+export type MemberList = {
 	[ memberId: string ]: Member
 }
 
-export interface MemberState {
+export type MemberState = {
 	from: string;
 	to: string;
 	id: string;

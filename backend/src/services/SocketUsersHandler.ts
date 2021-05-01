@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { Socket } from "socket.io";
 
-interface SocketUsers {
+type SocketUsers = {
 	[ socketId: string ]: string;
 }
 

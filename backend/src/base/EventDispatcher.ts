@@ -1,5 +1,5 @@
 
-interface Event {
+type Event = {
 	[ identifier: string ]: CallableFunction;
 }
 

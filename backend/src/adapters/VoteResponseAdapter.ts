@@ -2,13 +2,13 @@ import { Injectable } from "@nestjs/common";
 import { Story, Vote, VoteValue } from "../services/PokerStoryHandler";
 import { CurrentVotes, GroupVoteNames } from "../services/PokersService";
 
-export interface VoteResponse {
+export type VoteResponse = {
 	voterName: string;
 	currentValue: VoteValue;
 	initialValue: VoteValue;
 }
 
-export interface VotesResponse {
+export type VotesResponse = {
 	votes: VoteResponse[];
 	voteCount: number;
 	groupedVoterNames: GroupVoteNames;

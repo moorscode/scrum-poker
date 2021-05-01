@@ -4,7 +4,7 @@ import PokerMemberManager, { Member } from "./PokerMemberManager";
 export type ObscuredVoteValue = "#" | "!";
 export type VoteValue = PointValue | ObscuredVoteValue;
 
-export interface Story {
+export type Story = {
 	name: string;
 	voteAverage?: number | string;
 	nearestPointAverage?: VoteValue;
@@ -14,14 +14,14 @@ export interface Story {
 	votesRevealed: boolean;
 }
 
-export interface Vote {
+export type Vote = {
 	story: Story;
 	voter: Member;
 	currentValue: VoteValue;
 	initialValue: VoteValue;
 }
 
-export interface ObscuredVote extends Vote {
+export type ObscuredVote = Vote & {
 	currentValue: ObscuredVoteValue;
 	initialValue: ObscuredVoteValue;
 }
