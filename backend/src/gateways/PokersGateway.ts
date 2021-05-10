@@ -52,24 +52,28 @@ export default class PokersGateway implements OnGatewayInit {
 	 * @returns {void}
 	 */
 	afterInit(): void {
-		this.server.on( "connection", ( socket ) => {
+		this.server.on( "connection", ( socket: Socket ) => {
 			// Let the client know the points that can be chosen from.
 			socket.emit( "userId", this.generateId() );
 			socket.emit( "points", this.pointsProvider.getPoints() );
 
 			socket.on( "disconnecting", () => {
 				for ( const room in socket.rooms ) {
-					if ( ! socket.rooms[ room ] ) {
+					if ( room === socket.id ) {
 						continue;
 					}
 
-					if ( room.includes( "/pokers#" ) ) {
+					if ( ! socket.rooms[ room ] ) {
 						continue;
 					}
 
 					this.pokersService.disconnect( socket, room );
 					this.send( room, { members: true, votes: true } );
 				}
+			} );
+
+			socket.on( "disconnect", () => {
+				this.pokersService.exit( socket );
 			} );
 		} );
 	}
