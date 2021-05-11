@@ -1,7 +1,16 @@
 <template>
-	<section class="poker container" v-if="! $socket.connected">
-		<h1>Connecting to server</h1>
-		<p>Please be patient...</p>
+	<section class="poker container" v-if="debug || ! $socket.connected">
+		<span v-if="! $socket.connected">
+			<h1>Connecting to server</h1>
+			<p>Please be patient...</p>
+		</span>
+
+		<div v-if="debug">
+			<button v-on:click="connect" :disabled="$socket.connected">Connect</button>
+			<button v-on:click="disconnect" :disabled="! $socket.connected">Disconnect</button>
+			<br/>
+			&nbsp;
+		</div>
 	</section>
 </template>
 
@@ -15,6 +24,7 @@ export default {
 			clientId: window.localStorage.getItem( "clientId" ) || false,
 			nickname: window.localStorage.getItem( "nickname" ),
 			baseTitle: document.title,
+			debug: false,
 		};
 	},
 	created() {
