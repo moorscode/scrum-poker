@@ -14,5 +14,6 @@
       },
       "[html]": {
         "editor.defaultFormatter": "dbaeumer.vscode-eslint"
-      },
+	},
+	"jest.jestCommandLine": "yarn test",
 }

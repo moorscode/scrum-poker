@@ -54,12 +54,14 @@ describe( "PokersCleanupService", () => {
 				id: "socket",
 				join: jest.fn(),
 				leave: jest.fn(),
+				rooms: { room: "room" },
 			} as unknown as Socket;
 
 			const socket2: Socket = {
 				id: "socket2",
 				join: jest.fn(),
 				leave: jest.fn(),
+				rooms: { room: "room" },
 			} as unknown as Socket;
 
 			pokersService.identify( socket, "user1" );
@@ -69,7 +71,7 @@ describe( "PokersCleanupService", () => {
 			pokersService.join( socket2, "room", "name" );
 
 			// Set first member to be disconnected.
-			pokersService.disconnect( socket, "room" );
+			pokersService.disconnect( socket );
 
 			const rooms = pokersService.getRooms();
 

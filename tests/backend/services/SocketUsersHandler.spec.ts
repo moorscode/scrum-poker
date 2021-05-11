@@ -40,7 +40,7 @@ describe( "SocketUserHandler", () => {
 			socketUserHandler.add( socket2, "1" );
 			socketUserHandler.add( socket3, "2" );
 
-			expect( socketUserHandler.getUserSockets( "1" ) ).toStrictEqual( [ "socket 1", "socket 2" ] );
+			expect( socketUserHandler.getUserSockets( "1" ) ).toStrictEqual( [ socket, socket2 ] );
 		} );
 	} );
 } );
