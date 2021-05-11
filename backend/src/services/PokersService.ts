@@ -73,28 +73,69 @@ export default class PokersService {
 	 *
 	 * @param {Socket} socket The client.
 	 *
-	 * @returns {void}
+	 * @returns {string[]} Affected rooms.
 	 */
-	public exit( socket: Socket ): void {
-		const userId = this.getUserId( socket );
+	public exit( socket: Socket ): string[] {
+		const memberId = this.socketUsersService.getMemberId( socket );
+		if ( ! memberId ) {
+			return [];
+		}
+
+		const removeFromRooms = this.getRoomsToRemoveFrom( socket );
+
+		removeFromRooms.map( ( room: string ) => this.rooms[ room ].removeClient( memberId ) );
 
 		this.socketUsersService.remove( socket.id );
 
-		if ( ! this.socketUsersService.getMemberIds().includes( userId ) ) {
-			this.removeUserFromRooms( userId );
-		}
+		return removeFromRooms;
 	}
 
 	/**
 	 * Disconnects a client, stores data for reconnection.
 	 *
 	 * @param {Socket} socket Disconnecting client.
-	 * @param {string} room The room of the user.
 	 *
-	 * @returns {void}
+	 * @returns {string[]} List of affected rooms.
 	 */
-	public disconnect( socket: Socket, room: string ): void {
-		this.getRoom( room ).setDisconnected( this.getUserId( socket ) );
+	public disconnect( socket: Socket ): string[] {
+		const memberId = this.socketUsersService.getMemberId( socket );
+		if ( ! memberId ) {
+			return [];
+		}
+
+		const removeFromRooms = this.getRoomsToRemoveFrom( socket );
+
+		removeFromRooms.map( ( room: string ) => this.rooms[ room ].setDisconnected( memberId ) );
+
+		this.socketUsersService.remove( socket.id );
+
+		return removeFromRooms;
+	}
+
+	/**
+	 * List of rooms the provided socket was in alone.
+	 *
+	 * @param {Socket} socket The socket to base this on.
+	 *
+	 * @returns {string[]} List of room names.
+	 */
+	private getRoomsToRemoveFrom( socket: Socket ): string[] {
+		const memberId = this.socketUsersService.getMemberId( socket );
+		if ( ! memberId ) {
+			return [];
+		}
+
+		const socketRooms = Object.keys( socket.rooms ).filter( ( room: string ) => room !== socket.id );
+
+		const userSockets      = this.socketUsersService.getUserSockets( memberId );
+		const remainingSockets = userSockets.filter( ( userSocket: Socket ) => userSocket.id !== socket.id );
+		const remainingRooms   = remainingSockets.reduce( ( accumulator, otherSocket: Socket ) => {
+			accumulator = accumulator.concat( Object.keys( otherSocket.rooms ).filter( ( room: string ) => room !== otherSocket.id ) );
+			return accumulator;
+		}, [] );
+
+		// Remove from all rooms that do not match other sockets rooms.
+		return socketRooms.filter( ( room: string ) => ! remainingRooms.includes( room ) );
 	}
 
 	/**
@@ -130,9 +171,9 @@ export default class PokersService {
 	 *
 	 * @param {string} userId The user to get the sockets for.
 	 *
-	 * @returns {string[]} List of sockets with the userId.
+	 * @returns {Socket[]} List of sockets with the userId.
 	 */
-	public getUserSockets( userId: string ): string[] {
+	public getUserSockets( userId: string ): Socket[] {
 		return this.socketUsersService.getUserSockets( userId );
 	}
 
@@ -157,14 +198,19 @@ export default class PokersService {
 	 * Retrieves the room.
 	 *
 	 * @param {string} poker Room to get.
+	 * @param {boolean} create Create the room if it does not exist..
 	 *
 	 * @returns {PokerRoomCoordinator} The room.
 	 *
 	 * @private
 	 */
-	private getRoom( poker: string ): PokerRoomCoordinator {
+	private getRoom( poker: string, create = true ): PokerRoomCoordinator {
 		// Create a room if it doesn't exist already.
 		if ( ! this.rooms[ poker ] ) {
+			if ( ! create ) {
+				return null;
+			}
+
 			this.rooms[ poker ] = new PokerRoomCoordinator( this.pointsProvider );
 		}
 
@@ -202,7 +248,10 @@ export default class PokersService {
 	 * @returns {void}
 	 */
 	public leave( socket: Socket, poker: string ): void {
-		this.getRoom( poker ).removeClient( this.getUserId( socket ) );
+		const room = this.getRoom( poker, false );
+		if ( room ) {
+			room.removeClient( this.getUserId( socket ) );
+		}
 
 		socket.leave( poker );
 	}

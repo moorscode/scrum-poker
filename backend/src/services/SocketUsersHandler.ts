@@ -1,8 +1,13 @@
 import { Injectable } from "@nestjs/common";
 import { Socket } from "socket.io";
 
+type SocketUser = {
+	memberId: string;
+	socket: Socket;
+};
+
 type SocketUsers = {
-	[ socketId: string ]: string;
+	[ socketId: string ]: SocketUser;
 }
 
 @Injectable()
@@ -21,7 +26,7 @@ export default class SocketUserHandler {
 	 * @returns {void}
 	 */
 	public add( socket: Socket, memberId: string ): void {
-		this.users[ socket.id ] = memberId;
+		this.users[ socket.id ] = { memberId, socket };
 	}
 
 	/**
@@ -41,7 +46,7 @@ export default class SocketUserHandler {
 	 * @returns {string[]} List of all user IDs.
 	 */
 	public getMemberIds(): string[] {
-		return Object.values( this.users );
+		return Object.values( this.users ).map( ( user: SocketUser ) => user.memberId );
 	}
 
 	/**
@@ -54,7 +59,11 @@ export default class SocketUserHandler {
 	 * @private
 	 */
 	public getMemberId( socket: Socket ): string {
-		return this.users[ socket.id ];
+		if ( this.users[ socket.id ] ) {
+			return this.users[ socket.id ].memberId;
+		}
+
+		return null;
 	}
 
 	/**
@@ -64,15 +73,9 @@ export default class SocketUserHandler {
 	 *
 	 * @returns {string[]} List of socket IDs of the member.
 	 */
-	public getUserSockets( memberId: string ): string[] {
-		const socketIds = [];
-
-		for ( const socketId of Object.keys( this.users ) ) {
-			if ( this.users[ socketId ] === memberId ) {
-				socketIds.push( socketId );
-			}
-		}
-
-		return socketIds;
+	public getUserSockets( memberId: string ): Socket[] {
+		return Object.values( this.users )
+			.filter( ( user: SocketUser ) => user.memberId === memberId )
+			.map( ( user: SocketUser ) => user.socket );
 	}
 }

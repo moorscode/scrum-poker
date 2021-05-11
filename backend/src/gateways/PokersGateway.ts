@@ -40,7 +40,7 @@ export default class PokersGateway implements OnGatewayInit {
 	 *
 	 * @returns {void}
 	 */
-	@Interval( 1000 )
+	@Interval( 10000 )
 	cleanupInterval(): void {
 		const changedRooms = this.pokersCleanupService.cleanup();
 		changedRooms.map( ( room: string ) => this.send( room, { members: true, votes: true } ) );
@@ -58,22 +58,8 @@ export default class PokersGateway implements OnGatewayInit {
 			socket.emit( "points", this.pointsProvider.getPoints() );
 
 			socket.on( "disconnecting", () => {
-				for ( const room in socket.rooms ) {
-					if ( room === socket.id ) {
-						continue;
-					}
-
-					if ( ! socket.rooms[ room ] ) {
-						continue;
-					}
-
-					this.pokersService.disconnect( socket, room );
-					this.send( room, { members: true, votes: true } );
-				}
-			} );
-
-			socket.on( "disconnect", () => {
-				this.pokersService.exit( socket );
+				const rooms = this.pokersService.disconnect( socket );
+				rooms.map( ( room: string ) => this.send( room, { members: true, votes: true } ) );
 			} );
 		} );
 	}
@@ -99,10 +85,10 @@ export default class PokersGateway implements OnGatewayInit {
 	}
 
 	@SubscribeMessage( "exit" )
-	exit( client: Socket, message: { room: string } ): void {
-		this.pokersService.exit( client );
+	exit( client: Socket ): void {
+		const rooms = this.pokersService.exit( client );
 
-		this.send( message.room, { members: true, votes: true } );
+		rooms.map( ( room: string ) => this.send( room, { members: true, votes: true } ) );
 	}
 
 	@SubscribeMessage( "join" )
@@ -134,12 +120,12 @@ export default class PokersGateway implements OnGatewayInit {
 		this.pokersService.castVote( client, message.poker, message.vote );
 
 		// Send this vote to all sockets for the current user.
-		const vote      = this.pokersService.getVote( client, message.poker );
-		const socketIds = this.pokersService.getUserSockets( this.pokersService.getUserId( client ) );
+		const vote    = this.pokersService.getVote( client, message.poker );
+		const sockets = this.pokersService.getUserSockets( this.pokersService.getUserId( client ) );
 
-		for ( const socketId of socketIds ) {
-			if ( this.server.sockets[ socketId ] ) {
-				this.server.sockets[ socketId ].emit( "myVote", { currentVote: vote.currentValue, initialVote: vote.initialValue } );
+		for ( const socket of sockets ) {
+			if ( socket ) {
+				socket.emit( "myVote", { currentVote: vote.currentValue, initialVote: vote.initialValue } );
 			}
 		}
 
@@ -216,6 +202,12 @@ export default class PokersGateway implements OnGatewayInit {
 		history = false,
 		all = false,
 	} = {} ) {
+		// Don't send stuff to rooms that are cleaned up.
+		const rooms = Object.keys( this.pokersService.getRooms() );
+		if ( ! rooms.includes( poker ) ) {
+			return;
+		}
+
 		if ( all || story ) {
 			this.server.to( poker ).emit(
 				"story",
