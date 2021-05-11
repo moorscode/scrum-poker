@@ -36,8 +36,10 @@ describe( "PokersService", () => {
 			pokersService.join( socket, "room", "name" );
 
 			const result = pokersService.exit( socket );
-
 			expect( result ).toStrictEqual( [ "room" ] );
+
+			const members = pokersService.getGroupedMembers( "room" );
+			expect( members.voters ).toHaveLength( 0 );
 
 			expect( remove ).toBeCalledWith( socket );
 			expect( remove ).toBeCalledTimes( 1 );
@@ -97,15 +99,12 @@ describe( "PokersService", () => {
 			pokersService.identify( socket, "userid" );
 			pokersService.join( socket, "room", "name" );
 
-			const rooms = pokersService.getRooms();
-			const setDisconnected = jest.spyOn( rooms.room, "setDisconnected" );
-
-			const result = pokersService.disconnect( socket );
-
+			const result  = pokersService.disconnect( socket );
 			expect( result ).toStrictEqual( [ "room" ] );
 
-			expect( setDisconnected ).toBeCalledWith( "userid" );
-			expect( setDisconnected ).toBeCalledTimes( 1 );
+			const members = pokersService.getGroupedMembers( "room" );
+			expect( members.disconnected ).toHaveLength( 1 );
+			expect( members.disconnected[ 0 ].id ).toStrictEqual( "userid" );
 
 			expect( remove ).toBeCalledWith( socket );
 			expect( remove ).toBeCalledTimes( 1 );
@@ -120,7 +119,6 @@ describe( "PokersService", () => {
 			} as unknown as Socket;
 
 			const result = pokersService.disconnect( socket );
-
 			expect( result ).toStrictEqual( [] );
 		} );
 	} );
