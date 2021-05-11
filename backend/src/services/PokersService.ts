@@ -76,16 +76,10 @@ export default class PokersService {
 	 * @returns {string[]} Affected rooms.
 	 */
 	public exit( socket: Socket ): string[] {
-		const memberId = this.socketUsersService.getMemberId( socket );
-		if ( ! memberId ) {
-			return [];
-		}
-
 		const removeFromRooms = this.getRoomsToRemoveFrom( socket );
+		removeFromRooms.map( ( room: string ) => this.leave( socket, room ) );
 
-		removeFromRooms.map( ( room: string ) => this.rooms[ room ].removeClient( memberId ) );
-
-		this.socketUsersService.remove( socket.id );
+		this.socketUsersService.remove( socket );
 
 		return removeFromRooms;
 	}
@@ -104,10 +98,14 @@ export default class PokersService {
 		}
 
 		const removeFromRooms = this.getRoomsToRemoveFrom( socket );
+		removeFromRooms.map( ( poker: string ) => {
+			const room = this.getRoom( poker, false );
+			if ( room ) {
+				room.setDisconnected( memberId );
+			}
+		} );
 
-		removeFromRooms.map( ( room: string ) => this.rooms[ room ].setDisconnected( memberId ) );
-
-		this.socketUsersService.remove( socket.id );
+		this.socketUsersService.remove( socket );
 
 		return removeFromRooms;
 	}
@@ -129,28 +127,23 @@ export default class PokersService {
 
 		const userSockets      = this.socketUsersService.getUserSockets( memberId );
 		const remainingSockets = userSockets.filter( ( userSocket: Socket ) => userSocket.id !== socket.id );
-		const remainingRooms   = remainingSockets.reduce( ( accumulator, otherSocket: Socket ) => {
-			accumulator = accumulator.concat( Object.keys( otherSocket.rooms ).filter( ( room: string ) => room !== otherSocket.id ) );
-			return accumulator;
-		}, [] );
+
+		if ( remainingSockets.length === 0 ) {
+			return socketRooms;
+		}
+
+		const remainingRooms   = remainingSockets.reduce(
+			( accumulator, otherSocket: Socket ) => {
+				return accumulator
+					.concat(
+						Object.keys( otherSocket.rooms ).filter( ( room: string ) => room !== otherSocket.id ),
+					);
+			},
+			[],
+		);
 
 		// Remove from all rooms that do not match other sockets rooms.
 		return socketRooms.filter( ( room: string ) => ! remainingRooms.includes( room ) );
-	}
-
-	/**
-	 * Removes a user from their rooms.
-	 *
-	 * @param {string} userId The user Id.
-	 *
-	 * @returns {void}
-	 *
-	 * @private
-	 */
-	private removeUserFromRooms( userId: string ): void {
-		for ( const room of Object.keys( this.rooms ) ) {
-			this.rooms[ room ].removeClient( userId );
-		}
 	}
 
 	/**

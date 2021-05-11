@@ -32,12 +32,12 @@ export default class SocketUserHandler {
 	/**
 	 * Removes a socket connection.
 	 *
-	 * @param {string} socketId The socket that needs to be removed.
+	 * @param {Socket} socket The socket that needs to be removed.
 	 *
 	 * @returns {void}
 	 */
-	public remove( socketId: string ): void {
-		delete this.users[ socketId ];
+	public remove( socket: Socket ): void {
+		delete this.users[ socket.id ];
 	}
 
 	/**

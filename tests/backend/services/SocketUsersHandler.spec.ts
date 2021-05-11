@@ -24,7 +24,7 @@ describe( "SocketUserHandler", () => {
 			const socket = { id: "socket-id" } as unknown as Socket;
 
 			socketUserHandler.add( socket, "1" );
-			socketUserHandler.remove( "socket-id" );
+			socketUserHandler.remove( socket );
 
 			expect( socketUserHandler.getMemberIds() ).toStrictEqual( [] );
 		} );

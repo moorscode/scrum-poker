@@ -32,8 +32,6 @@ describe( "PokersCleanupService", () => {
 				leave: jest.fn(),
 			} as unknown as Socket;
 
-			const getRooms = jest.spyOn( pokersService, "getRooms" );
-
 			pokersService.join( socket, "room", "name" );
 			pokersService.leave( socket, "room" );
 
@@ -45,7 +43,6 @@ describe( "PokersCleanupService", () => {
 
 			const result = pokersService.getRooms();
 
-			expect( getRooms ).toHaveBeenCalled();
 			expect( Object.keys( result ) ).toHaveLength( 0 );
 		} );
 
@@ -73,9 +70,7 @@ describe( "PokersCleanupService", () => {
 			// Set first member to be disconnected.
 			pokersService.disconnect( socket );
 
-			const rooms = pokersService.getRooms();
-
-			expect( Object.keys( rooms ) ).toHaveLength( 1 );
+			expect( Object.keys( pokersService.getRooms() ) ).toHaveLength( 1 );
 
 			// Pretend we've moved 60 seconds in the future.
 			Date.now = jest.fn().mockReturnValue( now + 60000 );
