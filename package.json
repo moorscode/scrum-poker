@@ -55,7 +55,7 @@
     "copy-webpack-plugin": "^8.1.1",
     "css-loader": "^5.2.4",
     "dotenv": "^9.0.2",
-    "eslint": "^7.23.0",
+    "eslint": "^7.26.0",
     "eslint-config-yoast-base": "github:moorscode/eslint-config-yoast-base",
     "eslint-config-yoast-typescript": "github:moorscode/eslint-config-yoast-typescript",
     "file-loader": "^6.2.0",
