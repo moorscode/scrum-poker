@@ -21,9 +21,6 @@
           {{ name }}
         </li>
       </ul>
-      <p v-if="unvotedNames.length === 0">
-        Everybody voted!
-      </p>
     </div>
   </div>
 </template>

@@ -1,13 +1,13 @@
 import { Interval } from "@nestjs/schedule";
 import { OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
-import PointsProvider from "../services/PointsProvider";
-import { Vote } from "../services/PokerStoryHandler";
-import PokersService from "../services/PokersService";
 import HistoryResponseAdapter from "../adapters/HistoryResponseAdapter";
 import MembersResponseAdapter from "../adapters/MembersResponseAdapter";
 import VoteResponseAdapter from "../adapters/VoteResponseAdapter";
+import PointsProvider from "../services/PointsProvider";
 import PokersCleanupService from "../services/PokersCleanupService";
+import PokersService from "../services/PokersService";
+import { Vote } from "../services/PokerStoryHandler";
 
 @WebSocketGateway( { namespace: "/pokers" } )
 /**
@@ -33,7 +33,8 @@ export default class PokersGateway implements OnGatewayInit {
 		private readonly voteResponseAdapter: VoteResponseAdapter,
 		private readonly historyResponseAdapter: HistoryResponseAdapter,
 		private readonly membersResponseAdapter: MembersResponseAdapter,
-	) {}
+	) {
+	}
 
 	/**
 	 * Clean up the rooms periodically.
@@ -119,6 +120,8 @@ export default class PokersGateway implements OnGatewayInit {
 	vote( client: Socket, message: { poker: string; vote: Vote } ): void {
 		this.pokersService.castVote( client, message.poker, message.vote );
 
+		this.send( message.poker, { votes: true } );
+
 		// Send this vote to all sockets for the current user.
 		const vote    = this.pokersService.getVote( client, message.poker );
 		const sockets = this.pokersService.getUserSockets( this.pokersService.getUserId( client ) );
@@ -128,8 +131,6 @@ export default class PokersGateway implements OnGatewayInit {
 				socket.emit( "myVote", { currentVote: vote.currentValue, initialVote: vote.initialValue } );
 			}
 		}
-
-		this.send( message.poker, { votes: true } );
 	}
 
 	@SubscribeMessage( "finish" )
@@ -185,6 +186,7 @@ export default class PokersGateway implements OnGatewayInit {
 
 		this.send( message.poker, { votes: true } );
 	}
+
 	/* eslint-enable require-jsdoc */
 
 	/**

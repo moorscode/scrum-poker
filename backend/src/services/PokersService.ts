@@ -3,7 +3,7 @@ import { Socket } from "socket.io";
 import PointsProvider from "./PointsProvider";
 import { Member } from "./PokerMemberManager";
 import PokerRoomCoordinator from "./PokerRoomCoordinator";
-import { Vote, Story } from "./PokerStoryHandler";
+import { Story, Vote } from "./PokerStoryHandler";
 import SocketUserHandler from "./SocketUsersHandler";
 
 export type GroupVoteNames = {
@@ -42,7 +42,8 @@ export default class PokersService {
 	public constructor(
 		private readonly socketUsersService: SocketUserHandler,
 		private readonly pointsProvider: PointsProvider,
-	) {}
+	) {
+	}
 
 	/**
 	 * Greets a new user.
@@ -132,7 +133,7 @@ export default class PokersService {
 			return socketRooms;
 		}
 
-		const remainingRooms   = remainingSockets.reduce(
+		const remainingRooms = remainingSockets.reduce(
 			( accumulator, otherSocket: Socket ) => {
 				return accumulator
 					.concat(

@@ -1,7 +1,7 @@
 import { NestFactory } from "@nestjs/core";
-import { MainModule } from "./modules/MainModule";
 import { NestExpressApplication } from "@nestjs/platform-express";
 import { dirname, join } from "path";
+import { MainModule } from "./modules/MainModule";
 
 /**
  * Bootstraps the application.

@@ -13,7 +13,8 @@ export default class PokersCleanupService {
 	 *
 	 * @param {PokersService} pokersService The Poker service.
 	 */
-	constructor( private readonly pokersService: PokersService ) {}
+	constructor( private readonly pokersService: PokersService ) {
+	}
 
 	/**
 	 * Remove timed out members.

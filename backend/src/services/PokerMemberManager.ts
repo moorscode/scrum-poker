@@ -62,7 +62,7 @@ export default class PokerMemberManager extends EventDispatcher implements Membe
 	 *
 	 * @private
 	 */
-	 public addMember( id: string, name: string ): void {
+	public addMember( id: string, name: string ): void {
 		const member: Member = {
 			id,
 			name,
@@ -93,7 +93,7 @@ export default class PokerMemberManager extends EventDispatcher implements Membe
 	 *
 	 * @private
 	 */
-	 public setMemberName( id: string, name: string ): void {
+	public setMemberName( id: string, name: string ): void {
 		this.members[ id ].name = name;
 	}
 
@@ -106,7 +106,7 @@ export default class PokerMemberManager extends EventDispatcher implements Membe
 	 *
 	 * @private
 	 */
-	 public removeMember( id: string ): void {
+	public removeMember( id: string ): void {
 		delete this.members[ id ];
 
 		this.dispatch( "member-removed", id );
@@ -119,16 +119,18 @@ export default class PokerMemberManager extends EventDispatcher implements Membe
 	 *
 	 * @returns {void}
 	 */
-	 public makeObserver( id: string ): void {
-		if ( this.members[ id ] ) {
-			const from = this.members[ id ].type;
-
-			this.members[ id ].type = "observer";
-			this.members[ id ].connected = true;
-
-			this.dispatch( "member-state", { from, to: "observer", id } );
-			this.dispatch( "member-removed", id );
+	public makeObserver( id: string ): void {
+		if ( ! this.members[ id ] ) {
+			return;
 		}
+
+		const from = this.members[ id ].type;
+
+		this.members[ id ].type      = "observer";
+		this.members[ id ].connected = true;
+
+		this.dispatch( "member-state", { from, to: "observer", id } );
+		this.dispatch( "member-removed", id );
 	}
 
 	/**
@@ -139,12 +141,14 @@ export default class PokerMemberManager extends EventDispatcher implements Membe
 	 * @returns {void}
 	 */
 	public setDisconnected( id: string ): void {
-		if ( this.members[ id ] ) {
-			this.members[ id ].disconnectTime = Date.now();
-			this.members[ id ].connected = false;
-
-			this.dispatch( "member-state", { from: this.members[ id ].type, to: "disconnected", id } );
+		if ( ! this.members[ id ] ) {
+			return;
 		}
+
+		this.members[ id ].disconnectTime = Date.now();
+		this.members[ id ].connected      = false;
+
+		this.dispatch( "member-state", { from: this.members[ id ].type, to: "disconnected", id } );
 	}
 
 	/**
@@ -188,16 +192,16 @@ export default class PokerMemberManager extends EventDispatcher implements Membe
 	 * @private
 	 */
 	public getMember( memberId: string ): Member {
-		 if ( this.members[ memberId ] ) {
+		if ( this.members[ memberId ] ) {
 			return this.members[ memberId ];
-		 }
+		}
 
-		 return {
-			 name: "Invalid",
-			 id: "0",
-			 type: "invalid",
-			 connected: false,
-		 };
+		return {
+			name: "Invalid",
+			id: "0",
+			type: "invalid",
+			connected: false,
+		};
 	}
 
 	/**

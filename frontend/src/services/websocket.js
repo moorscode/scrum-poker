@@ -1,7 +1,9 @@
 import io from "socket.io-client";
 
+const server = window.location.protocol + "//" + window.location.hostname + ":" + window.location.port + "" + window.location.pathname + "pokers";
+
 export default io(
-	window.location.protocol + "//" + window.location.hostname + ":" + window.location.port + "" + window.location.pathname + "pokers",
+	server,
 	{
 		reconnection: true,
 		reconnectionDelay: 750,

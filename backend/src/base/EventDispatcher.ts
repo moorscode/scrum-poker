@@ -1,4 +1,3 @@
-
 type Event = {
 	[ identifier: string ]: CallableFunction;
 }

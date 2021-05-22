@@ -101,7 +101,7 @@ export default class PokerStoryHandler {
 			return;
 		}
 
-		const pointTotal = story.votes.reduce<number>(
+		const pointTotal  = story.votes.reduce<number>(
 			( accumulator: number, vote: Vote ) =>
 				accumulator + ( vote.currentValue as number ),
 			0,
@@ -145,7 +145,7 @@ export default class PokerStoryHandler {
 	 *
 	 * @returns {void}
 	 */
-	 public castVote( memberId: string, vote: VoteValue ): void {
+	public castVote( memberId: string, vote: VoteValue ): void {
 		if ( ! this.getCurrentVote( memberId ) ) {
 			this.addVote( memberId, vote );
 			return;
@@ -261,13 +261,11 @@ export default class PokerStoryHandler {
 	/**
 	 * Gets all casted votes and backfills the missing votes with "?".
 	 *
-	 * @param {Story} story The story to get votes for.
-	 *
 	 * @returns {Vote[]} The actual votes with the backfilled missing votes.
 	 */
 	private getUnobscuredVotes(): Vote[] {
-		const notVotedClients:Member[] = this.getVotePendingClients();
-		const notVoted = notVotedClients.map(
+		const notVotedClients: Member[] = this.getVotePendingClients();
+		const notVoted                  = notVotedClients.map(
 			( client: Member ): ObscuredVote => this.getObscuredVote( client ),
 		);
 
@@ -305,7 +303,7 @@ export default class PokerStoryHandler {
 	 * @returns {ObscuredVote} The obscured vote representing an hidden cast vote ("X") or a missing vote ("?").
 	 */
 	private getObscuredVote( member: Member ): ObscuredVote {
-		const hasVoted: boolean = typeof( this.getCurrentVote( member.id ) ) !== "undefined";
+		const hasVoted: boolean            = typeof this.getCurrentVote( member.id ) !== "undefined";
 		const voteValue: ObscuredVoteValue = hasVoted ? "!" : "#";
 
 		return {

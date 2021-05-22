@@ -25,7 +25,7 @@ export default class PokerHistoryList {
 	 *
 	 * @returns {Story[]} The stories of the room.
 	 */
-	 public getHistory(): Story[] {
+	public getHistory(): Story[] {
 		return this.history;
 	}
 
