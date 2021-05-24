@@ -17,9 +17,9 @@ import { mapState } from "vuex";
 export default {
 	name: "ResultStatistics",
 	computed: {
-		...mapState( [ "voteCount", "members", "voteAverage", "nearestPointAverage", "points", "votes" ] ),
+		...mapState( [ "voteCount", "members", "voteAverage", "nearestPointAverage", "points", "votes", "votesRevealed" ] ),
 		average() {
-			if ( this.voteCount === 0 || this.voteCount < this.members.voters.length ) {
+			if ( ! this.votesRevealed && ( this.voteCount === 0 || this.voteCount < this.members.voters.length ) ) {
 				return "";
 			}
 
@@ -60,22 +60,26 @@ export default {
 				return "n/a";
 			}
 
-			const flattendVotes = this.votes.map( vote => vote.currentValue );
+			const flattenedVotes = this.votes.map( vote => vote.currentValue );
 
-			if ( flattendVotes.indexOf( "coffee" ) !== -1 ) {
+			if ( flattenedVotes.indexOf( "coffee" ) !== -1 ) {
 				return "n/a";
 			}
 
-			if ( flattendVotes.indexOf( "?" ) !== -1 ) {
+			if ( flattenedVotes.indexOf( "?" ) !== -1 ) {
 				return "n/a";
 			}
+
+			const numberVotes = flattenedVotes
+				.map( ( vote ) => typeof vote === "number" ? parseFloat( "" + vote ) : null )
+				.filter( ( vote ) => vote !== null );
 
 			let powers = 0;
-			for ( let i = 0; i < this.votes.length; i++ ) {
-				powers += Math.pow( parseFloat( this.votes.map( vote => vote.currentValue )[ i ] ) - this.average, 2 );
+			for ( let i = 0; i < numberVotes.length; i++ ) {
+				powers += Math.pow( numberVotes[ i ] - this.average, 2 );
 			}
 
-			return Math.round( Math.sqrt( powers / this.votes.length ) * 100 ) / 100;
+			return Math.round( Math.sqrt( powers / numberVotes.length ) * 100 ) / 100;
 		},
 		averagePoint() {
 			if ( this.average === "" ) {
