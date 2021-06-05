@@ -1,7 +1,7 @@
-import PokersCleanupService from "../../../backend/src/services/PokersCleanupService";
+import PokersCleanupService from "../../../backend/src/services/Poker/PokersCleanupService";
 import { Test } from "@nestjs/testing";
-import PokersService from "../../../backend/src/services/PokersService";
-import PointsProvider from "../../../backend/src/services/PointsProvider";
+import PokersService from "../../../backend/src/services/Poker/PokersService";
+import PointsProvider from "../../../backend/src/services/Poker/PointsProvider";
 import SocketUsersService from "../../../backend/src/services/SocketUsersHandler";
 import { Socket } from "socket.io";
 import now from "../../bootstrap";

@@ -1,4 +1,4 @@
-import PokerMemberManager from "../../../backend/src/services/PokerMemberManager";
+import PokerMemberManager from "../../../backend/src/services/Poker/PokerMemberManager";
 
 describe( "PokerMemberManager", () => {
 	let pokerMemberManager: PokerMemberManager;

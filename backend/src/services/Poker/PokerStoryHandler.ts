@@ -30,7 +30,7 @@ export type ObscuredVote = Vote & {
  * Poker story handler.
  */
 export default class PokerStoryHandler {
-	private story: Story;
+	private readonly story: Story;
 
 	/**
 	 * Creates a new Poker Story.

@@ -17,7 +17,7 @@ const config = {
 		...glob.sync( path.join( __dirname, "src/css/*.scss" ) ),
 	],
 	output: {
-		path: path.resolve( process.cwd(), "dist/frontend" ),
+		path: path.resolve( process.cwd(), "dist/frontend/compliments-game" ),
 		filename: "[name].[contenthash].js",
 	},
 	target: "web",
@@ -82,7 +82,7 @@ const config = {
 	devServer: {
 		contentBase: path.join( __dirname, "public" ),
 		compress: true,
-		port: dotenv.parsed.POKER_CLIENT_PORT || 9000,
+		port: dotenv.parsed.CARDSGAME_CLIENT_PORT || 9000,
 		proxy: {
 			"/socket.io": {
 				target: "http://localhost:" + dotenv.parsed.SERVER_PORT,

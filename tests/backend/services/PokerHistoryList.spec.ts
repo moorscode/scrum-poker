@@ -1,5 +1,5 @@
-import PokerHistoryList from "../../../backend/src/services/PokerHistoryList";
-import { Story } from "../../../backend/src/services/PokerStoryHandler";
+import PokerHistoryList from "../../../backend/src/services/Poker/PokerHistoryList";
+import { Story } from "../../../backend/src/services/Poker/PokerStoryHandler";
 
 describe( "PokerHistoryList", () => {
 	let pokerHistoryList: PokerHistoryList;

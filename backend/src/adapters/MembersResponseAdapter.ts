@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
-import { Member } from "../services/PokerMemberManager";
-import { GroupedMembers } from "../services/PokersService";
+import { Member } from "../services/Poker/PokerMemberManager";
+import { GroupedMembers } from "../services/Poker/PokersService";
 
 export type MembersResponse = {
 	voters: string[];

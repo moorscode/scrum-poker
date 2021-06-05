@@ -1,4 +1,4 @@
-import EventDispatcher, { EventDispatcherInterface } from "../base/EventDispatcher";
+import EventDispatcher, { EventDispatcherInterface } from "../../base/EventDispatcher";
 
 export type MemberType = "voter" | "observer" | "invalid";
 

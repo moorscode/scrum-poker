@@ -1,4 +1,4 @@
-import PointsProvider from "../../../backend/src/services/PointsProvider";
+import PointsProvider from "../../../backend/src/services/Poker/PointsProvider";
 
 describe( "PointsProvider", () => {
 	let pointsProvider: PointsProvider;

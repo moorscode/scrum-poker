@@ -4,7 +4,7 @@ import PointsProvider from "./PointsProvider";
 import { Member } from "./PokerMemberManager";
 import PokerRoomCoordinator from "./PokerRoomCoordinator";
 import { Story, Vote } from "./PokerStoryHandler";
-import SocketUserHandler from "./SocketUsersHandler";
+import SocketUserHandler from "../SocketUsersHandler";
 
 export type GroupVoteNames = {
 	[ group: string ]: string[];

@@ -1,7 +1,7 @@
 import { Test } from "@nestjs/testing";
-import PointsProvider from "../../../backend/src/services/PointsProvider";
-import PokerMemberManager from "../../../backend/src/services/PokerMemberManager";
-import PokerStoryHandler from "../../../backend/src/services/PokerStoryHandler";
+import PointsProvider from "../../../backend/src/services/Poker/PointsProvider";
+import PokerMemberManager from "../../../backend/src/services/Poker/PokerMemberManager";
+import PokerStoryHandler from "../../../backend/src/services/Poker/PokerStoryHandler";
 
 describe( "PokerStoryHandler", () => {
 	let pokerStoryHandler: PokerStoryHandler;

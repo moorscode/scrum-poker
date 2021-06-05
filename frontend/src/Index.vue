@@ -1,47 +1,48 @@
 <template>
-  <main :class="[ { observing: observer }, backgroundColor ]">
-	<theme-picker />
-	<server-connection />
+	<main :class="[ { observing: observer }, backgroundColor ]">
+		<theme-picker/>
+		<server-connection/>
 
-	<section v-if="loading === false" class="poker container">
-	<h1>{{ title }}</h1>
+		<section v-if="loading === false" class="poker container">
+			<h1>{{ title }}</h1>
 
-	<section v-if="connected === false">
-		<connecting />
-	</section>
-
-	<section v-if="connected === true">
-		<room />
-
-		<div v-cloak v-if="room" class="pokerMain">
-			<refinement-finished v-if="refinementFinished" />
-
-			<section v-if="!refinementFinished">
-				<member-list />
-				<nickname />
-				<observer />
-				<story /> <refinement />
-
-				<section class="storyControls">
-					<story-name />
-					<poker-choices />
-				</section>
-
-				<results />
-				<result-statistics />
-
-				<member-status />
-
-				<story-history />
+			<section v-if="connected === false">
+				<connecting/>
 			</section>
-		</div>
+
+			<section v-if="connected === true">
+				<room/>
+
+				<div v-cloak v-if="room" class="pokerMain">
+					<refinement-finished v-if="refinementFinished"/>
+
+					<section v-if="!refinementFinished">
+						<member-list/>
+						<nickname/>
+						<observer/>
+						<story/>
+						<refinement/>
+
+						<section class="storyControls">
+							<story-name/>
+							<poker-choices/>
+						</section>
+
+						<results/>
+						<result-statistics/>
+
+						<member-status/>
+
+						<story-history/>
+					</section>
+				</div>
+			</section>
 		</section>
-	</section>
 
-	<feature-list v-if="this.room === false && this.loading === false" />
+		<feature-list v-if="this.room === false && this.loading === false"/>
 
-	<credits />
-  </main>
+		<credits/>
+	</main>
 </template>
 
 <script lang="ts">

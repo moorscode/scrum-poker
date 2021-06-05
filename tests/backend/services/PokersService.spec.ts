@@ -1,7 +1,7 @@
 import { Test } from "@nestjs/testing";
 import { Socket } from "socket.io";
-import PointsProvider from "../../../backend/src/services/PointsProvider";
-import PokersService from "../../../backend/src/services/PokersService";
+import PointsProvider from "../../../backend/src/services/Poker/PointsProvider";
+import PokersService from "../../../backend/src/services/Poker/PokersService";
 import SocketUserHandler from "../../../backend/src/services/SocketUsersHandler";
 
 describe( "PokersService", () => {
