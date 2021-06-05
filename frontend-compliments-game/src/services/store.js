@@ -10,6 +10,7 @@ export default new Vuex.Store( {
 		loading: false,
 		room: "",
 		nickname: "",
+		game: {},
 	},
 	mutations: {
 		nickname( state, nickname ) {
@@ -28,6 +29,9 @@ export default new Vuex.Store( {
 		},
 		SOCKET_JOINED( state, room ) {
 			state.room = room;
+		},
+		SOCKET_GAME( state, game ) {
+			state.game = game;
 		},
 	},
 } );

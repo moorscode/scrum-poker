@@ -1,5 +1,9 @@
+import { Interval } from "@nestjs/schedule";
 import { OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
+import CardsProvider from "../services/ComplimentsGame/CardsProvider";
+import GameCleanupService from "../services/ComplimentsGame/GameCleanupService";
+import GameService from "../services/ComplimentsGame/GameService";
 
 @WebSocketGateway( { namespace: "/compliments-game" } )
 /**
@@ -10,8 +14,28 @@ export default class ComplimentsGameGateway implements OnGatewayInit {
 
 	/**
 	 * Constructor
+	 *
+	 * @param {PokersService} gameService The Poker service.
+	 * @param {PointsProvider} cardsProvider The points provider service.
+	 * @param {PokersCleanupService} cleanupService The Poker cleanup service.
 	 */
-	constructor() {}
+	constructor(
+		private readonly gameService: GameService,
+		private readonly cardsProvider: CardsProvider,
+		private readonly cleanupService: GameCleanupService,
+	) {
+	}
+
+	/**
+	 * Clean up the rooms periodically.
+	 *
+	 * @returns {void}
+	 */
+	@Interval( 10000 )
+	cleanupInterval(): void {
+		const changedRooms = this.cleanupService.cleanup();
+		// changedRooms.map( ( room: string ) => this.send( room, { members: true, votes: true } ) );
+	}
 
 	/**
 	 * When the connection is initialized, run setup for the client socket.
@@ -22,11 +46,10 @@ export default class ComplimentsGameGateway implements OnGatewayInit {
 		this.server.on( "connection", ( socket: Socket ) => {
 			// Let the client know the points that can be chosen from.
 			socket.emit( "userId", this.generateId() );
-			// socket.emit( "cards", this.cardsProvider.getCards() );
 
 			socket.on( "disconnecting", () => {
-				// const rooms = this.cardsGameService.disconnect( socket );
-				// rooms.map( ( room: string ) => this.send( room, { members: true, votes: true } ) );
+				const rooms = this.gameService.disconnect( socket );
+				rooms.map( ( room: string ) => this.update( room ) );
 			} );
 		} );
 	}
@@ -48,44 +71,55 @@ export default class ComplimentsGameGateway implements OnGatewayInit {
 	@SubscribeMessage( "identify" )
 	identify( client: Socket, message: { id: string } ): void {
 		console.log( "identify", client.id, message );
-		// this.cardsGameService.identify( client, message.id );
+		this.gameService.identify( client, message.id );
 		client.emit( "welcome" );
 	}
 
 	@SubscribeMessage( "exit" )
 	exit( client: Socket ): void {
 		console.log( "exit", client.id );
-		// const rooms = this.cardsGameService.exit( client );
-		// rooms.map( ( room: string ) => this.send( room, { members: true, votes: true } ) );
+		const rooms = this.gameService.exit( client );
+		rooms.map( ( room: string ) => this.update( room ) );
 	}
 
 	@SubscribeMessage( "join" )
 	join( client: Socket, message: { room: string; name?: string } ): void {
 		console.log( "join", client.id, message );
-		// this.cardsGameService.join( client, message.room, message.name );
+		this.gameService.join( client, message.room, message.name );
 
 		client.emit( "joined", message.room );
+
+		this.update( message.room );
 	}
 
 	@SubscribeMessage( "leave" )
 	leave( client: Socket, message: { room: string } ): void {
-		// this.cardsGameService.leave( client, message.room );
+		this.gameService.leave( client, message.room );
 
-		// this.send( message.room, { members: true, votes: true } );
+		this.update( message.room );
 	}
 
 	// @SubscribeMessage( "finish" )
-	// finish( client: Socket, message: { room: string } ): void {
-	// 	console.log( "finish", message, client.id );
-	// 	this.server.to( message.room ).emit( "finished" );
+	// Finish( client: Socket, message: { room: string } ): void {
+	// 	Console.log( "finish", message, client.id );
+	// 	This.server.to( message.room ).emit( "finished" );
 	// }
 
 	@SubscribeMessage( "nickname" )
 	setNickname( client: Socket, message: { name: string; room: string } ): void {
 		console.log( "nickname", message );
-		// this.cardsGameService.setName( message.room, client, message.name );
+		this.gameService.setName( message.room, client, message.name );
 
-		// this.send( message.room, { members: true, votes: true } );
+		this.update( message.room );
 	}
 	/* eslint-enable require-jsdoc */
+
+	/**
+	 *
+	 * @param {string} room
+	 * @private
+	 */
+	private update( room: string ) {
+		this.server.to( room ).emit( "game", this.gameService.getGame( room ) );
+	}
 }

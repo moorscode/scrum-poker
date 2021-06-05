@@ -2,9 +2,8 @@ import { Injectable } from "@nestjs/common";
 
 export type Card = {
 	description: string;
-	dealt: boolean;
-	received: boolean;
-	receivedFrom?: string;
+	from?: string;
+	to?: string;
 };
 
 @Injectable()
@@ -21,13 +20,12 @@ export default class CardsProvider {
 		return [
 			{
 				description: "You give great compliments",
-				dealt: true,
-				received: false,
 			},
 			{
 				description: "You are a good listener",
-				dealt: true,
-				received: false,
+			},
+			{
+				description: "You are a also good listener",
 			},
 		];
 	}
