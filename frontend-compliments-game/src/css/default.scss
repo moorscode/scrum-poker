@@ -284,8 +284,21 @@ form.username {
 	}
 }
 
+.memberList-heading {
+	display: flex;
+	width: 100%;
+	margin: 24px 0 0;
+	font-size: 80%;
+	padding: 0;
+	align-items: flex-start;
+	& div {
+		flex: 1;
+		padding: 8px 0;
+	}
+}
+
 ul.memberList {
-	margin: 32px 0;
+	margin: 0 0 16px;
 	&,
 	& ul {
 		padding: 0;
@@ -298,6 +311,16 @@ ul.memberList {
 
 	& .received {
 		color: var( --main-accent-color );
+		&:before,
+		&:after {
+			content: '"';
+		}
+	}
+
+	& .received-from {
+		font-weight: normal;
+		font-size: 90%;
+		padding: 0;
 	}
 
 	& > li {
@@ -321,6 +344,18 @@ ul.memberList {
 			}
 		}
 	}
+
+	.previous-game {
+		margin: 16px 0 0;
+	}
+}
+
+.game-status {
+	font-size: 85%;
+}
+
+.start-the-game {
+	margin: 16px 0 0;
 }
 
 #card-picker {

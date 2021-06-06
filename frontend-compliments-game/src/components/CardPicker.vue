@@ -7,7 +7,7 @@
 					<li
 						v-for="card in myCards"
 						@click="pickCard(card)"
-						v-bind:key="card.description"
+						v-bind:key="card.id"
 						:class="pickedCard === card ? 'selected' : 'pick'"
 					>
 						{{ card.description }}
@@ -19,20 +19,40 @@
 						v-for="member in myRecipients"
 						@click="pickRecipient(member)"
 						v-bind:key="member.id"
-						:class="pickedMember === member ? 'selected' : 'pick'">
+						:class="pickedMember === member ? 'selected' : 'pick'"
+					>
 						{{ member.name }}
 					</li>
 				</ul>
-				<button @click="giveCard" :disabled="!pickedCard.description || !pickedMember.id">Give the card</button>
+				<button
+						@click="giveCard"
+						:disabled="!pickedCard.id || !pickedMember.id"
+				>Give the card
+				</button>
+				<p>Recipient indisposed?
+					<button @click="voteSkip">Let somebody else go instead</button>
+				</p>
 			</div>
 			<div v-if="turn !== userId">
 				<h2>{{ memberIdToName[turn] }} is choosing the card and recipient</h2>
-				<p><strong>Card:</strong> {{ pickedCard.description }}</p>
-				<p><strong>Recipient:</strong> {{ pickedMember.id === userId ? "YOU!" : memberIdToName[ pickedMember.id ] }}</p>
+				<p>
+					<strong>Card:</strong>
+					{{ pickedCard.description }}
+				</p>
+
+				<p>
+					<strong>Recipient:</strong>
+					{{ pickedMember.id === userId ? "YOU!" : memberIdToName[pickedMember.id] }}
+				</p>
 
 				<p>
 					Taking too long? Vote to skip...
-					<button @click="voteSkip" :disabled="waited < waitingTime">Next please <span v-if="waited < waitingTime">(available in {{ waitingTime - waited }} seconds)</span></button>
+					<button
+							@click="voteSkip"
+							:disabled="waited < waitingTime"
+					>Next please
+						<span v-if="waited < waitingTime">(available in {{ waitingTime - waited }} seconds)</span>
+					</button>
 				</p>
 			</div>
 		</div>
@@ -46,7 +66,7 @@ export default {
 	name: "card-picker",
 	data() {
 		return {
-			pickedCard: { description: "" },
+			pickedCard: { id: "" },
 			pickedMember: { id: "" },
 			debug: false,
 			waited: 0,
@@ -76,6 +96,8 @@ export default {
 			this.pickedMember = { id: "" };
 			this.pickedCard = { description: "" };
 			this.waited = 0;
+
+			window.clearInterval( this.counter );
 			this.counter = window.setInterval( () => {
 				this.waited++;
 			}, 1000 );
@@ -89,7 +111,7 @@ export default {
 				"pick",
 				{
 					room: this.room,
-					card: this.pickedCard.description,
+					card: this.pickedCard.id,
 					to: this.pickedMember.id,
 				},
 			);
@@ -101,7 +123,7 @@ export default {
 				"pick",
 				{
 					room: this.room,
-					card: this.pickedCard.description,
+					card: this.pickedCard.id,
 					to: this.pickedMember.id,
 				},
 			);
@@ -111,8 +133,8 @@ export default {
 				"give",
 				{
 					room: this.room,
+					card: this.pickedCard.id,
 					to: this.pickedMember.id,
-					card: this.pickedCard.description,
 				},
 			);
 		},
@@ -130,7 +152,7 @@ export default {
 			this.waited = 0;
 			if ( data.from !== this.userId ) {
 				this.pickedMember.id = data.to;
-				this.pickedCard.description = data.card;
+				this.pickedCard = data.card;
 			}
 		},
 	},

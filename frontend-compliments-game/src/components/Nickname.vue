@@ -11,7 +11,7 @@
       >
       <input
         type="submit"
-        value="Update"
+        value="Save"
         @click.prevent="updateNickname"
 		:disabled="game.started"
       >

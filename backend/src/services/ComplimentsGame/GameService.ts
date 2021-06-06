@@ -144,6 +144,18 @@ export default class GameService {
 	}
 
 	/**
+	 * Retrieves a card by ID.
+	 *
+	 * @param {string} room The room.
+	 * @param {string} cardId The card ID.
+	 *
+	 * @returns {Card} The card.
+	 */
+	public getCard( room: string, cardId: string ): Card {
+		return this.getRoom( room ).getCard( cardId );
+	}
+
+	/**
 	 * Retrieves the sockets the userId is connected with.
 	 *
 	 * @param {string} userId The user to get the sockets for.
@@ -258,20 +270,44 @@ export default class GameService {
 	 *
 	 * @returns {void}
 	 */
-	public startGame( room: string ): string {
-		return this.getRoom( room ).startGame();
+	public startGame( room: string ): void {
+		this.getRoom( room ).startGame();
 	}
 
-	public giveCard( room: string, socket: Socket, card: string, to: string ): string {
+	/**
+	 * Gives a card.
+	 *
+	 * @param {string} room The room to use.
+	 * @param {SocketIO.Socket} socket The client that gave the card.
+	 * @param {string} card The card.
+	 * @param {string} to The receiver.
+	 *
+	 * @returns {Card} The picked card.
+	 */
+	public giveCard( room: string, socket: Socket, card: string, to: string ): Card {
 		return this.getRoom( room ).giveCard( this.getUserId( socket ), card, to );
 	}
 
+	/**
+	 * Retrieves the member ID who's turn it is.
+	 *
+	 * @param {string} room The room to use.
+	 *
+	 * @returns {string} The ID of the member who's turn it is.
+	 */
 	public getTurnMemberId( room: string ): string {
 		return this.getRoom( room ).getTurnMemberId();
 	}
 
-	public voteSkip( room: string, socket: Socket ): void {
-		this.getRoom( room ).voteSkip( this.getUserId( socket ) );
+	/**
+	 * Votes to skip the current turn.
+	 *
+	 * @param {string} room The room to use.
+	 *
+	 * @returns {void}
+	 */
+	public voteSkip( room: string ): void {
+		this.getRoom( room ).voteSkip();
 	}
 
 	/**

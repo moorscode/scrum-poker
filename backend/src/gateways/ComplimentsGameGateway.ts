@@ -115,6 +115,7 @@ export default class ComplimentsGameGateway implements OnGatewayInit {
 		this.server.to( message.room ).emit( "picked", {
 			from: this.gameService.getUserId( client ),
 			card: message.card,
+			card: this.gameService.getCard( message.room, message.card ),
 			to: message.to,
 		} );
 	}
@@ -128,11 +129,7 @@ export default class ComplimentsGameGateway implements OnGatewayInit {
 
 	@SubscribeMessage( "vote-skip" )
 	skip( client: Socket, message: { room: string } ): void {
-		console.log( "voted to skip", client.id, message );
-
-		this.gameService.voteSkip( message.room, client );
-
-		console.log( this.gameService.getTurnMemberId( message.room ) );
+		this.gameService.voteSkip( message.room );
 
 		this.update( message.room );
 	}

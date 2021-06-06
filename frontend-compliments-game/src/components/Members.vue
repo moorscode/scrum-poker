@@ -1,11 +1,22 @@
 <template>
 	<section>
+		<div class="memberList-heading">
+			<div>Participant</div>
+			<div>Pending compliments</div>
+			<div>Given compliments</div>
+		</div>
 		<ul class="memberList">
-			<li v-if="! game.members.length" v-for="member in members" v-bind:key=member.id :class="member.id === userId ? 'me' : ''">
-				<div><i :class="['fas', members[member.id].connected ? 'fa-user' : 'fa-user-times']"/> {{ member.name }}</div>
+			<li v-if="! game.started" v-for="member in sortedMembers(members)" v-bind:key=member.id
+				:class="member.id === userId ? 'me' : ''">
+				<div><i :class="['fas', member.connected ? 'fa-user' : 'fa-user-times']"/> {{ member.name }}
+				</div>
 			</li>
-			<li v-for="member in game.members" v-bind:key=member :class="member.id === userId ? 'me' : ''">
-				<div><i :class="['fas', members[member.id].connected ? 'fa-user' : 'fa-user-slash']"/> {{ member.name }}</div>
+
+			<h3 v-if="! game.start && game.members.length > 0 && game.cards.length > 0" class="previous-game">Previous game:</h3>
+
+			<li v-if="game.cards.length > 0" v-for="member in sortedMembers(game.members)" v-bind:key=member :class="member.id === userId ? 'me' : ''">
+				<div><i :class="['fas', members[member.id].connected ? 'fa-user' : 'fa-user-slash']"/> {{ member.name }}
+				</div>
 				<div>
 					<ul>
 						<li v-for="card in pendingCards[member.id]" v-bind:key="'pending' + card.description">
@@ -17,7 +28,7 @@
 					<ul>
 						<li v-for="card in receivedCards[member.id]" v-bind:key="'received' + card.description">
 							<div class="received">{{ card.description }}</div>
-							from: {{ memberIdToName[ card.from ]}}
+							<div class="received-from">&mdash; {{ memberIdToName[card.from] }}</div>
 						</li>
 					</ul>
 				</div>
@@ -52,5 +63,20 @@ export default {
 			);
 		},
 	},
+	methods: {
+		sortedMembers( source ) {
+			const members = Object.values( source );
+			members.sort( ( a, b ) => {
+				if ( a.id === this.userId ) {
+					return -1;
+				}
+				if ( b.id === this.userId ) {
+					return 1;
+				}
+				return 0;
+			} );
+			return members;
+		},
+	}
 };
 </script>

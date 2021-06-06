@@ -25,6 +25,46 @@ export default class GameHandler {
 		private readonly cardsProvider: CardsProvider,
 	) {
 		this.game = { cards: [], members: [], started: false };
+
+		this.membersManager.on( "member-removed", this.removeMember.bind( this ) );
+	}
+
+	/**
+	 * Retrieves a card by Id.
+	 *
+	 * @param {string} cardId The card ID.
+	 *
+	 * @returns {Card} The card.
+	 */
+	public getCard( cardId: string ): Card {
+		return this.game.cards.find( ( card: Card ) => card.id === cardId );
+	}
+
+	/**
+	 * Removes a member from the game.
+	 *
+	 * @param {string} memberId The member that left.
+	 *
+	 * @returns {void}
+	 */
+	public removeMember( memberId: string ): void {
+		this.game.members = this.membersManager.getConnected();
+		this.game.cards = this.game.cards.filter( ( card: Card ) => card.from !== memberId && card.to !== memberId );
+
+		const memberCount       = this.game.members.length;
+		const cardsPerMember    = memberCount - 1;
+
+		this.game.members.forEach( ( member: Member ) => {
+			// If we removed an already given card, we don't have anything else to do.
+			const memberCards = this.game.cards.filter( ( card: Card ) => card.from === member.id );
+			if ( memberCards.length === cardsPerMember ) {
+				return;
+			}
+
+			// Remove the first unassigned card.
+			const index = this.game.cards.findIndex( ( card: Card ) => card.from === member.id && ! card.to );
+			this.game.cards.splice( index, 1 );
+		} );
 	}
 
 	/**
@@ -52,9 +92,9 @@ export default class GameHandler {
 		let cardIndex = 0;
 
 		members.forEach( ( member: Member ) => {
-			for ( let counter = 0; counter < cardsPerMember; counter ++ ) {
+			for ( let counter = 0; counter < cardsPerMember; counter++ ) {
 				this.game.cards[ cardIndex ].from = member.id;
-				cardIndex ++;
+				cardIndex++;
 			}
 		} );
 
@@ -64,40 +104,61 @@ export default class GameHandler {
 	/**
 	 * Starts a game.
 	 *
-	 * @returns {string}
+	 * @returns {void}
 	 */
-	public startGame(): string {
+	public startGame(): void {
 		this.game.members = this.membersManager.getConnected();
 
 		if ( this.assignCards() ) {
 			this.game.started = true;
 
-			return this.selectTurnMemberId();
+			this.selectTurnMemberId();
 		}
-
-		return "";
 	}
 
-	public giveCard( memberId: string, cardDescription: string, to: string ): string {
-		const theCard = this.game.cards.find( ( card: Card ) => card.description === cardDescription );
+	/**
+	 * Gives a card to a member.
+	 *
+	 * @param {string} memberId The giver.
+	 * @param {string} cardId The card.
+	 * @param {string} to The receiver.
+	 *
+	 * @returns {Card} The picked card.
+	 */
+	public giveCard( memberId: string, cardId: string, to: string ): Card {
+		const theCard = this.game.cards.find( ( card: Card ) => card.id === cardId );
 		theCard.to    = to;
 
-		return this.selectTurnMemberId();
+		this.selectTurnMemberId();
+
+		return theCard;
 	}
 
-	private selectTurnMemberId(): string {
+	/**
+	 * Selects the next member who's turn it will be.
+	 *
+	 * @returns {void}
+	 *
+	 * @private
+	 */
+	private selectTurnMemberId(): void {
 		// Only if there are still cards left...
 		if ( ! this.haveAvailableCards() ) {
 			this.finishGame();
-			return "";
+			return;
 		}
 
 		let memberIds = this.game.members.map( ( member: Member ) => member.id );
-		memberIds     = memberIds.filter( ( memberId ) => memberId !== this.lastTurnMemberId );
 
-		memberIds = memberIds.filter( ( memberId ) =>
-			this.game.cards.filter( ( card: Card ) => card.from === memberId && card.to === "" ),
+		memberIds = memberIds.filter(
+			( memberId ) => this.game.cards.filter( ( card: Card ) => card.from === memberId && ! card.to ).length !== 0,
 		);
+
+		memberIds = [ ...new Set( memberIds ) ];
+
+		if ( memberIds.length > 1 ) {
+			memberIds = memberIds.filter( ( memberId ) => memberId !== this.lastTurnMemberId );
+		}
 
 		/**
 		 * This is not needed with the skip functionality.
@@ -109,20 +170,28 @@ export default class GameHandler {
 
 		if ( memberIds.length === 0 ) {
 			this.finishGame();
-			return "";
+			return;
 		}
 
-		const index = Math.floor( Math.random() * memberIds.length );
+		const index = memberIds.length === 1 ? 0 : Math.floor( Math.random() * memberIds.length );
 
 		this.lastTurnMemberId = memberIds[ index ];
-
-		return memberIds[ index ];
 	}
 
+	/**
+	 * Retreives who's turn it is.
+	 *
+	 * @returns {string} The member ID who's turn it is.
+	 */
 	public getTurnMemberId(): string {
 		return this.lastTurnMemberId;
 	}
 
+	/**
+	 * Checks if there are any ungiven cards left in the game.
+	 *
+	 * @returns {boolean} True if there are cards to give.
+	 */
 	public haveAvailableCards(): boolean {
 		return this.game.cards.filter( ( card: Card ) => ! card.to ).length > 0;
 	}
@@ -145,7 +214,12 @@ export default class GameHandler {
 		return this.game;
 	}
 
-	public voteSkip( memberId: string ): void {
+	/**
+	 * Skips the current turn to another player.
+	 *
+	 * @returns {void}
+	 */
+	public voteSkip(): void {
 		// Do something.
 		this.selectTurnMemberId();
 	}
@@ -160,7 +234,7 @@ export default class GameHandler {
 	 * @private
 	 */
 	private shuffleArray( array: Card[] ) {
-		for ( let index = array.length - 1; index > 0; index -- ) {
+		for ( let index = array.length - 1; index > 0; index-- ) {
 			const secondIndex    = Math.floor( Math.random() * ( index + 1 ) );
 			const temp           = array[ index ];
 			array[ index ]       = array[ secondIndex ];

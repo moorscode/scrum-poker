@@ -1,4 +1,4 @@
-import CardsProvider from "./CardsProvider";
+import CardsProvider, { Card } from "./CardsProvider";
 import GameHandler, { Game } from "./GameHandler";
 import GameMemberManager, { Member, MemberList } from "./GameMemberManager";
 
@@ -24,24 +24,47 @@ export default class GameRoomCoordinator {
 	 * @returns {void}
 	 */
 	public newGame(): void {
-		// Create a new story.
 		this.gameHandler = new GameHandler( this.membersManager, this.cardsProvider );
 	}
 
-	public startGame(): string {
-		return this.gameHandler.startGame();
+	/**
+	 * Starts a game.
+	 *
+	 * @returns {void}
+	 */
+	public startGame(): void {
+		this.gameHandler.startGame();
 	}
 
-	public giveCard( memberId: string, card: string, to: string ): string {
+	/**
+	 * Gives a card to another member.
+	 *
+	 * @param {string} memberId The giver.
+	 * @param {string} card The card.
+	 * @param {string} to The receiver.
+	 *
+	 * @returns {Card} The picked card.
+	 */
+	public giveCard( memberId: string, card: string, to: string ): Card {
 		return this.gameHandler.giveCard( memberId, card, to );
 	}
 
+	/**
+	 * Retrieves the member who's turn it is.
+	 *
+	 * @returns {string} The member's ID.
+	 */
 	public getTurnMemberId(): string {
 		return this.gameHandler.getTurnMemberId();
 	}
 
-	public voteSkip( memberId: string ): void {
-		this.gameHandler.voteSkip( memberId );
+	/**
+	 * Votes to skip the current turn.
+	 *
+	 * @returns {void}
+	 */
+	public voteSkip(): void {
+		this.gameHandler.voteSkip();
 	}
 
 	/**
@@ -51,6 +74,17 @@ export default class GameRoomCoordinator {
 	 */
 	public getGame(): Game {
 		return this.gameHandler.getGame();
+	}
+
+	/**
+	 * Retrieves a card by ID.
+	 *
+	 * @param {string} cardId The card ID.
+	 *
+	 * @returns {Card} The card.
+	 */
+	public getCard( cardId: string ): Card {
+		return this.gameHandler.getCard( cardId );
 	}
 
 	/**
