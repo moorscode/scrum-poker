@@ -37,12 +37,12 @@
 				<h2>{{ memberIdToName[turn] }} is choosing the card and recipient</h2>
 				<p>
 					<strong>Card:</strong>
-					{{ pickedCard.description }}
+					{{ pickedCard.description || "..." }}
 				</p>
 
 				<p>
 					<strong>Recipient:</strong>
-					{{ pickedMember.id === userId ? "YOU!" : memberIdToName[pickedMember.id] }}
+					{{ pickedMember.id === userId ? "YOU!" : memberIdToName[pickedMember.id] || "..." }}
 				</p>
 
 				<p>
