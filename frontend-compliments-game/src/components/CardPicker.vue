@@ -2,7 +2,9 @@
 	<div id="card-picker" v-if="game.started && turn">
 		<div class="container">
 			<div v-if="turn === userId">
+				<h1>It's your turn!</h1>
 				<h2>Pick a card</h2>
+				<small>Click on an item below to select it.</small>
 				<ul>
 					<li
 						v-for="card in myCards"
@@ -14,6 +16,7 @@
 					</li>
 				</ul>
 				<h2>Pick a recipient</h2>
+				<small>Click on a name below to select it.</small>
 				<ul>
 					<li
 						v-for="member in myRecipients"
@@ -24,15 +27,19 @@
 						{{ member.name }}
 					</li>
 				</ul>
+
+				<p>
+					Take a moment to explain why this fits the person you picked so well.
+				</p>
+
 				<button
 						@click="giveCard"
 						:disabled="!pickedCard.id || !pickedMember.id"
 						class="primary"
 				>Give the card
 				</button>
-				<p>Recipient indisposed?
+				 &ndash; Recipient indisposed?
 					<button @click="voteSkip">Let somebody else go instead</button>
-				</p>
 			</div>
 			<div v-if="turn !== userId">
 				<h2>{{ memberIdToName[turn] }} is choosing the card and recipient</h2>

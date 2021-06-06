@@ -61,7 +61,7 @@ export default class GameHandler {
 		const memberCount       = this.game.members.length;
 		const cardsPerMember    = memberCount - 1;
 
-		if ( memberCount === 1 ) {
+		if ( memberCount <= 1 ) {
 			this.finishGame();
 			return;
 		}
