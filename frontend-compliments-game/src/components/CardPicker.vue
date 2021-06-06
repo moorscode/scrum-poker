@@ -110,7 +110,12 @@ export default {
 				this.waited++;
 			}, 1000 );
 
-			document.documentElement.style.overflow = ( newValue === "" ) ? "auto" : "hidden";
+			document.documentElement.style.overflow = ( newValue === "" || this.game.started === false ) ? "auto" : "hidden";
+		},
+		game( newValue ) {
+			if ( newValue.started === false ) {
+				document.documentElement.style.overflow = "auto";
+			}
 		},
 	},
 	methods: {
