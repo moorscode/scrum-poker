@@ -20,17 +20,17 @@
 </template>
 
 <script>
-import {mapState} from "vuex";
+import { mapState } from "vuex";
 
 export default {
 	name: "PickRoom",
 	data() {
 		return {
-			joinRoom: this.getFromURL("room") || "",
+			joinRoom: this.getFromURL( "room" ) || "",
 		};
 	},
 	computed: {
-		...mapState(["room", "nickname"]),
+		...mapState( [ "room", "nickname" ] ),
 		joinButton() {
 			return ! this.room ? "Join room!" : "Switch to room";
 		},
@@ -39,24 +39,26 @@ export default {
 		join() {
 			this.joinRoom = this.joinRoom.toLowerCase();
 
-			if (this.joinRoom === "") {
-				this.$store.commit("room", "");
+			if ( this.joinRoom === this.room ) {
 				return;
 			}
 
-			this.$socket.client.emit("join", {room: this.joinRoom, name: this.nickname});
+			if ( this.joinRoom === "" ) {
+				this.$store.commit( "room", "" );
+				return;
+			}
+
+			this.$socket.client.emit( "join", { room: this.joinRoom, name: this.nickname } );
 		},
-		getFromURL(key) {
-			return new URLSearchParams(window.location.search.substring(1)).get(key);
+		getFromURL( key ) {
+			return new URLSearchParams( window.location.search.substring( 1 ) ).get( key );
 		},
 	},
 	created() {
-		this.join();
-
-		window.onpopstate = (event) => {
-			this.joinRoom = (event.state && event.state.room) || "";
-			if (this.joinRoom !== this.room) {
-				this.$socket.client.emit("leave", {room: this.room});
+		window.onpopstate = ( event ) => {
+			this.joinRoom = ( event.state && event.state.room ) || "";
+			if ( this.joinRoom !== this.room ) {
+				this.$socket.client.emit( "leave", { room: this.room } );
 			}
 			this.join();
 		};
@@ -65,13 +67,13 @@ export default {
 		welcome() {
 			this.join();
 		},
-		joined(room) {
+		joined( room ) {
 			this.joinRoom = room;
 
-			if (room !== false && this.room !== room) {
-				const url = new URL(window.location);
-				url.searchParams.set("room", room);
-				window.history.pushState({room}, "", url);
+			if ( room !== false && this.room !== room ) {
+				const url = new URL( window.location );
+				url.searchParams.set( "room", room );
+				window.history.pushState( { room }, "", url );
 			}
 		},
 	},

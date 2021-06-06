@@ -10,11 +10,24 @@ export default new Vuex.Store( {
 		loading: false,
 		room: "",
 		nickname: "",
-		game: {},
+		userId: "",
+		game: {
+			started: false,
+			finished: false,
+			members: {},
+			cards: [],
+		},
+		members: [],
+		memberIdToName: {},
+		memberCount: 0,
+		connectedMembers: 0,
 	},
 	mutations: {
 		nickname( state, nickname ) {
 			state.nickname = nickname;
+		},
+		userId( state, userId ) {
+			state.userId = userId;
 		},
 		// Server state.
 		SOCKET_DISCONNECT( state ) {
@@ -32,6 +45,15 @@ export default new Vuex.Store( {
 		},
 		SOCKET_GAME( state, game ) {
 			state.game = game;
+		},
+		SOCKET_MEMBERS( state, members ) {
+			state.memberCount      = Object.keys( members ).length;
+			state.connectedMembers = Object.values( members ).filter( ( member ) => member.connected ).length;
+			state.members          = members;
+
+			for ( const [ memberId, member ] of Object.entries( members ) ) {
+				state.memberIdToName[ memberId ] = member.name;
+			}
 		},
 	},
 } );

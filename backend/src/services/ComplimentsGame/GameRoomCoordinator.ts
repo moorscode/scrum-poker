@@ -25,35 +25,11 @@ export default class GameRoomCoordinator {
 	 */
 	public newGame(): void {
 		// Create a new story.
-		const members = this.membersManager.getClientCount( false );
-		const cards   = this.cardsProvider.getCards();
-
-		// Each member gets a card for all other members.
-		const cardsPerMember     = members - 1;
-		const totalNumberOfCards = cardsPerMember * members;
-
-		const shuffledCards = this.shuffleArray( cards );
-		const gameCards     = shuffledCards.slice( 0, totalNumberOfCards );
-
-		this.gameHandler = new GameHandler( this.membersManager, gameCards );
-		this.gameHandler.assignCards();
+		this.gameHandler = new GameHandler( this.membersManager, this.cardsProvider );
 	}
 
-	/**
-	 *
-	 * @param array
-	 * @returns {any}
-	 * @private
-	 */
-	private shuffleArray( array ) {
-		for ( let index = array.length - 1; index > 0; index-- ) {
-			const secondIndex    = Math.floor( Math.random() * ( index + 1 ) );
-			const temp           = array[ index ];
-			array[ index ]       = array[ secondIndex ];
-			array[ secondIndex ] = temp;
-		}
-
-		return array;
+	public startGame(): void {
+		this.gameHandler.startGame();
 	}
 
 	/**
@@ -62,9 +38,7 @@ export default class GameRoomCoordinator {
 	 * @returns {Game} The current story.
 	 */
 	public getGame(): Game {
-		if ( this.gameHandler ) {
-			return this.gameHandler.getGame();
-		}
+		return this.gameHandler.getGame();
 	}
 
 	/**

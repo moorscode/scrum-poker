@@ -9,11 +9,12 @@
 				<connecting/>
 			</section>
 
-			<section v-if="connected === true">
+			<section>
 				<room/>
-
-				<div v-if="room" class="gameMain">
+				<div v-if="room && connected === true" class="gameMain">
 					<nickname/>
+					<game-control/>
+					<members/>
 				</div>
 			</section>
 		</section>
@@ -27,6 +28,8 @@ import ServerConnection from "./components/ServerConnection.vue";
 import Connecting from "./components/Connecting.vue";
 import Room from "./components/Room.vue";
 import Nickname from "./components/Nickname.vue";
+import GameControl from "./components/GameControl.vue";
+import Members from "./components/Members.vue";
 
 export default Vue.extend( {
 	components: {
@@ -34,6 +37,8 @@ export default Vue.extend( {
 		Connecting,
 		Nickname,
 		Room,
+		GameControl,
+		Members,
 	},
 	created() {
 		this.$socket.client.open();

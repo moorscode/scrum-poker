@@ -98,8 +98,6 @@ export default class GameMemberManager extends EventDispatcher implements Member
 
 		this.members[ id ].disconnectTime = Date.now();
 		this.members[ id ].connected      = false;
-
-		this.dispatch( "member-removed", id );
 	}
 
 	/**
@@ -142,6 +140,16 @@ export default class GameMemberManager extends EventDispatcher implements Member
 	public getDisconnected(): Member[] {
 		return Object.values( this.members )
 			.filter( ( member: Member ) => ! member.connected );
+	}
+
+	/**
+	 * Lists connected members in a room.
+	 *
+	 * @returns {Member[]} List of disconnected members.
+	 */
+	public getConnected(): Member[] {
+		return Object.values( this.members )
+			.filter( ( member: Member ) => member.connected );
 	}
 
 	/**

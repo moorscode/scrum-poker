@@ -2,8 +2,9 @@ import { Injectable } from "@nestjs/common";
 import { Socket } from "socket.io";
 import SocketUserHandler from "../SocketUsersHandler";
 import CardsProvider from "./CardsProvider";
-import GameRoomCoordinator from "./GameRoomCoordinator";
 import { Game } from "./GameHandler";
+import { MemberList } from "./GameMemberManager";
+import GameRoomCoordinator  from "./GameRoomCoordinator";
 
 export type Rooms = {
 	[ room: string ]: GameRoomCoordinator;
@@ -80,6 +81,17 @@ export default class GameService {
 		this.socketUsersService.remove( socket );
 
 		return removeFromRooms;
+	}
+
+	/**
+	 * The list of users of a room.
+	 *
+	 * @param {string} room The room to get the users from.
+	 *
+	 * @returns {MemberList} The list of users per connected/disconnected.
+	 */
+	public getMembers( room: string ): MemberList {
+		return this.getRoom( room ).getMembers();
 	}
 
 	/**
@@ -177,6 +189,7 @@ export default class GameService {
 			}
 
 			this.rooms[ room ] = new GameRoomCoordinator( this.cardsProvider );
+			this.rooms[ room ].newGame();
 		}
 
 		return this.rooms[ room ];
@@ -239,14 +252,25 @@ export default class GameService {
 	}
 
 	/**
-	 * Resets the votes for a room.
+	 * Creates a new game in a room.
 	 *
-	 * @param {string} room Room to reset.
+	 * @param {string} room Room to start a new game in.
 	 *
 	 * @returns {void}
 	 */
 	public newGame( room: string ): void {
 		this.getRoom( room ).newGame();
+	}
+
+	/**
+	 * Starts a new game.
+	 *
+	 * @param {string} room The room to start a game in.
+	 *
+	 * @returns {void}
+	 */
+	public startGame( room: string ): void {
+		this.getRoom( room ).startGame();
 	}
 
 	/**

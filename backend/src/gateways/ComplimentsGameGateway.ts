@@ -34,7 +34,7 @@ export default class ComplimentsGameGateway implements OnGatewayInit {
 	@Interval( 10000 )
 	cleanupInterval(): void {
 		const changedRooms = this.cleanupService.cleanup();
-		// changedRooms.map( ( room: string ) => this.send( room, { members: true, votes: true } ) );
+		changedRooms.map( ( room: string ) => this.update( room ) );
 	}
 
 	/**
@@ -112,14 +112,29 @@ export default class ComplimentsGameGateway implements OnGatewayInit {
 
 		this.update( message.room );
 	}
+
+	@SubscribeMessage( "start" )
+	start( client: Socket, message: { room: string } ): void {
+		console.log( "start game", client.id, message );
+		this.gameService.startGame( message.room );
+
+		client.emit( "joined", message.room );
+
+		this.update( message.room );
+	}
 	/* eslint-enable require-jsdoc */
 
 	/**
+	 * Updates a room.
 	 *
-	 * @param {string} room
+	 * @param {string} room The room to update.
+	 *
+	 * @returns {void}
+	 *
 	 * @private
 	 */
-	private update( room: string ) {
+	private update( room: string ): void {
+		this.server.to( room ).emit( "members", this.gameService.getMembers( room ) );
 		this.server.to( room ).emit( "game", this.gameService.getGame( room ) );
 	}
 }
