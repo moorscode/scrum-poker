@@ -154,6 +154,8 @@ export default {
 			if ( data.from !== this.userId ) {
 				this.pickedMember.id = data.to;
 				this.pickedCard = data.card;
+
+				this.waitingTime = ( data.to && data.card.id ) ? 90 : 20;
 			}
 		},
 	},
