@@ -54,6 +54,11 @@ export default class GameHandler {
 		const memberCount       = this.game.members.length;
 		const cardsPerMember    = memberCount - 1;
 
+		if ( memberCount === 1 ) {
+			this.finishGame();
+			return;
+		}
+
 		this.game.members.forEach( ( member: Member ) => {
 			// If we removed an already given card, we don't have anything else to do.
 			const memberCards = this.game.cards.filter( ( card: Card ) => card.from === member.id );
