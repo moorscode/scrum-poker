@@ -37,6 +37,13 @@ export default class GameHandler {
 	 * @returns {Card} The card.
 	 */
 	public getCard( cardId: string ): Card {
+		if ( ! cardId ) {
+			return {
+				description: "",
+				id: "",
+			};
+		}
+
 		return this.game.cards.find( ( card: Card ) => card.id === cardId );
 	}
 
