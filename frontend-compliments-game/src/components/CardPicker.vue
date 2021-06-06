@@ -4,7 +4,7 @@
 			<div v-if="turn === userId">
 				<h1>It's your turn!</h1>
 				<h2>Pick a card</h2>
-				<small>Click on an item below to select it.</small>
+				<small>Click on an item below to select it:</small>
 				<ul>
 					<li
 						v-for="card in myCards"
@@ -16,7 +16,7 @@
 					</li>
 				</ul>
 				<h2>Pick a recipient</h2>
-				<small>Click on a name below to select it.</small>
+				<small>Click on a name below to select it:</small>
 				<ul>
 					<li
 						v-for="member in myRecipients"
@@ -100,7 +100,7 @@ export default {
 		},
 	},
 	watch: {
-		turn() {
+		turn( newValue ) {
 			this.pickedMember = { id: "" };
 			this.pickedCard = { description: "" };
 			this.waited = 0;
@@ -109,6 +109,8 @@ export default {
 			this.counter = window.setInterval( () => {
 				this.waited++;
 			}, 1000 );
+
+			document.documentElement.style.overflow = ( newValue === "" ) ? "auto" : "hidden";
 		},
 	},
 	methods: {
