@@ -70,21 +70,18 @@ export default class ComplimentsGameGateway implements OnGatewayInit {
 	/* eslint-disable require-jsdoc */
 	@SubscribeMessage( "identify" )
 	identify( client: Socket, message: { id: string } ): void {
-		console.log( "identify", client.id, message );
 		this.gameService.identify( client, message.id );
 		client.emit( "welcome" );
 	}
 
 	@SubscribeMessage( "exit" )
 	exit( client: Socket ): void {
-		console.log( "exit", client.id );
 		const rooms = this.gameService.exit( client );
 		rooms.map( ( room: string ) => this.update( room ) );
 	}
 
 	@SubscribeMessage( "join" )
 	join( client: Socket, message: { room: string; name?: string } ): void {
-		console.log( "join", client.id, message );
 		this.gameService.join( client, message.room, message.name );
 
 		client.emit( "joined", message.room );
@@ -99,15 +96,8 @@ export default class ComplimentsGameGateway implements OnGatewayInit {
 		this.update( message.room );
 	}
 
-	// @SubscribeMessage( "finish" )
-	// Finish( client: Socket, message: { room: string } ): void {
-	// 	Console.log( "finish", message, client.id );
-	// 	This.server.to( message.room ).emit( "finished" );
-	// }
-
 	@SubscribeMessage( "nickname" )
 	setNickname( client: Socket, message: { name: string; room: string } ): void {
-		console.log( "nickname", message );
 		this.gameService.setName( message.room, client, message.name );
 
 		this.update( message.room );
@@ -115,10 +105,34 @@ export default class ComplimentsGameGateway implements OnGatewayInit {
 
 	@SubscribeMessage( "start" )
 	start( client: Socket, message: { room: string } ): void {
-		console.log( "start game", client.id, message );
 		this.gameService.startGame( message.room );
 
-		client.emit( "joined", message.room );
+		this.update( message.room );
+	}
+
+	@SubscribeMessage( "pick" )
+	pick( client: Socket, message: { room: string, card: string, to: string } ): void {
+		this.server.to( message.room ).emit( "picked", {
+			from: this.gameService.getUserId( client ),
+			card: message.card,
+			to: message.to,
+		} );
+	}
+
+	@SubscribeMessage( "give" )
+	give( client: Socket, message: { room: string, card: string, to: string } ): void {
+		this.gameService.giveCard( message.room, client, message.card, message.to );
+
+		this.update( message.room );
+	}
+
+	@SubscribeMessage( "vote-skip" )
+	skip( client: Socket, message: { room: string } ): void {
+		console.log( "voted to skip", client.id, message );
+
+		this.gameService.voteSkip( message.room, client );
+
+		console.log( this.gameService.getTurnMemberId( message.room ) );
 
 		this.update( message.room );
 	}
@@ -136,5 +150,6 @@ export default class ComplimentsGameGateway implements OnGatewayInit {
 	private update( room: string ): void {
 		this.server.to( room ).emit( "members", this.gameService.getMembers( room ) );
 		this.server.to( room ).emit( "game", this.gameService.getGame( room ) );
+		this.server.to( room ).emit( "turn", this.gameService.getTurnMemberId( room ) );
 	}
 }

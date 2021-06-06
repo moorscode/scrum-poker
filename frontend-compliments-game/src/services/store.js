@@ -13,7 +13,6 @@ export default new Vuex.Store( {
 		userId: "",
 		game: {
 			started: false,
-			finished: false,
 			members: {},
 			cards: [],
 		},
@@ -21,6 +20,7 @@ export default new Vuex.Store( {
 		memberIdToName: {},
 		memberCount: 0,
 		connectedMembers: 0,
+		turn: "",
 	},
 	mutations: {
 		nickname( state, nickname ) {
@@ -45,6 +45,9 @@ export default new Vuex.Store( {
 		},
 		SOCKET_GAME( state, game ) {
 			state.game = game;
+		},
+		SOCKET_TURN( state, userId ) {
+			state.turn = userId;
 		},
 		SOCKET_MEMBERS( state, members ) {
 			state.memberCount      = Object.keys( members ).length;

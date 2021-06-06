@@ -9,10 +9,12 @@
 			Room: <input
 				v-model="joinRoom"
 				type="text"
+				:disabled="game.started"
 		>
 			<input
 					type="submit"
 					v-model="joinButton"
+					:disabled="game.started"
 					@click.prevent="join"
 			>
 		</form>
@@ -30,7 +32,7 @@ export default {
 		};
 	},
 	computed: {
-		...mapState( [ "room", "nickname" ] ),
+		...mapState( [ "room", "nickname", "game" ] ),
 		joinButton() {
 			return ! this.room ? "Join room!" : "Switch to room";
 		},

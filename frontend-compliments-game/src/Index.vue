@@ -18,6 +18,7 @@
 				</div>
 			</section>
 		</section>
+		<card-picker/>
 	</main>
 </template>
 
@@ -30,6 +31,7 @@ import Room from "./components/Room.vue";
 import Nickname from "./components/Nickname.vue";
 import GameControl from "./components/GameControl.vue";
 import Members from "./components/Members.vue";
+import CardPicker from "./components/CardPicker.vue";
 
 export default Vue.extend( {
 	components: {
@@ -39,6 +41,7 @@ export default Vue.extend( {
 		Room,
 		GameControl,
 		Members,
+		CardPicker,
 	},
 	created() {
 		this.$socket.client.open();

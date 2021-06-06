@@ -28,8 +28,20 @@ export default class GameRoomCoordinator {
 		this.gameHandler = new GameHandler( this.membersManager, this.cardsProvider );
 	}
 
-	public startGame(): void {
-		this.gameHandler.startGame();
+	public startGame(): string {
+		return this.gameHandler.startGame();
+	}
+
+	public giveCard( memberId: string, card: string, to: string ): string {
+		return this.gameHandler.giveCard( memberId, card, to );
+	}
+
+	public getTurnMemberId(): string {
+		return this.gameHandler.getTurnMemberId();
+	}
+
+	public voteSkip( memberId: string ): void {
+		this.gameHandler.voteSkip( memberId );
 	}
 
 	/**

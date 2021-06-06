@@ -16,11 +16,9 @@ export default {
 			/* eslint-disable no-nested-ternary */
 			return this.game.started
 				? "In progress"
-				: this.game.finished
-					? "Finished"
-					: this.connectedMembers > 1
-						? "Ready to start"
-						: "Awaiting more players";
+				: this.connectedMembers <= 1
+					? "Awaiting more players"
+					: "Ready to start";
 		},
 	},
 	methods: {

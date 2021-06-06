@@ -5,7 +5,6 @@ export type Game = {
 	cards: Card[];
 	members: Member[];
 	started: boolean;
-	finished: boolean;
 }
 
 /**
@@ -13,6 +12,7 @@ export type Game = {
  */
 export default class GameHandler {
 	private readonly game: Game;
+	private lastTurnMemberId = "";
 
 	/**
 	 * Creates a new Poker Story.
@@ -24,7 +24,7 @@ export default class GameHandler {
 		private readonly membersManager: GameMemberManager,
 		private readonly cardsProvider: CardsProvider,
 	) {
-		this.game = { cards: [], members: [], started: false, finished: false };
+		this.game = { cards: [], members: [], started: false };
 	}
 
 	/**
@@ -64,15 +64,54 @@ export default class GameHandler {
 	/**
 	 * Starts a game.
 	 *
-	 * @returns {void}
+	 * @returns {string}
 	 */
-	public startGame(): void {
+	public startGame(): string {
 		this.game.members = this.membersManager.getConnected();
 
 		if ( this.assignCards() ) {
 			this.game.started  = true;
-			this.game.finished = false;
+
+			return this.selectTurnMemberId();
 		}
+
+		return "";
+	}
+
+	public giveCard( memberId: string, cardDescription: string, to: string ): string {
+		const theCard = this.game.cards.find( ( card: Card ) => card.description === cardDescription );
+		theCard.to    = to;
+
+		return this.selectTurnMemberId();
+	}
+
+	private selectTurnMemberId(): string {
+		// Only if there are still cards left...
+		if ( ! this.haveAvailableCards() ) {
+			this.finishGame();
+			return "";
+		}
+
+		const memberIds      = this.game.members.map( ( member: Member ) => member.id );
+		const otherMemberIds = memberIds.filter( ( memberId ) => memberId !== this.lastTurnMemberId );
+
+		const memberIdsWithCardsToGive = otherMemberIds.filter( ( memberId ) =>
+			this.game.cards.filter( ( card: Card ) => card.from === memberId && card.to === "" ),
+		);
+
+		const index = Math.floor( Math.random() * memberIdsWithCardsToGive.length );
+
+		this.lastTurnMemberId = memberIdsWithCardsToGive[ index ];
+
+		return memberIdsWithCardsToGive[ index ];
+	}
+
+	public getTurnMemberId(): string {
+		return this.lastTurnMemberId;
+	}
+
+	public haveAvailableCards(): boolean {
+		return this.game.cards.filter( ( card: Card ) => ! card.to ).length > 0;
 	}
 
 	/**
@@ -81,7 +120,7 @@ export default class GameHandler {
 	 * @returns {void}
 	 */
 	public finishGame(): void {
-		this.game.finished = true;
+		this.game.started = false;
 	}
 
 	/**
@@ -91,6 +130,11 @@ export default class GameHandler {
 	 */
 	public getGame(): Game {
 		return this.game;
+	}
+
+	public voteSkip( memberId: string ): void {
+		// do something.
+		this.selectTurnMemberId();
 	}
 
 	/**

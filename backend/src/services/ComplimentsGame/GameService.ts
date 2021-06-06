@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { Socket } from "socket.io";
 import SocketUserHandler from "../SocketUsersHandler";
-import CardsProvider from "./CardsProvider";
+import CardsProvider, { Card } from "./CardsProvider";
 import { Game } from "./GameHandler";
 import { MemberList } from "./GameMemberManager";
 import GameRoomCoordinator  from "./GameRoomCoordinator";
@@ -252,25 +252,26 @@ export default class GameService {
 	}
 
 	/**
-	 * Creates a new game in a room.
-	 *
-	 * @param {string} room Room to start a new game in.
-	 *
-	 * @returns {void}
-	 */
-	public newGame( room: string ): void {
-		this.getRoom( room ).newGame();
-	}
-
-	/**
 	 * Starts a new game.
 	 *
 	 * @param {string} room The room to start a game in.
 	 *
 	 * @returns {void}
 	 */
-	public startGame( room: string ): void {
-		this.getRoom( room ).startGame();
+	public startGame( room: string ): string {
+		return this.getRoom( room ).startGame();
+	}
+
+	public giveCard( room: string, socket: Socket, card: string, to: string ): string {
+		return this.getRoom( room ).giveCard( this.getUserId( socket ), card, to );
+	}
+
+	public getTurnMemberId( room: string ): string {
+		return this.getRoom( room ).getTurnMemberId();
+	}
+
+	public voteSkip( room: string, socket: Socket ): void {
+		this.getRoom( room ).voteSkip( this.getUserId( socket ) );
 	}
 
 	/**

@@ -41,7 +41,7 @@
 	--text-input-border-color: #eee;
 
 	--section-border-style: dashed;
-	--section-border-color: var( --main-accent-color );
+	--section-border-color: var(--main-accent-color);
 }
 
 [data-theme="dark"] {
@@ -68,16 +68,16 @@
 	--high-spread-background-color: #792323;
 
 	--status-disconnected: #792323;
-	--section-border-color: var( --main-accent-color );
+	--section-border-color: var(--main-accent-color);
 }
 
 * {
-	font-family: var( --font );
+	font-family: var(--font);
 }
 
 html, body {
 	font-weight: 400;
-	color: var( --text-color );
+	color: var(--text-color);
 	margin: 0;
 	padding: 0;
 	height: 100%;
@@ -85,22 +85,22 @@ html, body {
 
 main {
 	transition: background-color 500ms ease-in-out;
-	background-color: var( --main-background-color );
+	background-color: var(--main-background-color);
 	width: 100%;
 	min-height: 100%;
 	padding: 20px;
 	box-sizing: border-box;
 
 	&.no-spread {
-		background-color: var( --no-spread-background-color );
+		background-color: var(--no-spread-background-color);
 	}
 
 	&.high-spread {
-		background-color: var( --high-spread-background-color );
+		background-color: var(--high-spread-background-color);
 	}
 
 	&.normal-spread {
-		background-color: var( --main-background-color );
+		background-color: var(--main-background-color);
 	}
 
 	&.finished {
@@ -123,8 +123,8 @@ main {
 }
 
 h1, h2, h3 {
-	font-family: var( --font-title );
-	color: var( --main-accent-color );
+	font-family: var(--font-title);
+	color: var(--main-accent-color);
 }
 
 h1 {
@@ -133,7 +133,7 @@ h1 {
 	margin: 0 0 0.2em 0;
 
 	&.finished {
-		color: var( --refinement-finished-header-color );
+		color: var(--refinement-finished-header-color);
 	}
 }
 
@@ -146,7 +146,7 @@ label {
 }
 
 .fas {
-	color: var( --icon-color );
+	color: var(--icon-color);
 
 	&.observer {
 		color: black;
@@ -180,7 +180,7 @@ input[type=submit] {
 	&:active {
 		&,
 		& .fas {
-			color: var( --icon-color );
+			color: var(--icon-color);
 		}
 	}
 }
@@ -189,12 +189,12 @@ input[type=text] {
 	font-size: 16px;
 	padding: 4px;
 	border: 1px inset;
-	color: var( --text-color );
-	background-color: var( --text-input-background-color );
-	border-color: var( --text-input-border-color );
+	color: var(--text-color);
+	background-color: var(--text-input-background-color);
+	border-color: var(--text-input-border-color);
 
 	&.changed {
-		box-shadow: 0 0 0 2px var( --story-updated-color );
+		box-shadow: 0 0 0 2px var(--story-updated-color);
 		transition: box-shadow 250ms ease-in-out;
 		border-radius: 3px;
 	}
@@ -215,7 +215,7 @@ button {
 }
 
 a {
-	color: var( --main-accent-color );
+	color: var(--main-accent-color);
 }
 
 p.results {
@@ -242,10 +242,10 @@ p.results {
 
 .game {
 	padding: 16px 24px 0;
-	border: 1px solid var( --poker-border-color );
+	border: 1px solid var(--poker-border-color);
 	border-radius: 4px;
-	background-color: var( --poker-background-color );
-	box-shadow: var( --poker-shadow );
+	background-color: var(--poker-background-color);
+	box-shadow: var(--poker-shadow);
 }
 
 div.gameMain {
@@ -253,7 +253,7 @@ div.gameMain {
 }
 
 strong {
-	color: var( --main-accent-color );
+	color: var(--main-accent-color);
 }
 
 form.rooms {
@@ -266,7 +266,7 @@ form.username {
 	min-height: 2em;
 
 	& .fas {
-		color: var( --text-color );
+		color: var(--text-color);
 	}
 
 	& input[type=text] {
@@ -276,33 +276,76 @@ form.username {
 
 .fa-plug {
 	&.connected {
-		color: var( --status-connected );
+		color: var(--status-connected);
 	}
 
 	&.disconnected {
-		color: var( --status-disconnected );
+		color: var(--status-disconnected);
 	}
 }
 
 ul.memberList {
 	margin: 32px 0;
-	padding: 0;
+	&,
+	& ul {
+		padding: 0;
+		list-style: none;
+	}
 
-	& li {
+	& .received {
+		color: var( --main-accent-color );
+	}
+
+	& > li {
 		display: flex;
 		width: 100%;
 		margin: 0;
 		padding: 0;
-		align-items: center;
+		align-items: flex-start;
+		border-top: 1px solid #eee;
+
+		&.me {
+			font-weight: bold;
+		}
+
 		& div {
 			flex: 1;
 			padding: 8px 0;
 
 			ul {
 				margin: 0;
-				padding: 0;
 			}
 		}
+	}
+}
+
+#card-picker {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	backdrop-filter: blur( 1px );
+	background-color: rgba(0, 0, 0, 0.7);
+	display: flex;
+	align-items: center;
+
+	& .container {
+		width: 100%;
+		max-width: 600px;
+		padding: 24px 32px 32px;
+		background-color: rgba(255,255,255,0.8);
+		border-radius: 4px;
+	}
+
+	& .pick,
+	& .selected {
+		cursor: pointer;
+	}
+
+	& .selected {
+		color: var( --main-accent-color );
+		font-weight: bold;
 	}
 }
 

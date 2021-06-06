@@ -7,11 +7,13 @@
       <input
         v-model="nickname"
         type="text"
+		:disabled="game.started"
       >
       <input
         type="submit"
         value="Update"
         @click.prevent="updateNickname"
+		:disabled="game.started"
       >
     </form>
   </section>
@@ -28,7 +30,7 @@ export default {
 		};
 	},
 	computed: {
-		...mapState( [ "room" ] ),
+		...mapState( [ "room", "game" ] ),
 	},
 	methods: {
 		updateNickname() {
