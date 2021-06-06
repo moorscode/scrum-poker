@@ -114,7 +114,6 @@ export default class ComplimentsGameGateway implements OnGatewayInit {
 	pick( client: Socket, message: { room: string, card: string, to: string } ): void {
 		this.server.to( message.room ).emit( "picked", {
 			from: this.gameService.getUserId( client ),
-			card: message.card,
 			card: this.gameService.getCard( message.room, message.card ),
 			to: message.to,
 		} );
