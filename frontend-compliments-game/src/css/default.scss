@@ -292,6 +292,10 @@ ul.memberList {
 		list-style: none;
 	}
 
+	& .fas {
+		min-width: 20px;
+	}
+
 	& .received {
 		color: var( --main-accent-color );
 	}

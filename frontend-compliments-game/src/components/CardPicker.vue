@@ -23,16 +23,16 @@
 						{{ member.name }}
 					</li>
 				</ul>
-				<button @click="giveCard" :disabled="!pickedCard || !pickedMember">Give the card</button>
+				<button @click="giveCard" :disabled="!pickedCard.description || !pickedMember.id">Give the card</button>
 			</div>
 			<div v-if="turn !== userId">
 				<h2>{{ memberIdToName[turn] }} is choosing the card and recipient</h2>
 				<p><strong>Card:</strong> {{ pickedCard.description }}</p>
 				<p><strong>Recipient:</strong> {{ pickedMember.id === userId ? "YOU!" : memberIdToName[ pickedMember.id ] }}</p>
 
-				<p v-if="debug">
-				Taking too long, away from computer, connection issues? Vote to skip...
-				<button @click="voteSkip">Next please</button>
+				<p>
+					Taking too long? Vote to skip...
+					<button @click="voteSkip" :disabled="waited < waitingTime">Next please <span v-if="waited < waitingTime">(available in {{ waitingTime - waited }} seconds)</span></button>
 				</p>
 			</div>
 		</div>
@@ -49,6 +49,9 @@ export default {
 			pickedCard: { description: "" },
 			pickedMember: { id: "" },
 			debug: false,
+			waited: 0,
+			waitingTime: 20,
+			counter: null,
 		};
 	},
 	computed: {
@@ -72,6 +75,10 @@ export default {
 		turn() {
 			this.pickedMember = { id: "" };
 			this.pickedCard = { description: "" };
+			this.waited = 0;
+			this.counter = window.setInterval( () => {
+				this.waited++;
+			}, 1000 );
 		},
 	},
 	methods: {
@@ -120,6 +127,7 @@ export default {
 	},
 	sockets: {
 		picked( data ) {
+			this.waited = 0;
 			if ( data.from !== this.userId ) {
 				this.pickedMember.id = data.to;
 				this.pickedCard.description = data.card;

@@ -70,7 +70,7 @@ export default class GameHandler {
 		this.game.members = this.membersManager.getConnected();
 
 		if ( this.assignCards() ) {
-			this.game.started  = true;
+			this.game.started = true;
 
 			return this.selectTurnMemberId();
 		}
@@ -92,18 +92,31 @@ export default class GameHandler {
 			return "";
 		}
 
-		const memberIds      = this.game.members.map( ( member: Member ) => member.id );
-		const otherMemberIds = memberIds.filter( ( memberId ) => memberId !== this.lastTurnMemberId );
+		let memberIds = this.game.members.map( ( member: Member ) => member.id );
+		memberIds     = memberIds.filter( ( memberId ) => memberId !== this.lastTurnMemberId );
 
-		const memberIdsWithCardsToGive = otherMemberIds.filter( ( memberId ) =>
+		memberIds = memberIds.filter( ( memberId ) =>
 			this.game.cards.filter( ( card: Card ) => card.from === memberId && card.to === "" ),
 		);
 
-		const index = Math.floor( Math.random() * memberIdsWithCardsToGive.length );
+		/**
+		 * This is not needed with the skip functionality.
+		 *
+		memberIds = memberIds.filter( ( memberId ) =>
+			this.membersManager.getConnected().map( ( member: Member ) => member.id ).includes( memberId ),
+		);
+		 **/
 
-		this.lastTurnMemberId = memberIdsWithCardsToGive[ index ];
+		if ( memberIds.length === 0 ) {
+			this.finishGame();
+			return "";
+		}
 
-		return memberIdsWithCardsToGive[ index ];
+		const index = Math.floor( Math.random() * memberIds.length );
+
+		this.lastTurnMemberId = memberIds[ index ];
+
+		return memberIds[ index ];
 	}
 
 	public getTurnMemberId(): string {
@@ -133,7 +146,7 @@ export default class GameHandler {
 	}
 
 	public voteSkip( memberId: string ): void {
-		// do something.
+		// Do something.
 		this.selectTurnMemberId();
 	}
 

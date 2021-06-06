@@ -32,17 +32,21 @@ export default {
 		};
 	},
 	computed: {
-		...mapState( [ "room", "nickname", "game" ] ),
+		...mapState( [ "room", "nickname", "game", "loading" ] ),
 		joinButton() {
 			return ! this.room ? "Join room!" : "Switch to room";
 		},
 	},
 	methods: {
 		join() {
+			if ( this.loading ) {
+				return;
+			}
+
 			this.joinRoom = this.joinRoom.toLowerCase();
 
-			if ( this.joinRoom === this.room ) {
-				return;
+			if ( this.joinRoom !== this.room ) {
+				this.$socket.client.emit( "leave", { room: this.room } );
 			}
 
 			if ( this.joinRoom === "" ) {
@@ -57,6 +61,7 @@ export default {
 		},
 	},
 	created() {
+		this.join();
 		window.onpopstate = ( event ) => {
 			this.joinRoom = ( event.state && event.state.room ) || "";
 			if ( this.joinRoom !== this.room ) {
@@ -65,10 +70,14 @@ export default {
 			this.join();
 		};
 	},
-	sockets: {
-		welcome() {
-			this.join();
+	watch: {
+		loading( newValue ) {
+			if ( newValue === false ) {
+				this.join();
+			}
 		},
+	},
+	sockets: {
 		joined( room ) {
 			this.joinRoom = room;
 

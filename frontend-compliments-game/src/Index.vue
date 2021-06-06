@@ -2,16 +2,12 @@
 	<main>
 		<server-connection/>
 
-		<section v-if="loading === false" class="game container">
+		<section class="game container">
 			<h1>Compliments game</h1>
 
-			<section v-if="connected === false">
-				<connecting/>
-			</section>
-
-			<section>
+			<section v-if="connected">
 				<room/>
-				<div v-if="room && connected === true" class="gameMain">
+				<div v-if="room" class="gameMain">
 					<nickname/>
 					<game-control/>
 					<members/>

@@ -1,8 +1,11 @@
 <template>
 	<section>
 		<ul class="memberList">
+			<li v-if="! game.members.length" v-for="member in members" v-bind:key=member.id :class="member.id === userId ? 'me' : ''">
+				<div><i :class="['fas', members[member.id].connected ? 'fa-user' : 'fa-user-times']"/> {{ member.name }}</div>
+			</li>
 			<li v-for="member in game.members" v-bind:key=member :class="member.id === userId ? 'me' : ''">
-				<div><i class="fas fa-person-booth"/> {{ member.name }}</div>
+				<div><i :class="['fas', members[member.id].connected ? 'fa-user' : 'fa-user-slash']"/> {{ member.name }}</div>
 				<div>
 					<ul>
 						<li v-for="card in pendingCards[member.id]" v-bind:key="'pending' + card.description">
@@ -29,7 +32,7 @@ import { mapState } from "vuex";
 export default {
 	name: "Members",
 	computed: {
-		...mapState( [ "game", "userId", "memberIdToName" ] ),
+		...mapState( [ "game", "userId", "memberIdToName", "members" ] ),
 		pendingCards() {
 			return this.game.members.reduce(
 				( list, member ) => {
