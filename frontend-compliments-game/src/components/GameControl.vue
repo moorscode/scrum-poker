@@ -1,7 +1,7 @@
 <template>
 	<section>
 		<div class="game-status">Game: {{ gameStatus }}</div>
-		<div class="start-the-game"><button @click="start" :disabled="game.started || connectedMembers <= 1">Start the game!</button></div>
+		<div class="start-the-game"><button @click="start" :disabled="game.started || connectedMembers <= 1" class="primary">Start the game!</button></div>
 	</section>
 </template>
 

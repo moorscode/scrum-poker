@@ -27,6 +27,7 @@
 				<button
 						@click="giveCard"
 						:disabled="!pickedCard.id || !pickedMember.id"
+						class="primary"
 				>Give the card
 				</button>
 				<p>Recipient indisposed?
