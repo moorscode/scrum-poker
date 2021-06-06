@@ -1,4 +1,7 @@
 import { Injectable } from "@nestjs/common";
+import cards from "../../config/cards";
+import * as fs from "fs";
+import * as path from "path";
 
 export type Card = {
 	description: string;
@@ -17,16 +20,8 @@ export default class CardsProvider {
 	 * @returns {Card[]} The cards.
 	 */
 	public getCards(): Card[] {
-		return [
-			{
-				description: "You give great compliments",
-			},
-			{
-				description: "You are a good listener",
-			},
-			{
-				description: "You are a also good listener",
-			},
-		];
+		return cards.map( ( line: string ) => {
+			return { description: line };
+		} );
 	}
 }
