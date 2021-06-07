@@ -232,7 +232,6 @@ export default class GameHandler {
 	 * @returns {void}
 	 */
 	public voteSkip(): void {
-		// Do something.
 		this.selectTurnMemberId();
 	}
 
