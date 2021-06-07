@@ -384,7 +384,7 @@ ul.memberList {
 	overflow-y: auto;
 	backdrop-filter: blur( 1px );
 	background-color: rgba(0, 0, 0, 0.7);
-	display: flex;
+
 	align-items: baseline;
 
 	& .container {
@@ -404,6 +404,7 @@ ul.memberList {
 	& .selected {
 		color: var( --main-accent-color );
 		font-weight: bold;
+		border: 2px solid var( --main-accent-color );
 	}
 }
 

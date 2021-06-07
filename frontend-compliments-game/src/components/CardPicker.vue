@@ -9,10 +9,8 @@
 					<li
 						v-for="card in myCards"
 						@click="pickCard(card)"
-						v-bind:key="card.id"
-						:class="pickedCard === card ? 'selected' : 'pick'"
 					>
-						{{ card.description }}
+						<button v-bind:key="card.id" :class="pickedCard === card ? 'selected' : 'pick'">{{ card.description }}</button>
 					</li>
 				</ul>
 				<h2>Pick a recipient</h2>
@@ -20,11 +18,9 @@
 				<ul>
 					<li
 						v-for="member in myRecipients"
-						@click="pickRecipient(member)"
 						v-bind:key="member.id"
-						:class="pickedMember === member ? 'selected' : 'pick'"
 					>
-						{{ member.name }}
+						<button @click="pickRecipient(member)" :class="pickedMember === member ? 'selected' : 'pick'">{{ member.name }}</button>
 					</li>
 				</ul>
 
@@ -38,9 +34,10 @@
 						class="primary"
 				>Give the card
 				</button>
-				 &ndash; Recipient indisposed?
-					<button @click="voteSkip">Let somebody else go instead</button>
+				&ndash; Recipient indisposed?
+				<button @click="voteSkip">Let somebody else go instead</button>
 			</div>
+
 			<div v-if="turn !== userId">
 				<h2>{{ memberIdToName[turn] }} is choosing the card and recipient</h2>
 				<p>
@@ -63,6 +60,28 @@
 					</button>
 				</p>
 			</div>
+		</div>
+
+		<div class="container" v-if="turn !== userId && myCards.length > 0">
+			<h3>Your remaining cards</h3>
+			<ul>
+				<li
+						v-for="card in myCards"
+						v-bind:key="card.id"
+				>
+					{{ card.description }}
+				</li>
+			</ul>
+
+			<h3>Your remaining recipients</h3>
+			<ul>
+				<li
+						v-for="member in myRecipients"
+						v-bind:key="member.id"
+				>
+					{{ member.name }}
+				</li>
+			</ul>
 		</div>
 	</div>
 </template>
