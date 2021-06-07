@@ -54,7 +54,6 @@ export default class PokersGateway implements OnGatewayInit {
 	 */
 	afterInit(): void {
 		this.server.on( "connection", ( socket: Socket ) => {
-			console.log( "New connection", socket.id );
 			// Let the client know the points that can be chosen from.
 			socket.emit( "userId", this.generateId() );
 			socket.emit( "points", this.pointsProvider.getPoints() );
@@ -82,14 +81,12 @@ export default class PokersGateway implements OnGatewayInit {
 	/* eslint-disable require-jsdoc */
 	@SubscribeMessage( "identify" )
 	identify( client: Socket, message: { id: string } ): void {
-		console.log( "identify", client.id, message );
 		this.pokersService.identify( client, message.id );
 		client.emit( "welcome" );
 	}
 
 	@SubscribeMessage( "exit" )
 	exit( client: Socket ): void {
-		console.log( "exit", client.id );
 		const rooms = this.pokersService.exit( client );
 
 		rooms.map( ( room: string ) => this.send( room, { members: true, votes: true } ) );
@@ -97,7 +94,6 @@ export default class PokersGateway implements OnGatewayInit {
 
 	@SubscribeMessage( "join" )
 	join( client: Socket, message: { poker: string; name?: string } ): void {
-		console.log( "join", client.id, message );
 		this.pokersService.join( client, message.poker, message.name );
 
 		client.emit( "joined", message.poker );
@@ -122,7 +118,6 @@ export default class PokersGateway implements OnGatewayInit {
 
 	@SubscribeMessage( "vote" )
 	vote( client: Socket, message: { poker: string; vote: Vote } ): void {
-		console.log( "vote", client.id, message );
 		this.pokersService.castVote( client, message.poker, message.vote );
 
 		this.send( message.poker, { votes: true } );
@@ -140,13 +135,11 @@ export default class PokersGateway implements OnGatewayInit {
 
 	@SubscribeMessage( "finish" )
 	finish( client: Socket, message: { poker: string } ): void {
-		console.log( "finish", message, client.id );
 		this.server.to( message.poker ).emit( "finished" );
 	}
 
 	@SubscribeMessage( "nickname" )
 	setNickname( client: Socket, message: { name: string; poker: string } ): void {
-		console.log( "nickname", message );
 		this.pokersService.setName( message.poker, client, message.name );
 
 		this.send( message.poker, { members: true, votes: true } );
@@ -154,7 +147,6 @@ export default class PokersGateway implements OnGatewayInit {
 
 	@SubscribeMessage( "newStory" )
 	newStory( client: Socket, message: { poker: string } ): void {
-		console.log( "new story", message );
 		this.pokersService.newStory( message.poker );
 
 		this.send( message.poker, { story: true, votes: true, history: true } );
@@ -162,7 +154,6 @@ export default class PokersGateway implements OnGatewayInit {
 
 	@SubscribeMessage( "changeStoryName" )
 	story( client: Socket, message: { poker: string; name: string } ): void {
-		console.log( "story name", message );
 		this.pokersService.setStoryName( message.poker, message.name );
 
 		this.send( message.poker, { story: true } );
@@ -184,7 +175,6 @@ export default class PokersGateway implements OnGatewayInit {
 
 	@SubscribeMessage( "observe" )
 	observer( client: Socket, message: { poker: string } ): void {
-		console.log( "Observing", client.id );
 		this.pokersService.observe( client, message.poker );
 
 		this.send( message.poker, { votes: true, members: true } );
