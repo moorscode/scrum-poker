@@ -1,5 +1,5 @@
 import CardsProvider, { Card } from "./CardsProvider";
-import GameHandler, { Game } from "./GameHandler";
+import GameHandler, { Game, GameMemberList } from "./GameHandler";
 import GameMemberManager, { Member, MemberList } from "./GameMemberManager";
 
 /**
@@ -77,6 +77,17 @@ export default class GameRoomCoordinator {
 	}
 
 	/**
+	 * Marks a member as ready to start.
+	 *
+	 * @param {string} memberId The member.
+	 *
+	 * @returns {void}
+	 */
+	public setReady( memberId: string ): void {
+		this.gameHandler.setReady( memberId );
+	}
+
+	/**
 	 * Retrieves a card by ID.
 	 *
 	 * @param {string} cardId The card ID.
@@ -90,10 +101,10 @@ export default class GameRoomCoordinator {
 	/**
 	 * Lists clients in a room.
 	 *
-	 * @returns {MemberList[]} List of clients.
+	 * @returns {GameMemberList} List of clients.
 	 */
-	public getMembers(): MemberList {
-		return this.membersManager.getMembers();
+	public getMembers(): GameMemberList {
+		return this.gameHandler.getMembers();
 	}
 
 	/**

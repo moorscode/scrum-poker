@@ -103,6 +103,16 @@ export default class ComplimentsGameGateway implements OnGatewayInit {
 		this.update( message.room );
 	}
 
+	@SubscribeMessage( "ready" )
+	ready( client: Socket, message: { room: string } ): void {
+		this.gameService.setReady( message.room, client );
+
+		// This will determine if everybody is ready internally.
+		this.gameService.startGame( message.room );
+
+		this.update( message.room );
+	}
+
 	@SubscribeMessage( "start" )
 	start( client: Socket, message: { room: string } ): void {
 		this.gameService.startGame( message.room );

@@ -1,10 +1,18 @@
 import CardsProvider, { Card } from "./CardsProvider";
 import GameMemberManager, { Member } from "./GameMemberManager";
 
+export type GameMember = Member & {
+	ready: boolean;
+}
+
 export type Game = {
 	cards: Card[];
-	members: Member[];
+	members: GameMember[];
 	started: boolean;
+}
+
+export type GameMemberList = {
+	[ memberId: string ]: GameMember
 }
 
 /**
@@ -26,7 +34,80 @@ export default class GameHandler {
 	) {
 		this.game = { cards: [], members: [], started: false };
 
+		this.membersManager.on( "member-added", this.addMember.bind( this ) );
 		this.membersManager.on( "member-removed", this.removeMember.bind( this ) );
+	}
+
+	/**
+	 * Deals with a member joining.
+	 *
+	 * @returns {void}
+	 *
+	 * @private
+	 */
+	private addMember(): void {
+		if ( this.game.started ) {
+			return;
+		}
+
+		this.refreshMembers();
+	}
+
+	/**
+	 * Refreshes the member list.
+	 *
+	 * @returns {void}
+	 *
+	 * @private
+	 */
+	private refreshMembers(): void {
+		this.game.members = this.membersManager.getConnected()
+			.reduce(
+				( memberList: GameMember[], member: Member ): GameMember[] => {
+					let found: GameMember = memberList.find( ( gameMember: GameMember ) => gameMember.id === member.id );
+					if ( ! found ) {
+						found = {
+							ready: false,
+							...member,
+						};
+					}
+
+					memberList.push( found );
+
+					return memberList;
+				},
+				[],
+			);
+
+		if ( this.game.members.length <= 1 ) {
+			this.resetReady();
+		}
+	}
+
+	/**
+	 * Resets all player ready statuses.
+	 *
+	 * @returns {void}
+	 *
+	 * @private
+	 */
+	private resetReady(): void {
+		this.game.members = this.game.members.map( ( member: GameMember ) => {
+			member.ready = false;
+			return member;
+		} );
+	}
+
+	/**
+	 * Retrieves the list of game members.
+	 *
+	 * @returns {GameMemberList} The list of game members.
+	 */
+	public getMembers(): GameMemberList {
+		return this.game.members.reduce( ( list: GameMemberList, member: GameMember ) => {
+			list[ member.id ] = member;
+			return list;
+		}, {} );
 	}
 
 	/**
@@ -48,6 +129,22 @@ export default class GameHandler {
 	}
 
 	/**
+	 * Marks a member as ready to start.
+	 *
+	 * @param {string} memberId The member.
+	 *
+	 * @returns {void}
+	 */
+	public setReady( memberId: string ): void {
+		this.game.members.map( ( member: GameMember ) => {
+			if ( member.id === memberId ) {
+				member.ready = true;
+			}
+			return member;
+		} );
+	}
+
+	/**
 	 * Removes a member from the game.
 	 *
 	 * @param {string} memberId The member that left.
@@ -55,11 +152,12 @@ export default class GameHandler {
 	 * @returns {void}
 	 */
 	public removeMember( memberId: string ): void {
-		this.game.members = this.membersManager.getConnected();
+		this.refreshMembers();
+
 		this.game.cards = this.game.cards.filter( ( card: Card ) => card.from !== memberId && card.to !== memberId );
 
-		const memberCount       = this.game.members.length;
-		const cardsPerMember    = memberCount - 1;
+		const memberCount    = this.game.members.length;
+		const cardsPerMember = memberCount - 1;
 
 		if ( memberCount <= 1 ) {
 			this.finishGame();
@@ -85,10 +183,10 @@ export default class GameHandler {
 	 * @returns {boolean} If the cards could be assigned.
 	 */
 	private assignCards(): boolean {
-		const members: Member[] = this.game.members;
-		const memberCount       = members.length;
-		const cards             = this.cardsProvider.getCards();
-		const cardsPerMember    = memberCount - 1;
+		const members: GameMember[] = this.game.members;
+		const memberCount           = members.length;
+		const cards                 = this.cardsProvider.getCards();
+		const cardsPerMember        = memberCount - 1;
 
 		// Each member gets a card for all other members.
 		const totalNumberOfCards = cardsPerMember * memberCount;
@@ -103,7 +201,7 @@ export default class GameHandler {
 
 		let cardIndex = 0;
 
-		members.forEach( ( member: Member ) => {
+		members.forEach( ( member: GameMember ) => {
 			for ( let counter = 0; counter < cardsPerMember; counter++ ) {
 				this.game.cards[ cardIndex ].from = member.id;
 				cardIndex++;
@@ -119,13 +217,19 @@ export default class GameHandler {
 	 * @returns {void}
 	 */
 	public startGame(): void {
-		this.game.members = this.membersManager.getConnected();
+		if ( ! this.isEverybodyReady() ) {
+			return;
+		}
 
 		if ( this.assignCards() ) {
 			this.game.started = true;
 
 			this.selectTurnMemberId();
 		}
+	}
+
+	private isEverybodyReady(): boolean {
+		return this.game.members.filter( ( member: GameMember ) => ! member.ready ).length === 0;
 	}
 
 	/**
@@ -215,6 +319,9 @@ export default class GameHandler {
 	 */
 	public finishGame(): void {
 		this.game.started = false;
+
+		this.refreshMembers();
+		this.resetReady();
 	}
 
 	/**

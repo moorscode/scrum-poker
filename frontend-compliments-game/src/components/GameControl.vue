@@ -2,7 +2,10 @@
 	<section>
 		<div class="game-status">Game: {{ gameStatus }}</div>
 		<div class="start-the-game">
-			<button @click="start" :disabled="game.started || connectedMembers <= 1" class="primary">Start the game!</button>
+			<button @click="ready" :disabled="isReady || allReady" :class="[ isReady ? 'selected' : '', 'primary']">I am ready!</button>
+<!--			<button @click="start" :disabled="! allReady" class="primary" title="Available when everybody is ready...">-->
+<!--				Start the game!-->
+<!--			</button>-->
 		</div>
 	</section>
 </template>
@@ -13,19 +16,44 @@ import { mapState } from "vuex";
 export default {
 	name: "GameControl",
 	computed: {
-		...mapState( [ "game", "connectedMembers", "room" ] ),
+		...mapState( [ "game", "connectedMembers", "room", "userId" ] ),
 		gameStatus() {
 			/* eslint-disable no-nested-ternary */
-			return this.game.started
-				? "In progress"
-				: this.connectedMembers <= 1
-					? "Awaiting more players"
-					: "Ready to start";
+			if ( this.game.started ) {
+				return "In progress";
+			}
+
+			if ( this.connectedMembers < 2 ) {
+				return "Waiting for more members...";
+			}
+
+			const ready = Object.values( this.game.members ).filter( ( member ) => member.ready ).length;
+
+			return this.allReady
+				? "Everybody is ready, let's start the game!"
+				: `Waiting for everybody to ready up (${ready}/${this.connectedMembers})...`;
+		},
+		isReady() {
+			if ( this.connectedMembers <= 1 ) {
+				return true;
+			}
+
+			if ( Object.values( this.game.members ).find( ( member ) => member.id === this.userId && member.ready ) ) {
+				return true;
+			}
+
+			return false;
+		},
+		allReady() {
+			return this.game.started || Object.values( this.game.members ).filter( ( member ) => ! member.ready ).length === 0;
 		},
 	},
 	methods: {
 		start() {
 			this.$socket.client.emit( "start", { room: this.room } );
+		},
+		ready() {
+			this.$socket.client.emit( "ready", { room: this.room } );
 		},
 	},
 };

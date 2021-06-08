@@ -190,6 +190,12 @@ input[type=submit] {
 				box-shadow: 0 0 10px -2px var(--main-accent-color);
 			}
 		}
+
+		&[disabled].selected {
+			background-color: var(--main-accent-color);
+			text-shadow: 1px 1px rgba(0, 0, 0, 0.3);
+			color: white;
+		}
 	}
 
 	&:enabled {
@@ -412,7 +418,7 @@ ul.memberList {
 	& .selected {
 		color: var( --main-accent-color );
 		font-weight: bold;
-		border: 2px solid var( --main-accent-color );
+		border: 1px solid var( --main-accent-color );
 	}
 }
 

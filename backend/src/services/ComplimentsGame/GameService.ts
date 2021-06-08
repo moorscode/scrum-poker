@@ -2,8 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { Socket } from "socket.io";
 import SocketUserHandler from "../SocketUsersHandler";
 import CardsProvider, { Card } from "./CardsProvider";
-import { Game } from "./GameHandler";
-import { MemberList } from "./GameMemberManager";
+import { Game, GameMemberList } from "./GameHandler";
 import GameRoomCoordinator  from "./GameRoomCoordinator";
 
 export type Rooms = {
@@ -88,9 +87,9 @@ export default class GameService {
 	 *
 	 * @param {string} room The room to get the users from.
 	 *
-	 * @returns {MemberList} The list of users per connected/disconnected.
+	 * @returns {GameMemberList} The list of users per connected/disconnected.
 	 */
-	public getMembers( room: string ): MemberList {
+	public getMembers( room: string ): GameMemberList {
 		return this.getRoom( room ).getMembers();
 	}
 
@@ -272,6 +271,18 @@ export default class GameService {
 	 */
 	public startGame( room: string ): void {
 		this.getRoom( room ).startGame();
+	}
+
+	/**
+	 * Marks a member as ready to start.
+	 *
+	 * @param {string} room The room.
+	 * @param {SocketIO.Socket} socket The client.
+	 *
+	 * @returns {void}
+	 */
+	public setReady( room: string, socket: Socket ): void {
+		this.getRoom( room ).setReady( this.getUserId( socket ) );
 	}
 
 	/**
