@@ -2,7 +2,7 @@
 	<section>
 		<div class="game-status">Game: {{ gameStatus }}</div>
 		<div class="start-the-game">
-			<button @click="ready" :disabled="isReady || allReady" :class="[ isReady ? 'selected' : '', 'primary']">I am ready!</button>
+			<button @click="ready" :disabled="isReady || allReady || connectedMembers <= 1" :class="[ isReady ? 'selected' : '', 'primary']">I am ready!</button>
 <!--			<button @click="start" :disabled="! allReady" class="primary" title="Available when everybody is ready...">-->
 <!--				Start the game!-->
 <!--			</button>-->
@@ -35,7 +35,7 @@ export default {
 		},
 		isReady() {
 			if ( this.connectedMembers <= 1 ) {
-				return true;
+				return false;
 			}
 
 			if ( Object.values( this.game.members ).find( ( member ) => member.id === this.userId && member.ready ) ) {

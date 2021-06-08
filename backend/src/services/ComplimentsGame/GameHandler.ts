@@ -79,7 +79,7 @@ export default class GameHandler {
 				[],
 			);
 
-		if ( this.game.members.length <= 1 ) {
+		if ( this.game.members.length === 1 ) {
 			this.resetReady();
 		}
 	}
