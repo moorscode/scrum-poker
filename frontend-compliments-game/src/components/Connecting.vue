@@ -1,7 +1,7 @@
 <template>
-	<div>
+	<p>
 		<i class="fas fa-plug"></i> &nbsp;Connecting to the server&hellip;
-	</div>
+	</p>
 </template>
 
 <script>

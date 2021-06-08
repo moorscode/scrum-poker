@@ -5,6 +5,10 @@
 		<section class="game container">
 			<h1>Compliments game</h1>
 
+			<section v-if="connected === false">
+				<connecting/>
+			</section>
+
 			<section v-if="connected">
 				<room/>
 				<div v-if="room" class="gameMain">

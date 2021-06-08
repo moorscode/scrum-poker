@@ -1,16 +1,9 @@
 <template>
-	<section class="poker container" v-if="debug || ! $socket.connected">
-		<span v-if="! $socket.connected">
-			<h1>Connecting to server</h1>
-			<p>Please be patient...</p>
-		</span>
-
-		<div v-if="debug">
-			<button v-on:click="connect" :disabled="$socket.connected">Connect</button>
-			<button v-on:click="disconnect" :disabled="! $socket.connected">Disconnect</button>
-			<br/>
-			&nbsp;
-		</div>
+	<section class="poker container" v-if="debug">
+		<button v-on:click="connect" :disabled="$socket.connected">Connect</button>
+		<button v-on:click="disconnect" :disabled="! $socket.connected">Disconnect</button>
+		<br/>
+		&nbsp;
 	</section>
 </template>
 
