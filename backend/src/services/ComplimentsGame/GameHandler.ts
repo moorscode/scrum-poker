@@ -65,7 +65,7 @@ export default class GameHandler {
 		this.game.members = this.membersManager.getConnected()
 			.reduce(
 				( memberList: GameMember[], member: Member ): GameMember[] => {
-					const found: GameMember = memberList.find( ( gameMember: GameMember ) => gameMember.id === member.id );
+					const found: GameMember = this.game.members.find( ( gameMember: GameMember ) => gameMember.id === member.id );
 
 					memberList.push( {
 						ready: found ? found.ready : false,
