@@ -3,10 +3,10 @@
 		<div v-if="!room">
 			<p>Welcome to the compliments game!</p>
 
-			<p>Join a room to start complimenting your team members.</p>
+			<p>Join a team to start complimenting your team members.</p>
 		</div>
 		<form class="rooms">
-			Room: <input
+			Team: <input
 				v-model="joinRoom"
 				type="text"
 				:disabled="game.started"
@@ -34,7 +34,7 @@ export default {
 	computed: {
 		...mapState( [ "room", "nickname", "game", "loading" ] ),
 		joinButton() {
-			return ! this.room ? "Join room!" : "Switch to room";
+			return this.room ? "Switch to team" : "Join team!";
 		},
 	},
 	methods: {
