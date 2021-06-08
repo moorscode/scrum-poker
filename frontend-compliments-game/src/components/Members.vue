@@ -7,17 +7,8 @@
 			<div>Given compliments</div>
 		</div>
 		<ul class="memberList">
-			<li v-if="! game.started" v-for="member in sortedMembers(members)" v-bind:key=member.id
-				:class="member.id === userId ? 'me' : ''">
-				<div><i :class="['fas', member.connected ? 'fa-user' : 'fa-user-times']"/> {{ member.name }}
-				</div>
-			</li>
-
-			<h3 v-if="! game.start && game.members.length > 0 && game.cards.length > 0" class="previous-game">Previous game:</h3>
-
-			<li v-if="game.cards.length > 0" v-for="member in sortedMembers(game.members)" v-bind:key=member :class="member.id === userId ? 'me' : ''">
-				<div><i :class="['fas', members[member.id].connected ? 'fa-user' : 'fa-user-slash']"/> {{ member.name }}
-				</div>
+			<li v-for="member in sortedMembers(game.members)" v-bind:key=member :class="member.id === userId ? 'me' : ''">
+				<div><i :class="['fas', memberIcon(member)]"/> {{ member.name }}</div>
 				<div>
 					<ul>
 						<li v-for="card in pendingCards[member.id]" v-bind:key="'pending' + card.description">
@@ -78,6 +69,17 @@ export default {
 			} );
 			return members;
 		},
-	}
+		memberIcon( member ) {
+			if ( ! member.connected ) {
+				return 'fa-user-slash';
+			}
+
+			if ( member.ready ) {
+				return 'fa-user-check';
+			}
+
+			return 'fa-user';
+		}
+	},
 };
 </script>

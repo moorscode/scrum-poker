@@ -37,6 +37,8 @@ export default class GameHandler {
 		this.membersManager.on( "member-added", this.addMember.bind( this ) );
 		this.membersManager.on( "member-updated", this.refreshMembers.bind( this ) );
 		this.membersManager.on( "member-removed", this.removeMember.bind( this ) );
+
+		this.refreshMembers();
 	}
 
 	/**
