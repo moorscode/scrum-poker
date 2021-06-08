@@ -2,10 +2,8 @@
 	<section>
 		<div class="game-status">Game: {{ gameStatus }}</div>
 		<div class="start-the-game">
+			<p>When you are ready to start, press the button below.<br/>The game will automatically start when everybody has pressed their ready button.</p>
 			<button @click="ready" :disabled="isReady || allReady || connectedMembers <= 1" :class="[ isReady ? 'selected' : '', 'primary']">I am ready!</button>
-<!--			<button @click="start" :disabled="! allReady" class="primary" title="Available when everybody is ready...">-->
-<!--				Start the game!-->
-<!--			</button>-->
 		</div>
 	</section>
 </template>
@@ -24,7 +22,7 @@ export default {
 			}
 
 			if ( this.connectedMembers < 2 ) {
-				return "Waiting for more members...";
+				return "Waiting for more members to join...";
 			}
 
 			const ready = Object.values( this.game.members ).filter( ( member ) => member.ready ).length;

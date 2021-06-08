@@ -1,5 +1,6 @@
 <template>
 	<section>
+		<p>The following members are currently in the room.</p>
 		<div class="memberList-heading">
 			<div>Participant</div>
 			<div>Pending compliments</div>
