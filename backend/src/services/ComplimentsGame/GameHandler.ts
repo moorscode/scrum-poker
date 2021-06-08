@@ -35,6 +35,7 @@ export default class GameHandler {
 		this.game = { cards: [], members: [], started: false };
 
 		this.membersManager.on( "member-added", this.addMember.bind( this ) );
+		this.membersManager.on( "member-updated", this.refreshMembers.bind( this ) );
 		this.membersManager.on( "member-removed", this.removeMember.bind( this ) );
 	}
 
@@ -64,15 +65,12 @@ export default class GameHandler {
 		this.game.members = this.membersManager.getConnected()
 			.reduce(
 				( memberList: GameMember[], member: Member ): GameMember[] => {
-					let found: GameMember = memberList.find( ( gameMember: GameMember ) => gameMember.id === member.id );
-					if ( ! found ) {
-						found = {
-							ready: false,
-							...member,
-						};
-					}
+					const found: GameMember = memberList.find( ( gameMember: GameMember ) => gameMember.id === member.id );
 
-					memberList.push( found );
+					memberList.push( {
+						ready: found ? found.ready : false,
+						...member,
+					} );
 
 					return memberList;
 				},

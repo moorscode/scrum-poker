@@ -27,6 +27,14 @@ interface MemberEventDispatcherInterface extends EventDispatcherInterface {
 	 * @param {CallableFunction} callback A callback when the event is triggered, which takes a member id.
 	 */
 	on( event: "member-removed", callback: ( id: string ) => void ): void;
+
+	/**
+	 * The member updated event listener.
+	 *
+	 * @param {string} event The event being fired: "member-removed".
+	 * @param {CallableFunction} callback A callback when the event is triggered, which takes a member id.
+	 */
+	on( event: "member-updated", callback: ( id: string ) => void ): void;
 }
 
 /**
@@ -67,6 +75,8 @@ export default class GameMemberManager extends EventDispatcher implements Member
 	 */
 	public setMemberName( id: string, name: string ): void {
 		this.members[ id ].name = name;
+
+		this.dispatch( "member-updated", id );
 	}
 
 	/**
@@ -98,17 +108,6 @@ export default class GameMemberManager extends EventDispatcher implements Member
 
 		this.members[ id ].disconnectTime = Date.now();
 		this.members[ id ].connected      = false;
-	}
-
-	/**
-	 * Lists clients in a room.
-	 *
-	 * @returns {MemberList[]} List of clients.
-	 *
-	 * @private
-	 */
-	public getMembers(): MemberList {
-		return this.members;
 	}
 
 	/**
