@@ -7,7 +7,7 @@
 			<div>Given compliments</div>
 		</div>
 		<ul class="memberList">
-			<li v-for="member in sortedMembers(game.members)" v-bind:key=member :class="member.id === userId ? 'me' : ''">
+			<li v-for="member in sortedMembers(game.members)" v-bind:key="member.id" :class="member.id === userId ? 'me' : ''">
 				<div><i :class="['fas', memberIcon(member)]"/> {{ member.name }}</div>
 				<div>
 					<ul>
