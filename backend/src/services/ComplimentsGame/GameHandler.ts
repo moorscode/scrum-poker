@@ -138,7 +138,7 @@ export default class GameHandler {
 	public setReady( memberId: string ): void {
 		this.game.members.map( ( member: GameMember ) => {
 			if ( member.id === memberId ) {
-				member.ready = true;
+				member.ready = ! member.ready;
 			}
 			return member;
 		} );

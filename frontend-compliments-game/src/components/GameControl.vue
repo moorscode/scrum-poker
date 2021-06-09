@@ -1,13 +1,20 @@
 <template>
 	<section>
-		<div class="game-status">Game: {{ gameStatus }}</div>
 		<div class="start-the-game">
+			<div class="game-status">Game: {{ gameStatus }}</div>
 			<p>When you are ready to start, press the button below.<br/>
-				The game will automatically start when everybody has pressed their ready button.</p>
-			<button
-				@click="ready"
-				:disabled="isReady || allReady || connectedMembers <= 1"
-				:class="[ isReady ? 'selected' : '', 'primary']">I am ready!</button>
+				The game will automatically start when everybody has indicated they are ready.</p>
+
+			<div class="ready">
+				<label>
+					<input type="checkbox"
+						@click="ready"
+						v-model="isReady"
+						:disabled="allReady || connectedMembers <= 1"
+						:class="[ isReady ? 'selected' : '', 'primary']">
+					I am ready!
+				</label>
+			</div>
 		</div>
 	</section>
 </template>
