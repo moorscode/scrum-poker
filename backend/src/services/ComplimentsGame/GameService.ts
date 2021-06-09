@@ -175,7 +175,7 @@ export default class GameService {
 	 * @returns {void}
 	 */
 	public join( socket: Socket, room: string, name: string ): void {
-		const useName = name || "Unnamed" + Math.floor( Math.random() * 100000 );
+		const useName = name || "~please save your name~";
 
 		socket.join( room );
 
@@ -257,6 +257,10 @@ export default class GameService {
 	public setName( poker: string, socket: Socket, name: string ): void {
 		if ( ! name ) {
 			return;
+		}
+
+		if ( name === "~please save your name~" ) {
+			name = "Please tell me to stop fooling around.";
 		}
 
 		this.getRoom( poker ).setClientName( this.getUserId( socket ), name );

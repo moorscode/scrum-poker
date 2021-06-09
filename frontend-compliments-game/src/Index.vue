@@ -10,11 +10,22 @@
 			</section>
 
 			<section v-if="connected">
-				<room/>
-				<div v-if="room" class="gameMain">
-					<nickname/>
-					<game-control/>
-					<members/>
+				<p>Welcome to the compliments game!</p>
+
+				<nickname/>
+				<div v-if="nickname">
+					<room/>
+				</div>
+
+				<div v-if="!room">
+					<p v-if="! nickname">Please, set your name first.</p>
+					<p v-if="nickname">Enter your team name to start complimenting your team members.</p>
+				</div>
+
+				<div v-if="room && nickname" class="gameMain">
+						<game-control/>
+						<members/>
+					</div>
 				</div>
 			</section>
 		</section>
@@ -52,6 +63,7 @@ export default Vue.extend( {
 				"loading",
 				"connected",
 				"room",
+				"nickname",
 			],
 		),
 	},

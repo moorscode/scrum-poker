@@ -74,6 +74,13 @@ export default class GameMemberManager extends EventDispatcher implements Member
 	 * @private
 	 */
 	public setMemberName( id: string, name: string ): void {
+		const duplicates = Object.values( this.members )
+			.filter( ( member: Member ) => member.name === name && member.id !== id );
+
+		if ( duplicates.length > 0 ) {
+			name += Math.floor( Math.random() * 1000 );
+		}
+
 		this.members[ id ].name = name;
 
 		this.dispatch( "member-updated", id );

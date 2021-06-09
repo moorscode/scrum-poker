@@ -5,15 +5,16 @@
 			<p>When you are ready to start, press the button below.<br/>
 				The game will automatically start when everybody has indicated they are ready.</p>
 
-			<div class="ready">
+			<div :class="[ 'ready', members[userId].name === '~please save your name~' ? 'disabled' : '' ]">
 				<label>
 					<input type="checkbox"
 						@click="ready"
 						v-model="isReady"
-						:disabled="allReady || connectedMembers <= 1"
+						:disabled="allReady || connectedMembers <= 1 || members[userId].name === '~please save your name~'"
 						:class="[ isReady ? 'selected' : '', 'primary']">
 					I am ready!
 				</label>
+				<strong v-if="members[userId].name === '~please save your name~'">&mdash; Please enter your name first</strong>
 			</div>
 		</div>
 	</section>
@@ -25,7 +26,7 @@ import { mapState } from "vuex";
 export default {
 	name: "GameControl",
 	computed: {
-		...mapState( [ "game", "connectedMembers", "room", "userId" ] ),
+		...mapState( [ "game", "connectedMembers", "room", "userId", "members" ] ),
 		gameStatus() {
 			/* eslint-disable no-nested-ternary */
 			if ( this.game.started ) {

@@ -1,8 +1,6 @@
 <template>
-  <section v-if="room">
-    <form
-      class="username"
-    >
+  <section>
+    <form class="username">
       Name:
       <input
         v-model="nickname"
@@ -30,7 +28,7 @@ export default {
 		};
 	},
 	computed: {
-		...mapState( [ "room", "game" ] ),
+		...mapState( [ "room", "game", "members", "userId" ] ),
 	},
 	methods: {
 		updateNickname() {
@@ -45,7 +43,9 @@ export default {
 			this.$store.commit( "nickname", this.nickname );
 
 			// Tell the server.
-			this.$socket.client.emit( "nickname", { name: this.nickname, room: this.room } );
+			if ( this.room ) {
+				this.$socket.client.emit( "nickname", { name: this.nickname, room: this.room } );
+			}
 		},
 	},
 };

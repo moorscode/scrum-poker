@@ -1,10 +1,5 @@
 <template>
 	<section>
-		<div v-if="!room">
-			<p>Welcome to the compliments game!</p>
-
-			<p>Join a team to start complimenting your team members.</p>
-		</div>
 		<form class="rooms">
 			Team: <input
 				v-model="joinRoom"
