@@ -228,6 +228,13 @@ export default class GameHandler {
 		}
 	}
 
+	/**
+	 * Checks if everybody is ready.
+	 *
+	 * @returns {boolean} True if everybody is ready.
+	 *
+	 * @private
+	 */
 	private isEverybodyReady(): boolean {
 		return this.game.members.filter( ( member: GameMember ) => ! member.ready ).length === 0;
 	}

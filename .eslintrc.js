@@ -57,7 +57,21 @@ module.exports = {
 			}
 		},
 		{
+			files: ["frontend-compliments-game/src/**/*.vue"], // Or *.test.js
+			rules: {
+				"require-jsdoc": 0,
+				"no-alert": 0,
+			}
+		},
+		{
 			files: ["frontend/src/index.js"], // Or *.test.js
+			rules: {
+				"require-jsdoc": 0,
+				"no-inline-comments": 0,
+			}
+		},
+		{
+			files: ["frontend-compliments-game/src/index.js"], // Or *.test.js
 			rules: {
 				"require-jsdoc": 0,
 				"no-inline-comments": 0,

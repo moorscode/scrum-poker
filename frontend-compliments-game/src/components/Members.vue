@@ -71,15 +71,15 @@ export default {
 		},
 		memberIcon( member ) {
 			if ( ! member.connected ) {
-				return 'fa-user-slash';
+				return "fa-user-slash";
 			}
 
 			if ( member.ready ) {
-				return 'fa-user-check';
+				return "fa-user-check";
 			}
 
-			return 'fa-user';
-		}
+			return "fa-user";
+		},
 	},
 };
 </script>

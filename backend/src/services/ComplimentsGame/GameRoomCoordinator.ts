@@ -1,6 +1,6 @@
 import CardsProvider, { Card } from "./CardsProvider";
 import GameHandler, { Game, GameMemberList } from "./GameHandler";
-import GameMemberManager, { Member, MemberList } from "./GameMemberManager";
+import GameMemberManager, { Member } from "./GameMemberManager";
 
 /**
  * Poker Room

@@ -19,7 +19,7 @@
     "start:prod": "node dist/backend/main",
     "watch:frontend": "webpack serve --mode development --config ./frontend/webpack.config.js",
     "watch:frontend-compliments-game": "webpack serve --mode development --config frontend-compliments-game/webpack.config.js",
-    "cs": "eslint \\\"backend/**/*.ts\\\" \\\"frontend/**/*.js\\\" \\\"frontend-compliments-game/**/*.js\\\" \\\"frontend/**/*.vue\\\" \\\"frontend-compliments-game/**/*.vue\\\" \\\"tests/**/*.ts\\\"",
+    "cs": "eslint \"backend/**/*.ts\" \"frontend/**/*.vue\" \"frontend-compliments-game/**/*.vue\" \"frontend/*.js\" \"frontend-compliments-game/*.js\" \"tests/**/*.ts\"",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",

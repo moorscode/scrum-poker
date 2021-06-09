@@ -46,7 +46,7 @@ export default {
 				window.localStorage.setItem( "clientId", this.$data.clientId );
 			}
 			this.$socket.client.emit( "identify", { id: this.$data.clientId } );
-      this.$store.commit( "userId", this.$data.clientId );
+			this.$store.commit( "userId", this.$data.clientId );
 		},
 		votes( msg ) {
 			document.title = this.$data.baseTitle + " " + msg.voteCount + "/" + this.members.voters.length;

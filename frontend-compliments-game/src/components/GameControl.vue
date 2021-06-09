@@ -2,8 +2,12 @@
 	<section>
 		<div class="game-status">Game: {{ gameStatus }}</div>
 		<div class="start-the-game">
-			<p>When you are ready to start, press the button below.<br/>The game will automatically start when everybody has pressed their ready button.</p>
-			<button @click="ready" :disabled="isReady || allReady || connectedMembers <= 1" :class="[ isReady ? 'selected' : '', 'primary']">I am ready!</button>
+			<p>When you are ready to start, press the button below.<br/>
+				The game will automatically start when everybody has pressed their ready button.</p>
+			<button
+				@click="ready"
+				:disabled="isReady || allReady || connectedMembers <= 1"
+				:class="[ isReady ? 'selected' : '', 'primary']">I am ready!</button>
 		</div>
 	</section>
 </template>
