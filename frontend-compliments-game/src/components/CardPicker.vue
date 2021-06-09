@@ -123,6 +123,7 @@ export default {
 			this.pickedMember = { id: "" };
 			this.pickedCard = { description: "" };
 			this.waited = 0;
+			this.waitingTime = 20;
 
 			window.clearInterval( this.counter );
 			this.counter = window.setInterval( () => {
