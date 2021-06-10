@@ -5,7 +5,7 @@
 			<p>When you are ready to start, press the button below.<br/>
 				The game will automatically start when everybody has indicated they are ready.</p>
 
-			<div :class="[ 'ready', members[userId].name === '~please save your name~' ? 'disabled' : '' ]">
+			<div class="ready">
 				<label>
 					<input type="checkbox"
 						@click="ready"
