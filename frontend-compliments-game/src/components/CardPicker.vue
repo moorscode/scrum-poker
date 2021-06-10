@@ -4,7 +4,7 @@
 			<div v-if="turn === userId">
 				<h1>It's your turn!</h1>
 				<h2>Pick a card</h2>
-				<small>Click on an item below to select it:</small>
+				<small>Click on a card below to select it:</small>
 				<ul>
 					<li
 						v-for="card in myCards"
@@ -37,11 +37,11 @@
 				>Give the card
 				</button>
 				&ndash; Recipient indisposed?
-				<button @click="voteSkip">Let somebody else go instead</button>
+				<button @click="voteSkip">Let somebody else go first</button>
 			</div>
 
 			<div v-if="turn !== userId">
-				<h2>{{ memberIdToName[turn] }} is choosing the card and recipient</h2>
+				<h2>{{ memberIdToName[turn] }} is choosing a card and recipient</h2>
 				<p>
 					<strong>Card:</strong>
 					{{ pickedCard.description || "..." }}
@@ -65,25 +65,31 @@
 		</div>
 
 		<div class="container" v-if="turn !== userId">
-			<h3>Your remaining cards</h3>
-			<ul>
-				<li
-						v-for="card in myCards"
-						v-bind:key="card.id"
-				>
-					{{ card.description }}
-				</li>
-			</ul>
+			<div v-if="myRecipients.length > 0">
+				<h3>Recipients you can give a card to</h3>
+				<p>Note: You can pick one card for each participant.</p>
+				<ul>
+					<li
+							v-for="member in myRecipients"
+							v-bind:key="member.id"
+					>
+						{{ member.name }}
+					</li>
+				</ul>
 
-			<h3>Your remaining recipients</h3>
-			<ul>
-				<li
-						v-for="member in myRecipients"
-						v-bind:key="member.id"
-				>
-					{{ member.name }}
-				</li>
-			</ul>
+				<h3>Cards you can pick from</h3>
+				<ul>
+					<li
+							v-for="card in myCards"
+							v-bind:key="card.id"
+					>
+						{{ card.description }}
+					</li>
+				</ul>
+			</div>
+			<div v-if="myRecipients.length === 0">
+				<h3>You're done giving compliments</h3>
+			</div>
 		</div>
 
 		<div class="container" v-if="turn === userId">
