@@ -421,13 +421,25 @@ ul.memberList {
 
 	& .pick,
 	& .selected {
-		cursor: pointer;
+		& button {
+			cursor: pointer;
+		}
 	}
 
 	& .selected {
 		color: var( --main-accent-color );
 		font-weight: bold;
-		border: 1px solid var( --main-accent-color );
+		list-style-type: none;
+		&:before {
+			content: '\f00c';
+			font-family: 'Font Awesome 5 Free';
+			position: relative;
+			margin-left: -20px;
+			margin-right: 4px;
+		}
+		& button {
+			border: 1px solid var(--main-accent-color);
+		}
 	}
 }
 

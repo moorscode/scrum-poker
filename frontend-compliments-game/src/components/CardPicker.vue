@@ -9,8 +9,9 @@
 					<li
 						v-for="card in myCards"
 						@click="pickCard(card)"
+						:class="pickedCard === card ? 'selected' : 'pick'"
 					>
-						<button v-bind:key="card.id" :class="pickedCard === card ? 'selected' : 'pick'">{{ card.description }}</button>
+						<button v-bind:key="card.id">{{ card.description }}</button>
 					</li>
 				</ul>
 				<h2>Pick a recipient</h2>
@@ -19,8 +20,9 @@
 					<li
 						v-for="member in myRecipients"
 						v-bind:key="member.id"
+						:class="pickedMember === member ? 'selected' : 'pick'"
 					>
-						<button @click="pickRecipient(member)" :class="pickedMember === member ? 'selected' : 'pick'">{{ member.name }}</button>
+						<button @click="pickRecipient(member)">{{ member.name }}</button>
 					</li>
 				</ul>
 
@@ -62,7 +64,7 @@
 			</div>
 		</div>
 
-		<div class="container" v-if="turn !== userId && myCards.length > 0">
+		<div class="container" v-if="turn !== userId">
 			<h3>Your remaining cards</h3>
 			<ul>
 				<li
@@ -83,6 +85,19 @@
 				</li>
 			</ul>
 		</div>
+
+		<div class="container" v-if="turn === userId">
+			<h3>Game status</h3>
+			Members received number of compliments:
+			<ul>
+				<li
+						v-for="member in game.members"
+						v-bind:key="'cards-received' + member.id"
+				>
+					{{ member.name }} - {{ memberReceivedCards( member.id ) }} compliments
+				</li>
+			</ul>
+		</div>
 	</div>
 </template>
 
@@ -95,7 +110,6 @@ export default {
 		return {
 			pickedCard: { id: "" },
 			pickedMember: { id: "" },
-			debug: false,
 			waited: 0,
 			waitingTime: 20,
 			counter: null,
@@ -162,6 +176,9 @@ export default {
 					to: this.pickedMember.id,
 				},
 			);
+		},
+		memberReceivedCards( memberId ) {
+			return this.game.cards.filter( ( card ) => card.to === memberId ).length;
 		},
 		giveCard() {
 			this.$socket.client.emit(
