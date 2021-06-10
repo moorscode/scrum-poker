@@ -156,25 +156,42 @@ export default class GameHandler {
 
 		this.game.cards = this.game.cards.filter( ( card: Card ) => card.from !== memberId && card.to !== memberId );
 
-		const memberCount    = this.game.members.length;
-		const cardsPerMember = memberCount - 1;
-
+		const memberCount = this.game.members.length;
 		if ( memberCount <= 1 ) {
 			this.finishGame();
 			return;
 		}
 
+		const cardsPerMember = this.getCardsPerMember();
+
 		this.game.members.forEach( ( member: Member ) => {
 			// If we removed an already given card, we don't have anything else to do.
 			const memberCards = this.game.cards.filter( ( card: Card ) => card.from === member.id );
-			if ( memberCards.length === cardsPerMember ) {
+			const excessCards = memberCards.length - cardsPerMember;
+			if ( excessCards === 0 ) {
 				return;
 			}
 
 			// Remove the first unassigned card.
-			const index = this.game.cards.findIndex( ( card: Card ) => card.from === member.id && ! card.to );
-			this.game.cards.splice( index, 1 );
+			const availableCards = this.game.cards.filter( ( card: Card ) => card.from === member.id && ! card.to );
+			const removeCards: Card[] = availableCards.splice( 0, excessCards );
+
+			// Remove the cards that should not be used anymore.
+			this.game.cards = this.game.cards
+				.filter( ( card: Card ) => ! removeCards.map( ( removeCard: Card ) => removeCard.id ).includes( card.id ) );
 		} );
+	}
+
+	/**
+	 * Determines the number of cards per member.
+	 *
+	 * @returns {number} The number of cards everybody should receive.
+	 *
+	 * @private
+	 */
+	private getCardsPerMember(): number {
+		const memberCount = this.game.members.length;
+		return ( memberCount - 1 ) + 2;
 	}
 
 	/**
@@ -186,7 +203,7 @@ export default class GameHandler {
 		const members: GameMember[] = this.game.members;
 		const memberCount           = members.length;
 		const cards                 = this.cardsProvider.getCards();
-		const cardsPerMember        = memberCount - 1;
+		const cardsPerMember        = this.getCardsPerMember();
 
 		// Each member gets a card for all other members.
 		const totalNumberOfCards = cardsPerMember * memberCount;
@@ -271,34 +288,35 @@ export default class GameHandler {
 			return;
 		}
 
-		let memberIds = this.game.members.map( ( member: Member ) => member.id );
+		const memberIds = this.getMemberIds();
+		const numberOfRecipients = this.game.members.length - 1;
 
-		memberIds = memberIds.filter(
-			( memberId ) => this.game.cards.filter( ( card: Card ) => card.from === memberId && ! card.to ).length !== 0,
+		// Remove members who have given a card to all other members.
+		let memberIdsWhoCanGive = memberIds.filter(
+			( memberId: string ) => {
+				const given = this.game.cards.filter( ( card: Card ) => card.from === memberId && card.to ).length;
+				return given !== numberOfRecipients;
+			},
 		);
 
-		memberIds = [ ...new Set( memberIds ) ];
-
-		if ( memberIds.length > 1 ) {
-			memberIds = memberIds.filter( ( memberId ) => memberId !== this.lastTurnMemberId );
+		// Avoid the previous person going again if possible.
+		if ( memberIdsWhoCanGive.length > 1 ) {
+			memberIdsWhoCanGive = memberIdsWhoCanGive.filter( ( memberId ) => memberId !== this.lastTurnMemberId );
 		}
 
-		/**
-		 * This is not needed with the skip functionality.
-		 *
-		memberIds = memberIds.filter( ( memberId ) =>
-			this.membersManager.getConnected().map( ( member: Member ) => member.id ).includes( memberId ),
-		);
-		 **/
-
-		if ( memberIds.length === 0 ) {
+		// No more options = game done.
+		if ( memberIdsWhoCanGive.length === 0 ) {
 			this.finishGame();
 			return;
 		}
 
-		const index = memberIds.length === 1 ? 0 : Math.floor( Math.random() * memberIds.length );
+		const index = memberIdsWhoCanGive.length === 1 ? 0 : Math.floor( Math.random() * memberIdsWhoCanGive.length );
 
-		this.lastTurnMemberId = memberIds[ index ];
+		this.lastTurnMemberId = memberIdsWhoCanGive[ index ];
+	}
+
+	private getMemberIds(): string[] {
+		return this.game.members.map( ( member: Member ) => member.id );
 	}
 
 	/**
@@ -359,7 +377,7 @@ export default class GameHandler {
 	 * @private
 	 */
 	private shuffleArray( array: Card[] ) {
-		for ( let index = array.length - 1; index > 0; index-- ) {
+		for ( let index = array.length - 1; index > 0; index -- ) {
 			const secondIndex    = Math.floor( Math.random() * ( index + 1 ) );
 			const temp           = array[ index ];
 			array[ index ]       = array[ secondIndex ];

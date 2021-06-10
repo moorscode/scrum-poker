@@ -3,19 +3,11 @@
 		<p>The following members are currently in the room:</p>
 		<div class="memberList-heading">
 			<div>Participant</div>
-			<div>Pending compliments</div>
-			<div>Given compliments</div>
+			<div>Received compliments</div>
 		</div>
 		<ul class="memberList">
 			<li v-for="member in sortedMembers(game.members)" v-bind:key="member.id" :class="member.id === userId ? 'me' : ''">
 				<div><i :class="['fas', memberIcon(member)]"/> {{ member.name }}</div>
-				<div>
-					<ul>
-						<li v-for="card in pendingCards[member.id]" v-bind:key="'pending' + card.description">
-							{{ member.id === userId ? card.description : "?" }}
-						</li>
-					</ul>
-				</div>
 				<div>
 					<ul>
 						<li v-for="card in receivedCards[member.id]" v-bind:key="'received' + card.description">
@@ -36,15 +28,6 @@ export default {
 	name: "Members",
 	computed: {
 		...mapState( [ "game", "userId", "memberIdToName", "members" ] ),
-		pendingCards() {
-			return this.game.members.reduce(
-				( list, member ) => {
-					list[ member.id ] = this.game.cards.filter( ( card ) => card.from === member.id && ! card.to );
-					return list;
-				},
-				[],
-			);
-		},
 		receivedCards() {
 			return this.game.members.reduce(
 				( list, member ) => {
