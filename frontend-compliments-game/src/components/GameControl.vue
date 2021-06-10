@@ -10,12 +10,17 @@
 					<input type="checkbox"
 						@click="ready"
 						v-model="isReady"
-						:disabled="allReady || connectedMembers <= 1 || members[userId].name === '~please save your name~'"
+						:disabled="connectedMembers <= 1"
 						:class="[ isReady ? 'selected' : '', 'primary']">
 					I am ready!
 				</label>
-				<strong v-if="members[userId].name === '~please save your name~'">&mdash; Please enter your name first</strong>
 			</div>
+			<button
+					@click="start"
+					:disabled="! allReady"
+					class="primary">
+				Start the game!
+			</button>
 		</div>
 	</section>
 </template>
