@@ -2,17 +2,17 @@
 	<section>
 		<p>The following members are currently in the room:</p>
 		<div class="memberList-heading">
-			<div>Participant</div>
+			<div class="member">Participant</div>
 			<div>Received compliments</div>
 		</div>
 		<ul class="memberList">
 			<li v-for="member in sortedMembers(game.members)" v-bind:key="member.id" :class="member.id === userId ? 'me' : ''">
-				<div><i :class="['fas', memberIcon(member)]"/> {{ member.name }}</div>
+				<div class="member"><i :class="['fas', memberIcon(member)]"/> {{ member.name }} {{ member.id === userId ? "(you)" : "" }}</div>
 				<div>
 					<ul>
 						<li v-for="card in receivedCards[member.id]" v-bind:key="'received' + card.description">
 							<div class="received">{{ card.description }}</div>
-							<div class="received-from">&mdash; {{ memberIdToName[card.from] }}</div>
+							<div class="received-from">&mdash; from: {{ memberIdToName[card.from] }}</div>
 						</li>
 					</ul>
 				</div>

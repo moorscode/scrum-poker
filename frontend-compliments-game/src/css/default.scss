@@ -331,9 +331,18 @@ form.username {
 	font-size: 80%;
 	padding: 0;
 	align-items: flex-start;
-	& div {
-		flex: 1;
-		padding: 8px 0;
+}
+
+.memberList-heading,
+ul.memberList {
+	& > div,
+	& > li > div {
+		padding: 8px;
+		margin-left: 16px;
+		&.member {
+			flex-basis: 25%;
+			margin-left: 0;
+		}
 	}
 }
 
@@ -360,6 +369,7 @@ ul.memberList {
 	& .received-from {
 		font-weight: normal;
 		font-size: 90%;
+		font-style: italic;
 		padding: 0;
 	}
 
@@ -373,12 +383,10 @@ ul.memberList {
 
 		&.me {
 			font-weight: bold;
+			background-color: #eee;
 		}
 
 		& div {
-			flex: 1;
-			padding: 8px 0;
-
 			ul {
 				margin: 0;
 			}
