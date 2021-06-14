@@ -7537,10 +7537,10 @@ vue-loader@^15.9.7:
     vue-hot-reload-api "^2.3.0"
     vue-style-loader "^4.1.0"
 
-vue-socket.io-extended@^4.1.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/vue-socket.io-extended/-/vue-socket.io-extended-4.1.0.tgz#c87ded5202b68580f8ffbd96f47c1f1d6e0c5b6d"
-  integrity sha512-8a7eeHkUB6fnMtgHw0QrENHhgRF+VcZlz24dYvGZCZkxY8S0xO7e88GTz7fxj7HJ/uSu701Gv8FDi80bIzdqMQ==
+vue-socket.io-extended@^4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/vue-socket.io-extended/-/vue-socket.io-extended-4.2.0.tgz#e663553669fd3dcd9786b1add40b18580d36816f"
+  integrity sha512-3ZHy53W4CpzRdTZjWL7krq80FQlnK6IyOG0ur158pij1PXKyVBYDpjE0/3SluK7NeNTqefa/Y8RFCFy6BISG/g==
   dependencies:
     "@types/socket.io-client" "1.4.36"
 
