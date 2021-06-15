@@ -139,6 +139,13 @@ export default class ComplimentsGameGateway implements OnGatewayInit {
 
 		this.update( message.room );
 	}
+
+	@SubscribeMessage( "force-finish" )
+	forceFinish( client: Socket, message: { room: string } ): void {
+		this.gameService.finishGame( message.room );
+
+		this.update( message.room );
+	}
 	/* eslint-enable require-jsdoc */
 
 	/**

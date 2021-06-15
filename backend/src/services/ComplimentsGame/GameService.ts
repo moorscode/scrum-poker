@@ -166,6 +166,17 @@ export default class GameService {
 	}
 
 	/**
+	 * Finishes a game.
+	 *
+	 * @param {string} room The room to finish the game for.
+	 *
+	 * @returns {void}
+	 */
+	public finishGame( room: string ): void {
+		this.getRoom( room ).finishGame();
+	}
+
+	/**
 	 * Lets a client join a room.
 	 *
 	 * @param {Socket} socket The client.

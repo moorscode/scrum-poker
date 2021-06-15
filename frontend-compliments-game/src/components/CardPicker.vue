@@ -104,6 +104,12 @@
 				</li>
 			</ul>
 		</div>
+
+		<div class="container danger">
+			<h3>End the game</h3>
+			If the time is about to run out or something is going wrong,<br/>
+			you can <button @click="confirmStop">end the game</button>.
+		</div>
 	</div>
 </template>
 
@@ -199,6 +205,21 @@ export default {
 		voteSkip() {
 			this.$socket.client.emit(
 				"vote-skip",
+				{
+					room: this.room,
+				},
+			);
+		},
+		confirmStop() {
+			if ( ! window.confirm(
+				"Are you sure you want to end the game?" +
+				"\n\nContinueing the game is not possible, you'll need to restart to play again."
+			) ) {
+				return;
+			}
+
+			this.$socket.client.emit(
+				"force-finish",
 				{
 					room: this.room,
 				},

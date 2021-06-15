@@ -37,6 +37,15 @@ export default class GameRoomCoordinator {
 	}
 
 	/**
+	 * Finishes a game.
+	 *
+	 * @returns {void}
+	 */
+	public finishGame(): void {
+		this.gameHandler.finishGame();
+	}
+
+	/**
 	 * Gives a card to another member.
 	 *
 	 * @param {string} memberId The giver.
