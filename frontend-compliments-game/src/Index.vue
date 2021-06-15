@@ -23,12 +23,16 @@
 				</div>
 
 				<div v-if="room && nickname" class="gameMain">
-						<game-control/>
-						<members/>
-					</div>
+					<game-control/>
+					<members/>
 				</div>
 			</section>
 		</section>
+
+		<section class="container">
+			<translate />
+		</section>
+
 		<card-picker/>
 	</main>
 </template>
@@ -43,6 +47,7 @@ import Nickname from "./components/Nickname.vue";
 import GameControl from "./components/GameControl.vue";
 import Members from "./components/Members.vue";
 import CardPicker from "./components/CardPicker.vue";
+import Translate from "./components/Translate.vue";
 
 export default Vue.extend( {
 	components: {
@@ -53,6 +58,7 @@ export default Vue.extend( {
 		GameControl,
 		Members,
 		CardPicker,
+		Translate,
 	},
 	created() {
 		this.$socket.client.open();
