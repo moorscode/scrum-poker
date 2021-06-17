@@ -9,6 +9,7 @@ export type Game = {
 	cards: Card[];
 	members: GameMember[];
 	started: boolean;
+	finished: boolean;
 }
 
 export type GameMemberList = {
@@ -32,7 +33,7 @@ export default class GameHandler {
 		private readonly membersManager: GameMemberManager,
 		private readonly cardsProvider: CardsProvider,
 	) {
-		this.game = { cards: [], members: [], started: false };
+		this.game = { cards: [], members: [], started: false, finished: false };
 
 		this.membersManager.on( "member-added", this.addMember.bind( this ) );
 		this.membersManager.on( "member-updated", this.refreshMembers.bind( this ) );
@@ -158,7 +159,7 @@ export default class GameHandler {
 
 		const memberCount = this.game.members.length;
 		if ( memberCount <= 1 ) {
-			this.finishGame();
+			this.finishGame( false );
 			return;
 		}
 
@@ -240,6 +241,7 @@ export default class GameHandler {
 
 		if ( this.assignCards() ) {
 			this.game.started = true;
+			this.game.finished = false;
 
 			this.selectTurnMemberId();
 		}
@@ -284,7 +286,7 @@ export default class GameHandler {
 	private selectTurnMemberId(): void {
 		// Only if there are still cards left...
 		if ( ! this.haveAvailableCards() ) {
-			this.finishGame();
+			this.finishGame( true );
 			return;
 		}
 
@@ -306,7 +308,7 @@ export default class GameHandler {
 
 		// No more options = game done.
 		if ( memberIdsWhoCanGive.length === 0 ) {
-			this.finishGame();
+			this.finishGame( true );
 			return;
 		}
 
@@ -315,6 +317,13 @@ export default class GameHandler {
 		this.lastTurnMemberId = memberIdsWhoCanGive[ index ];
 	}
 
+	/**
+	 * Retrieves the member IDs.
+	 *
+	 * @returns {string[]} List of member IDs.
+	 *
+	 * @private
+	 */
 	private getMemberIds(): string[] {
 		return this.game.members.map( ( member: Member ) => member.id );
 	}
@@ -340,10 +349,13 @@ export default class GameHandler {
 	/**
 	 * Finishes a game.
 	 *
+	 * @param {boolean} completed True if the game was completed.
+	 *
 	 * @returns {void}
 	 */
-	public finishGame(): void {
+	public finishGame( completed = false ): void {
 		this.game.started = false;
+		this.game.finished = completed;
 
 		this.refreshMembers();
 		this.resetReady();
@@ -377,7 +389,7 @@ export default class GameHandler {
 	 * @private
 	 */
 	private shuffleArray( array: Card[] ) {
-		for ( let index = array.length - 1; index > 0; index -- ) {
+		for ( let index = array.length - 1; index > 0; index-- ) {
 			const secondIndex    = Math.floor( Math.random() * ( index + 1 ) );
 			const temp           = array[ index ];
 			array[ index ]       = array[ secondIndex ];

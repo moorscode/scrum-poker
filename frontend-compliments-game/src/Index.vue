@@ -10,16 +10,19 @@
 			</section>
 
 			<section v-if="connected">
-				<p>Welcome to the compliments game!</p>
+				<p v-if="! room">Welcome to the compliments game!</p>
+
+				<img v-if="! room" src="http://my.yoast.com/static/media/greeting.42ea05bc.png" width="200"/>
+
+				<p v-if="! nickname">Please, set your name first.</p>
+				<p v-if="nickname && ! room">Enter your team name to start complimenting your team members.</p>
 
 				<nickname/>
 				<div v-if="nickname">
 					<room/>
 				</div>
 
-				<div v-if="!room">
-					<p v-if="! nickname">Please, set your name first.</p>
-					<p v-if="nickname">Enter your team name to start complimenting your team members.</p>
+				<div v-if="! room">
 				</div>
 
 				<div v-if="room && nickname" class="gameMain">

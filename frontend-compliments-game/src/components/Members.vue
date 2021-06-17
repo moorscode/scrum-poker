@@ -18,6 +18,11 @@
 				</div>
 			</li>
 		</ul>
+		<div v-if="game.finished" class="center">
+			<img src="http://my.yoast.com/static/media/checkout-success.3712b637.svg" width="200">
+			<p>That was it, thanks for participating!</p>
+			<p>If you like you can start again, but please note that the received compliments will be erased.</p>
+		</div>
 	</section>
 </template>
 
@@ -27,7 +32,7 @@ import { mapState } from "vuex";
 export default {
 	name: "Members",
 	computed: {
-		...mapState( [ "game", "userId", "memberIdToName", "members" ] ),
+		...mapState( [ "game", "userId", "memberIdToName", "members", "turn" ] ),
 		receivedCards() {
 			return this.game.members.reduce(
 				( list, member ) => {

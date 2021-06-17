@@ -42,7 +42,7 @@ export default class GameRoomCoordinator {
 	 * @returns {void}
 	 */
 	public finishGame(): void {
-		this.gameHandler.finishGame();
+		this.gameHandler.finishGame( true );
 	}
 
 	/**

@@ -13,6 +13,7 @@ export default new Vuex.Store( {
 		userId: "",
 		game: {
 			started: false,
+			finished: false,
 			members: {},
 			cards: [],
 		},
