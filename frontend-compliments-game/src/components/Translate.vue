@@ -4,7 +4,7 @@
 			Translate this page in
 			your preferred language:
 		</p>
-		<span id="google_translate_element" />
+		<span id="google_translate_element"/>
 	</div>
 </template>
 
@@ -12,6 +12,30 @@
 
 export default {
 	name: "Translate",
+	mounted() {
+		this.$nextTick( () => {
+			this.googleTranslateInit();
+		} );
+	},
+	methods: {
+
+		googleTranslateInit: function() {
+			const checkIfGoogleLoaded = setInterval( () => {
+				if ( google.translate.TranslateElement !== null ) {
+					clearInterval( checkIfGoogleLoaded );
+
+					this.googleTranslateElement( "google_translate_element" );
+				}
+			}, 100 );
+		},
+
+		googleTranslateElement: function( id ) {
+			new google.translate.TranslateElement( {
+				pageLanguage: "en",
+				layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+			}, id );
+		},
+	},
 };
 
 </script>
