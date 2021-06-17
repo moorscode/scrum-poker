@@ -31,7 +31,7 @@ export default [
 	"overtuigend (convincing)",
 	"respectvol (respectful)",
 	"rustig (easy going)",
-	"serieus (seriousl)",
+	"serieus (serious)",
 	"tevreden (content)",
 	"veelzijdig (versatile)",
 	"voor jezelf opkomen (standing up for yourself)",
