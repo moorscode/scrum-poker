@@ -24,7 +24,7 @@ export default [
 	"intelligent (intelligent)",
 	"krachtig (powerful)",
 	"makkelijke prater (easy talker)",
-	"nuchter (sober)",
+	"nuchter (down to earth)",
 	"ontspannend (relaxed)",
 	"open",
 	"optimistisch (optimistic)",
