@@ -60,7 +60,7 @@ export default [
 	"praktisch (practical)",
 	"speels (playful)",
 	"spontaan (spontanious)",
-	"tactvol (tactful)" ,
+	"tactvol (tactful)",
 	"toegewijd (dedicated)",
 	"tolerant",
 	"vastberaden (determined)",
