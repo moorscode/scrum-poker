@@ -213,7 +213,7 @@ export default {
 		confirmStop() {
 			if ( ! window.confirm(
 				"Are you sure you want to end the game?" +
-				"\n\nContinueing the game is not possible, you'll need to restart to play again."
+				"\n\nContinueing the game is not possible, you'll need to restart to play again.",
 			) ) {
 				return;
 			}
