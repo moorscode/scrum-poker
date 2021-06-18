@@ -9,6 +9,7 @@
 </template>
 
 <script>
+/* global google */
 
 export default {
 	name: "Translate",
@@ -30,6 +31,7 @@ export default {
 		},
 
 		googleTranslateElement: function( id ) {
+			// eslint-disable-next-line no-new
 			new google.translate.TranslateElement( {
 				pageLanguage: "en",
 				layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
