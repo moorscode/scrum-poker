@@ -19,7 +19,10 @@ export default class CardsProvider {
 	 * @returns {Card[]} The cards.
 	 */
 	public getCards(): Card[] {
-		const list = cards.map( ( line: string ) => {
+		const moreCards = cards;
+		moreCards.push( ...cards );
+
+		const list = moreCards.map( ( line: string ) => {
 			return { description: line, id: this.generateId() };
 		} );
 
