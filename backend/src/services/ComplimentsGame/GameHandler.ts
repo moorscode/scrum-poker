@@ -174,7 +174,7 @@ export default class GameHandler {
 			}
 
 			// Remove the first unassigned card.
-			const availableCards = this.game.cards.filter( ( card: Card ) => card.from === member.id && ! card.to );
+			const availableCards      = this.game.cards.filter( ( card: Card ) => card.from === member.id && ! card.to );
 			const removeCards: Card[] = availableCards.splice( 0, excessCards );
 
 			// Remove the cards that should not be used anymore.
@@ -203,7 +203,6 @@ export default class GameHandler {
 	private assignCards(): boolean {
 		const members: GameMember[] = this.game.members;
 		const memberCount           = members.length;
-		const cards                 = this.cardsProvider.getCards();
 		const cardsPerMember        = this.getCardsPerMember();
 
 		// Each member gets a card for all other members.
@@ -211,6 +210,12 @@ export default class GameHandler {
 
 		if ( totalNumberOfCards < 1 ) {
 			return false;
+		}
+
+		const cards = this.cardsProvider.getCards();
+		// Make sure we have enough cards to go around.
+		while ( cards.length < totalNumberOfCards ) {
+			cards.push( ...this.cardsProvider.getCards() );
 		}
 
 		const shuffledCards = this.shuffleArray( cards );
@@ -240,7 +245,7 @@ export default class GameHandler {
 		}
 
 		if ( this.assignCards() ) {
-			this.game.started = true;
+			this.game.started  = true;
 			this.game.finished = false;
 
 			this.selectTurnMemberId();
@@ -290,7 +295,7 @@ export default class GameHandler {
 			return;
 		}
 
-		const memberIds = this.getMemberIds();
+		const memberIds          = this.getMemberIds();
 		const numberOfRecipients = this.game.members.length - 1;
 
 		// Remove members who have given a card to all other members.
@@ -354,7 +359,7 @@ export default class GameHandler {
 	 * @returns {void}
 	 */
 	public finishGame( completed = false ): void {
-		this.game.started = false;
+		this.game.started  = false;
 		this.game.finished = completed;
 
 		this.refreshMembers();
