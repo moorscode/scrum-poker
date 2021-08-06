@@ -1,4 +1,4 @@
-import PointsProvider from "./PointsProvider";
+import PointsProvider, { VotingSystem } from "./PointsProvider";
 import PokerHistoryList from "./PokerHistoryList";
 import PokerMemberManager, { Member, MemberList } from "./PokerMemberManager";
 import { CurrentVotes, GroupVoteNames } from "./PokersService";
@@ -32,7 +32,7 @@ export default class PokerRoomCoordinator {
 		this.historyList.addStory( this.storyService.getStory() );
 
 		// Create a new story.
-		this.storyService = new PokerStoryHandler( this.membersManager, this.pointsProvider );
+		this.storyService = new PokerStoryHandler( this.membersManager, this.pointsProvider, this.storyService.getStory().votingSystem );
 	}
 
 	/**
@@ -53,6 +53,17 @@ export default class PokerRoomCoordinator {
 	 */
 	public setStoryName( name: string ): void {
 		this.storyService.setName( name );
+	}
+
+	/**
+	 * Set the voting system.
+	 *
+	 * @param {VotingSystem} votingSystem The voting system.
+	 *
+	 * @returns {void}
+	 */
+	public setStoryVotingSystem( votingSystem: VotingSystem ): void {
+		this.storyService.setVotingSystem( votingSystem );
 	}
 
 	/**

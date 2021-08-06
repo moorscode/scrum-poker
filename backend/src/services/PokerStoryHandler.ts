@@ -1,8 +1,8 @@
-import PointsProvider, { PointValue } from "./PointsProvider";
+import PointsProvider, { EmotionValue, PointValue, VotingSystem } from "./PointsProvider";
 import PokerMemberManager, { Member } from "./PokerMemberManager";
 
 export type ObscuredVoteValue = "#" | "!";
-export type VoteValue = PointValue | ObscuredVoteValue;
+export type VoteValue = PointValue | EmotionValue | ObscuredVoteValue;
 
 export type Story = {
 	name: string;
@@ -12,6 +12,7 @@ export type Story = {
 	votes: Vote[];
 	voters: number;
 	votesRevealed: boolean;
+	votingSystem: VotingSystem;
 }
 
 export type Vote = {
@@ -37,12 +38,14 @@ export default class PokerStoryHandler {
 	 *
 	 * @param {PokerMemberManager} membersManager The members manager to use.
 	 * @param {PointsProvider} pointsProvider The points provider.
+	 * @param {VotingSystem} votingSystem The voting system to use for the next story.
 	 */
 	public constructor(
 		private readonly membersManager: PokerMemberManager,
 		private readonly pointsProvider: PointsProvider,
+		private votingSystem: VotingSystem = "Points",
 	) {
-		this.story = { name: "", votes: [], voters: 0, votesRevealed: false };
+		this.story = { name: "", votes: [], voters: 0, votesRevealed: false, votingSystem };
 
 		this.membersManager.on( "member-state", this.recalculate.bind( this ) );
 		this.membersManager.on( "member-removed", this.removeVote.bind( this ) );
@@ -66,6 +69,19 @@ export default class PokerStoryHandler {
 	 */
 	public setName( name: string ): void {
 		this.story.name = name;
+	}
+
+	/**
+	 * Sets the voting system and resets all the votes.
+	 *
+	 * @param {VotingSystem} votingSystem The voting system to use.
+	 *
+	 * @returns {void}
+	 */
+	public setVotingSystem( votingSystem: VotingSystem ): void {
+		this.story.votingSystem = votingSystem;
+		this.story.votes = [];
+		this.recalculate();
 	}
 
 	/**
@@ -109,7 +125,7 @@ export default class PokerStoryHandler {
 		story.voteAverage = Math.fround( pointTotal / story.votes.length );
 
 		// Find the nearest available point. Always round up.
-		for ( const availablePoint of this.pointsProvider.getNumericPoints() ) {
+		for ( const availablePoint of this.pointsProvider.getNumericPoints( story.votingSystem ) ) {
 			if ( story.voteAverage - availablePoint <= 0 ) {
 				story.nearestPointAverage = availablePoint as PointValue;
 				break;

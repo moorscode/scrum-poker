@@ -104,19 +104,19 @@ main {
 	&.no-spread {
 		background-color: var( --no-spread-background-color );
 	}
-	
+
 	&.high-spread {
 		background-color: var( --high-spread-background-color );
 	}
-	
+
 	&.normal-spread {
 		background-color: var( --main-background-color );
 	}
-	
+
 	&.finished {
 		background: linear-gradient(124deg, #ff2400, #e81d1d, #e8b71d, #e3e81d, #1de840, #1ddde8, #2b1de8, #dd00f3, #dd00f3);
 		background-size: 1800% 1800%;
-	
+
 		animation: rainbow 18s ease infinite;
 	}
 
@@ -210,6 +210,10 @@ input[type=text] {
 	}
 }
 
+select{
+	min-height: 2em;
+}
+
 button {
 	& .fas {
 		color: black;
@@ -227,6 +231,12 @@ button {
 a {
 	color: var( --main-accent-color );
 }
+
+div.flex {
+	display: flex;
+	justify-content: space-between
+}
+
 
 p.results {
 	margin-bottom: 1em;
@@ -298,32 +308,32 @@ section.storyControls {
 		& strong {
 			color: var( --main-accent-color );
 		}
-	
+
 		& ul {
 			margin-top: 4px;
 			padding-left: 10px;
 		}
-		
+
 		& li {
 			list-style: none;
 			margin: 0;
 		}
-	
+
 		& .fa-person-booth {
 			margin-left: 4px;
 			color: var( --status-connected );
 		}
-		
+
 		& .fa-user-secret {
 			margin-left: 5px;
 			margin-right: 3px;
 		}
-	
+
 		& .fa-plug {
 			margin-left: 5px;
 			margin-right: 5px;
 		}
-	
+
 		&.hidden {
 			display: none;
 		}
@@ -414,7 +424,7 @@ button.choice {
 	outline: 0;
 	user-select: none;
 
-	&:last-child {
+	&.coffee {
 		min-width: 86px;
 	}
 
@@ -469,11 +479,11 @@ button.result {
 	&:hover {
 		color: black;
 	}
-	
+
 	&:active {
 		top: 0;
 	}
-	
+
 	&:focus {
 		outline: 0;
 	}
@@ -489,7 +499,7 @@ button.result {
 	&.initialVote {
 		z-index: 1;
 		position: absolute;
-	
+
 		& + button.result {
 			left: 0;
 			top: 14px;
@@ -518,7 +528,7 @@ button.result {
 		background: var( --members-list-background-color );
 		box-shadow: 3px 3px 0 -1px var( --main-accent-color );
 	}
-	
+
 	&:active,
 	&:hover {
 		& > .vote-names {
@@ -550,7 +560,7 @@ span.resultContainer {
 	&:hover {
 		z-index: 10;
 	}
-	
+
 	&:first-child {
 		margin-left: 0;
 	}
@@ -562,7 +572,7 @@ div.voting {
 	& .voted {
 		color: var( --voted-color );
 	}
-	
+
 	& .unvoted {
 		color: var( --not-voted-color );
 	}
@@ -604,7 +614,7 @@ span.allVoted {
 			margin-left: 8px;
 		}
 	}
-	
+
 	&.hidden {
 		& .story {
 			display: none;

@@ -23,7 +23,10 @@
 				<story /> <refinement />
 
 				<section class="storyControls">
-					<story-name />
+					<div class="flex">
+						<story-name />
+						<voting-system />
+					</div>
 					<poker-choices />
 				</section>
 
@@ -66,9 +69,11 @@ import Credits from "./components/Credits.vue";
 import ServerConnection from "./components/ServerConnection.vue";
 import Connecting from "./components/Connecting.vue";
 import ThemePicker from "./components/ThemePicker.vue";
+import VotingSystem from "./components/VotingSystem.vue";
 
 export default Vue.extend( {
 	components: {
+		VotingSystem,
 		Room,
 		Nickname,
 		Observer,

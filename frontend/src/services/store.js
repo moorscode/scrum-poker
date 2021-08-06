@@ -23,6 +23,7 @@ export default new Vuex.Store( {
 		groupedVoterNames: [],
 		nearestPointAverage: null,
 		refinementFinished: false,
+		votingSystem: "Points",
 	},
 	mutations: {
 		// Local state.
@@ -55,8 +56,9 @@ export default new Vuex.Store( {
 		SOCKET_MEMBERLIST( state, members ) {
 			state.members = members;
 		},
-		SOCKET_STORY( state, name ) {
-			state.storyName = name;
+		SOCKET_STORY( state, data ) {
+			state.storyName = data.name;
+			state.votingSystem = data.votingSystem;
 		},
 		SOCKET_VOTES( state, data ) {
 			const votes = data.votes.sort( ( a, b ) => a.currentValue - b.currentValue ) || [];

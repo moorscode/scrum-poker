@@ -4,7 +4,7 @@ import { Server, Socket } from "socket.io";
 import HistoryResponseAdapter from "../adapters/HistoryResponseAdapter";
 import MembersResponseAdapter from "../adapters/MembersResponseAdapter";
 import VoteResponseAdapter from "../adapters/VoteResponseAdapter";
-import PointsProvider from "../services/PointsProvider";
+import PointsProvider, { VotingSystem } from "../services/PointsProvider";
 import PokersCleanupService from "../services/PokersCleanupService";
 import PokersService from "../services/PokersService";
 import { Vote } from "../services/PokerStoryHandler";
@@ -56,7 +56,6 @@ export default class PokersGateway implements OnGatewayInit {
 		this.server.on( "connection", ( socket: Socket ) => {
 			// Let the client know the points that can be chosen from.
 			socket.emit( "userId", this.generateId() );
-			socket.emit( "points", this.pointsProvider.getPoints() );
 
 			socket.on( "disconnecting", () => {
 				const rooms = this.pokersService.disconnect( socket );
@@ -98,15 +97,12 @@ export default class PokersGateway implements OnGatewayInit {
 
 		client.emit( "joined", message.poker );
 
-		const story = this.pokersService.getStory( message.poker );
-		client.emit( "story", story.name );
-
 		const vote = this.pokersService.getVote( client, message.poker );
 		if ( vote ) {
 			client.emit( "myVote", { currentVote: vote.currentValue, initialVote: vote.initialValue } );
 		}
 
-		this.send( message.poker, { members: true, votes: true, history: true } );
+		this.send( message.poker, { story: true, points: true, members: true, votes: true, history: true } );
 	}
 
 	@SubscribeMessage( "leave" )
@@ -143,6 +139,12 @@ export default class PokersGateway implements OnGatewayInit {
 		this.pokersService.setName( message.poker, client, message.name );
 
 		this.send( message.poker, { members: true, votes: true } );
+	}
+
+	@SubscribeMessage( "setVotingSystem" )
+	setVotingSystem( client: Socket, message: { poker: string, votingSystem: VotingSystem } ): void {
+		this.pokersService.setStoryVotingSystem( message.poker, message.votingSystem );
+		this.send( message.poker, { story: true, points: true, votes: true } );
 	}
 
 	@SubscribeMessage( "newStory" )
@@ -202,6 +204,7 @@ export default class PokersGateway implements OnGatewayInit {
 		votes = false,
 		members = false,
 		history = false,
+		points = false,
 		all = false,
 	} = {} ) {
 		// Don't send stuff to rooms that are cleaned up.
@@ -211,10 +214,13 @@ export default class PokersGateway implements OnGatewayInit {
 		}
 
 		if ( all || story ) {
+			const currentStory = this.pokersService.getStory( poker );
 			this.server.to( poker ).emit(
 				"story",
-				this.pokersService.getStory( poker ).name,
-			);
+				{
+					name: currentStory.name,
+					votingSystem: currentStory.votingSystem,
+				} );
 		}
 
 		if ( all || members ) {
@@ -243,6 +249,13 @@ export default class PokersGateway implements OnGatewayInit {
 				this.historyResponseAdapter.format(
 					this.pokersService.getHistory( poker ),
 				),
+			);
+		}
+
+		if ( all || points ) {
+			this.server.to( poker ).emit(
+				"points",
+				this.pointsProvider.getPoints( this.pokersService.getStory( poker ).votingSystem ),
 			);
 		}
 	}

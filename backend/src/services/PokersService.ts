@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { Socket } from "socket.io";
-import PointsProvider from "./PointsProvider";
+import PointsProvider, { VotingSystem } from "./PointsProvider";
 import { Member } from "./PokerMemberManager";
 import PokerRoomCoordinator from "./PokerRoomCoordinator";
 import { Story, Vote } from "./PokerStoryHandler";
@@ -320,7 +320,7 @@ export default class PokersService {
 	 */
 	public castVote( socket: Socket, poker: string, vote ): void {
 		// Prevent cheaters from entering bogus point totals.
-		if ( ! this.pointsProvider.getPoints().includes( vote ) ) {
+		if ( ! this.pointsProvider.isValid( this.getStory( poker ).votingSystem, vote ) ) {
 			return;
 		}
 
@@ -372,6 +372,17 @@ export default class PokersService {
 		this.getRoom( poker ).setStoryName( name );
 	}
 
+	/**
+	 * Sets the voting system.
+	 *
+	 * @param {string} poker The room to set.
+	 * @param {VotingSystem} system The new voting system
+	 *
+	 * @returns {void}
+	 */
+	public setStoryVotingSystem( poker: string, system: VotingSystem ): void {
+		this.getRoom( poker ).setStoryVotingSystem( system );
+	}
 	/**
 	 * Gets the current story.
 	 *
