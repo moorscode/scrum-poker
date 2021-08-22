@@ -1,8 +1,9 @@
-import PointsProvider, { VotingSystem } from "./PointsProvider";
 import PokerHistoryList from "./PokerHistoryList";
 import PokerMemberManager, { Member, MemberList } from "./PokerMemberManager";
 import { CurrentVotes, GroupVoteNames } from "./PokersService";
 import PokerStoryHandler, { Story, Vote, VoteValue } from "./PokerStoryHandler";
+import PointProviderFactory from "./voting/PointProviderFactory";
+import { VotingSystem } from "./voting/VotingSystem";
 
 /**
  * Poker Room
@@ -15,12 +16,12 @@ export default class PokerRoomCoordinator {
 	/**
 	 * Poker Room coordinator constructor.
 	 *
-	 * @param {PointsProvider} pointsProvider The points provider.
+	 * @param {PointProviderFactory} pointProviderFactory A factory for creating the pointsProvider.
 	 */
-	constructor( private readonly pointsProvider: PointsProvider ) {
+	constructor( private readonly pointProviderFactory: PointProviderFactory ) {
 		this.membersManager = new PokerMemberManager();
 		this.historyList = new PokerHistoryList();
-		this.storyService = new PokerStoryHandler( this.membersManager, this.pointsProvider );
+		this.storyService = new PokerStoryHandler( this.membersManager, this.pointProviderFactory );
 	}
 
 	/**
@@ -32,7 +33,7 @@ export default class PokerRoomCoordinator {
 		this.historyList.addStory( this.storyService.getStory() );
 
 		// Create a new story.
-		this.storyService = new PokerStoryHandler( this.membersManager, this.pointsProvider, this.storyService.getStory().votingSystem );
+		this.storyService = new PokerStoryHandler( this.membersManager, this.pointProviderFactory, this.storyService.getStory().votingSystem );
 	}
 
 	/**

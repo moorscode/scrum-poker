@@ -1,15 +1,15 @@
-import PointsProvider from "../../../backend/src/services/PointsProvider";
+import FibonacciPointProvider from "../../../backend/src/services/voting/FibonacciPointProvider";
 
-describe( "PointsProvider", () => {
-	let pointsProvider: PointsProvider;
+describe( "FibonacciPointProvider", () => {
+	let fibonacciPointProvider: FibonacciPointProvider;
 
 	beforeEach( async () => {
-		pointsProvider = new PointsProvider();
+		fibonacciPointProvider = new FibonacciPointProvider();
 	} );
 
 	describe( "getPoints", () => {
 		it( "should return all points", () => {
-			const result = pointsProvider.getPoints();
+			const result = fibonacciPointProvider.getPoints();
 
 			expect( result ).toStrictEqual( [ 0, 0.5, 1, 2, 3, 5, 8, 13, 21, 100, "?", "coffee" ] );
 		} );
@@ -17,7 +17,7 @@ describe( "PointsProvider", () => {
 
 	describe( "getNumericPoints", () => {
 		it( "should not return non-numeric points", () => {
-			const result = pointsProvider.getNumericPoints();
+			const result = fibonacciPointProvider.getNumericPoints();
 
 			expect( result ).not.toContain( "?" );
 			expect( result ).not.toContain( "coffee" );

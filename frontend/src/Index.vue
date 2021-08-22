@@ -129,7 +129,12 @@ export default Vue.extend( {
 			return this.observer ? "Observer mode" : "Pum Scroker";
 		},
 		pointSpread() {
-			if ( this.voteCount === 0 || this.voteCount < this.members.voters.length || typeof this.voteAverage === "string" ) {
+			if (
+				this.voteCount === 0 ||
+				this.voteCount < this.members.voters.length ||
+				typeof this.voteAverage === "string" ||
+				this.voteAverage === null
+			) {
 				return null;
 			}
 

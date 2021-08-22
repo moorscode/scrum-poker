@@ -1,10 +1,12 @@
 import { Injectable } from "@nestjs/common";
 import { Socket } from "socket.io";
-import PointsProvider, { VotingSystem } from "./PointsProvider";
 import { Member } from "./PokerMemberManager";
 import PokerRoomCoordinator from "./PokerRoomCoordinator";
 import { Story, Vote } from "./PokerStoryHandler";
 import SocketUserHandler from "./SocketUsersHandler";
+import PointProviderFactory from "./voting/PointProviderFactory";
+import VoteValidationService from "./voting/VoteValidationService";
+import { VotingSystem } from "./voting/VotingSystem";
 
 export type GroupVoteNames = {
 	[ group: string ]: string[];
@@ -37,11 +39,13 @@ export default class PokersService {
 	 * Constructs the poker service.
 	 *
 	 * @param {SocketUserHandler} socketUsersService The user socket service.
-	 * @param {PointsProvider} pointsProvider The points provider.
+	 * @param {VoteValidationService} voteValidationService The class that validates a cast vote.
+	 * @param {PointProviderFactory} pointProviderFactory A factory for creating a pointProvider.
 	 */
 	public constructor(
 		private readonly socketUsersService: SocketUserHandler,
-		private readonly pointsProvider: PointsProvider,
+		private readonly voteValidationService: VoteValidationService,
+		private readonly pointProviderFactory: PointProviderFactory,
 	) {
 	}
 
@@ -205,7 +209,7 @@ export default class PokersService {
 				return null;
 			}
 
-			this.rooms[ poker ] = new PokerRoomCoordinator( this.pointsProvider );
+			this.rooms[ poker ] = new PokerRoomCoordinator( this.pointProviderFactory );
 		}
 
 		return this.rooms[ poker ];
@@ -320,7 +324,7 @@ export default class PokersService {
 	 */
 	public castVote( socket: Socket, poker: string, vote ): void {
 		// Prevent cheaters from entering bogus point totals.
-		if ( ! this.pointsProvider.isValid( this.getStory( poker ).votingSystem, vote ) ) {
+		if ( ! this.voteValidationService.isValid( this.getStory( poker ).votingSystem, vote ) ) {
 			return;
 		}
 

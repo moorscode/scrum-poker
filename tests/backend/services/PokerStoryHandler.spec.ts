@@ -1,26 +1,28 @@
 import { Test } from "@nestjs/testing";
-import PointsProvider from "../../../backend/src/services/PointsProvider";
 import PokerMemberManager from "../../../backend/src/services/PokerMemberManager";
 import PokerStoryHandler from "../../../backend/src/services/PokerStoryHandler";
+import PointProviderFactory from "../../../backend/src/services/voting/PointProviderFactory";
+import VoteValidationService from "../../../backend/src/services/voting/VoteValidationService";
 
 describe( "PokerStoryHandler", () => {
 	let pokerStoryHandler: PokerStoryHandler;
 	let membersManager: PokerMemberManager;
-	let pointsProvider: PointsProvider;
+	let pointProviderFactory: PointProviderFactory;
 
 	beforeEach( async () => {
 		const module = await Test.createTestingModule( {
 			providers: [
 				PokerMemberManager,
-				PointsProvider,
+				VoteValidationService,
+				PointProviderFactory,
 			],
 		},
 		).compile();
 
 		membersManager = module.get<PokerMemberManager>( PokerMemberManager );
-		pointsProvider = module.get<PointsProvider>( PointsProvider );
+		pointProviderFactory = module.get<PointProviderFactory>( PointProviderFactory );
 
-		pokerStoryHandler = new PokerStoryHandler( membersManager, pointsProvider );
+		pokerStoryHandler = new PokerStoryHandler( membersManager, pointProviderFactory );
 	} );
 
 	describe( "setName", () => {

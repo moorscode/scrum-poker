@@ -1,8 +1,9 @@
 import { Test } from "@nestjs/testing";
 import { Socket } from "socket.io";
-import PointsProvider from "../../../backend/src/services/PointsProvider";
 import PokersService from "../../../backend/src/services/PokersService";
 import SocketUserHandler from "../../../backend/src/services/SocketUsersHandler";
+import PointProviderFactory from "../../../backend/src/services/voting/PointProviderFactory";
+import VoteValidationService from "../../../backend/src/services/voting/VoteValidationService";
 
 describe( "PokersService", () => {
 	let pokersService: PokersService;
@@ -12,8 +13,9 @@ describe( "PokersService", () => {
 		const module = await Test.createTestingModule( {
 			providers: [
 				PokersService,
-				PointsProvider,
 				SocketUserHandler,
+				VoteValidationService,
+				PointProviderFactory,
 			],
 		} ).compile();
 
