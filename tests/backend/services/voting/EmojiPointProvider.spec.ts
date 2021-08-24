@@ -1,4 +1,4 @@
-import EmojiPointProvider from "../../../backend/src/services/voting/EmojiPointProvider";
+import EmojiPointProvider from "../../../../backend/src/services/voting/EmojiPointProvider";
 
 describe( "EmojiPointProvider", () => {
 	let emojiPointProvider: EmojiPointProvider;

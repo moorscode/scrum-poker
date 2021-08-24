@@ -1,7 +1,7 @@
-import EmojiPointProvider from "../../../backend/src/services/voting/EmojiPointProvider";
-import FibonacciPointProvider from "../../../backend/src/services/voting/FibonacciPointProvider";
-import PointProviderFactory from "../../../backend/src/services/voting/PointProviderFactory";
-import { VotingSystem } from "../../../backend/src/services/voting/VotingSystem";
+import EmojiPointProvider from "../../../../backend/src/services/voting/EmojiPointProvider";
+import FibonacciPointProvider from "../../../../backend/src/services/voting/FibonacciPointProvider";
+import PointProviderFactory from "../../../../backend/src/services/voting/PointProviderFactory";
+import { VotingSystem } from "../../../../backend/src/services/voting/VotingSystem";
 
 describe( "PointProviderFactory", () => {
 	let pointProviderFactory: PointProviderFactory;
