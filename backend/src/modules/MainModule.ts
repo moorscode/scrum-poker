@@ -1,7 +1,6 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { ScheduleModule } from "@nestjs/schedule";
-import PointsProvider from "../services/PointsProvider";
 import { PokersModule } from "./PokersModule";
 
 @Module( {
@@ -11,9 +10,7 @@ import { PokersModule } from "./PokersModule";
 		ScheduleModule.forRoot(),
 	],
 	controllers: [],
-	providers: [
-		PointsProvider,
-	],
+	providers: [],
 } )
 
 // eslint-disable-next-line require-jsdoc

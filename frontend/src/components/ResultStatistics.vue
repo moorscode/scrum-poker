@@ -1,14 +1,14 @@
 <template>
-  <section v-if="average !== ''">
-    <p>
-      Average: {{ average }}<br>
-      Standard deviation: {{ standardDeviation }}<br>
-      <strong>Average story point: {{ averagePoint }}</strong>
-    </p>
-    <p v-if="averageContext">
-      <strong>{{ averageContext }}</strong>
-    </p>
-  </section>
+	<section v-if="average !== ''">
+		<p>
+			Average: {{ average }}<br>
+			Standard deviation: {{ standardDeviation }}<br>
+			<strong>Average story point: {{ averagePoint }}</strong>
+		</p>
+		<p v-if="averageContext">
+			<strong>{{ averageContext }}</strong>
+		</p>
+	</section>
 </template>
 
 <script>
@@ -29,6 +29,10 @@ export default {
 
 			if ( this.voteAverage === "?" ) {
 				return "Not enough clarity, please go further in depth.";
+			}
+
+			if ( this.votes.every( ( vote ) => isNaN( vote ) ) ) {
+				return "";
 			}
 
 			return Math.round( this.voteAverage * 100 ) / 100;

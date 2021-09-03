@@ -1,9 +1,10 @@
 import PokersCleanupService from "../../../backend/src/services/PokersCleanupService";
 import { Test } from "@nestjs/testing";
 import PokersService from "../../../backend/src/services/PokersService";
-import PointsProvider from "../../../backend/src/services/PointsProvider";
 import SocketUsersService from "../../../backend/src/services/SocketUsersHandler";
 import { Socket } from "socket.io";
+import PointProviderFactory from "../../../backend/src/services/voting/PointProviderFactory";
+import VoteValidationService from "../../../backend/src/services/voting/VoteValidationService";
 import now from "../../bootstrap";
 
 describe( "PokersCleanupService", () => {
@@ -15,8 +16,9 @@ describe( "PokersCleanupService", () => {
 			providers: [
 				PokersCleanupService,
 				PokersService,
-				PointsProvider,
+				VoteValidationService,
 				SocketUsersService,
+				PointProviderFactory,
 			],
 		} ).compile();
 

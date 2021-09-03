@@ -14,7 +14,7 @@
     >
       <i
         v-if="point === 'coffee'"
-        :class="['fas','fa-mug-hot']"
+        :class="['fas','fa-mug-hot','coffee']"
       />
       {{ point }}
     </button>

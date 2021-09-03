@@ -1,8 +1,10 @@
-import PointsProvider, { PointValue } from "./PointsProvider";
 import PokerMemberManager, { Member } from "./PokerMemberManager";
+import PointProviderFactory from "./voting/PointProviderFactory";
+import { PointProviderInterface } from "./voting/PointProviderInterface";
+import { VotingSystem } from "./voting/VotingSystem";
 
 export type ObscuredVoteValue = "#" | "!";
-export type VoteValue = PointValue | ObscuredVoteValue;
+export type VoteValue = string | number | ObscuredVoteValue;
 
 export type Story = {
 	name: string;
@@ -12,6 +14,7 @@ export type Story = {
 	votes: Vote[];
 	voters: number;
 	votesRevealed: boolean;
+	votingSystem: VotingSystem;
 }
 
 export type Vote = {
@@ -30,19 +33,23 @@ export type ObscuredVote = Vote & {
  * Poker story handler.
  */
 export default class PokerStoryHandler {
-	private story: Story;
+	private readonly story: Story;
+	private pointProvider: PointProviderInterface;
 
 	/**
 	 * Creates a new Poker Story.
 	 *
 	 * @param {PokerMemberManager} membersManager The members manager to use.
-	 * @param {PointsProvider} pointsProvider The points provider.
+	 * @param {PointProviderFactory} pointProviderFactory The points provider factory.
+	 * @param {VotingSystem} votingSystem The voting system to use for the next story.
 	 */
 	public constructor(
 		private readonly membersManager: PokerMemberManager,
-		private readonly pointsProvider: PointsProvider,
+		private readonly pointProviderFactory: PointProviderFactory,
+		private votingSystem: VotingSystem = "Points",
 	) {
-		this.story = { name: "", votes: [], voters: 0, votesRevealed: false };
+		this.story = { name: "", votes: [], voters: 0, votesRevealed: false, votingSystem };
+		this.pointProvider = pointProviderFactory.getPointProvider( votingSystem );
 
 		this.membersManager.on( "member-state", this.recalculate.bind( this ) );
 		this.membersManager.on( "member-removed", this.removeVote.bind( this ) );
@@ -69,9 +76,21 @@ export default class PokerStoryHandler {
 	}
 
 	/**
-	 * Recalculates the story.
+	 * Sets the voting system and resets all the votes.
 	 *
-	 * @param {Story} story The base story to use.
+	 * @param {VotingSystem} votingSystem The voting system to use.
+	 *
+	 * @returns {void}
+	 */
+	public setVotingSystem( votingSystem: VotingSystem ): void {
+		this.story.votingSystem = votingSystem;
+		this.story.votes = [];
+		this.pointProvider = this.pointProviderFactory.getPointProvider( votingSystem );
+		this.recalculate();
+	}
+
+	/**
+	 * Recalculates the story.
 	 *
 	 * @returns {Story} The modified story.
 	 */
@@ -88,20 +107,20 @@ export default class PokerStoryHandler {
 		}
 
 		if ( story.votes.some( ( vote: Vote ) => vote.currentValue === "coffee" ) ) {
-			story.voteAverage         = "coffee";
+			story.voteAverage = "coffee";
 			story.nearestPointAverage = "coffee";
 
 			return;
 		}
 
 		if ( story.votes.some( ( vote: Vote ) => vote.currentValue === "?" ) ) {
-			story.voteAverage         = "?";
+			story.voteAverage = "?";
 			story.nearestPointAverage = "?";
 
 			return;
 		}
 
-		const pointTotal  = story.votes.reduce<number>(
+		const pointTotal = story.votes.reduce<number>(
 			( accumulator: number, vote: Vote ) =>
 				accumulator + ( vote.currentValue as number ),
 			0,
@@ -109,9 +128,9 @@ export default class PokerStoryHandler {
 		story.voteAverage = Math.fround( pointTotal / story.votes.length );
 
 		// Find the nearest available point. Always round up.
-		for ( const availablePoint of this.pointsProvider.getNumericPoints() ) {
+		for ( const availablePoint of this.pointProvider.getNumericPoints() ) {
 			if ( story.voteAverage - availablePoint <= 0 ) {
-				story.nearestPointAverage = availablePoint as PointValue;
+				story.nearestPointAverage = availablePoint;
 				break;
 			}
 		}
@@ -265,7 +284,7 @@ export default class PokerStoryHandler {
 	 */
 	private getUnobscuredVotes(): Vote[] {
 		const notVotedClients: Member[] = this.getVotePendingClients();
-		const notVoted                  = notVotedClients.map(
+		const notVoted = notVotedClients.map(
 			( client: Member ): ObscuredVote => this.getObscuredVote( client ),
 		);
 
@@ -279,8 +298,6 @@ export default class PokerStoryHandler {
 
 	/**
 	 * Retrieves the obscured votes.
-	 *
-	 * @param {Story} story The story to get obscured votes for.
 	 *
 	 * @returns {ObscuredVote[]} List of obscured votes.
 	 */
@@ -303,7 +320,7 @@ export default class PokerStoryHandler {
 	 * @returns {ObscuredVote} The obscured vote representing an hidden cast vote ("X") or a missing vote ("?").
 	 */
 	private getObscuredVote( member: Member ): ObscuredVote {
-		const hasVoted: boolean            = typeof this.getCurrentVote( member.id ) !== "undefined";
+		const hasVoted: boolean = typeof this.getCurrentVote( member.id ) !== "undefined";
 		const voteValue: ObscuredVoteValue = hasVoted ? "!" : "#";
 
 		return {
@@ -316,8 +333,6 @@ export default class PokerStoryHandler {
 
 	/**
 	 * Checks if everybody has voted.
-	 *
-	 * @param {Story} story The story.
 	 *
 	 * @returns {boolean} True if every client has voted.
 	 */

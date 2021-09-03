@@ -39,7 +39,7 @@ export default {
 		},
 	},
 	sockets: {
-		story( name ) {
+		story( { name } ) {
 			const nameChanged = ( this.storyName !== name );
 
 			this.editStoryName = name;

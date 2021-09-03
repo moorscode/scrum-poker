@@ -23,7 +23,10 @@
 				<story /> <refinement />
 
 				<section class="storyControls">
-					<story-name />
+					<div class="flex">
+						<story-name />
+						<voting-system />
+					</div>
 					<poker-choices />
 				</section>
 
@@ -66,9 +69,11 @@ import Credits from "./components/Credits.vue";
 import ServerConnection from "./components/ServerConnection.vue";
 import Connecting from "./components/Connecting.vue";
 import ThemePicker from "./components/ThemePicker.vue";
+import VotingSystem from "./components/VotingSystem.vue";
 
 export default Vue.extend( {
 	components: {
+		VotingSystem,
 		Room,
 		Nickname,
 		Observer,
@@ -124,7 +129,12 @@ export default Vue.extend( {
 			return this.observer ? "Observer mode" : "Pum Scroker";
 		},
 		pointSpread() {
-			if ( this.voteCount === 0 || this.voteCount < this.members.voters.length || typeof this.voteAverage === "string" ) {
+			if (
+				this.voteCount === 0 ||
+				this.voteCount < this.members.voters.length ||
+				typeof this.voteAverage === "string" ||
+				this.voteAverage === null
+			) {
 				return null;
 			}
 

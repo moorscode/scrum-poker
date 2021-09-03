@@ -4,10 +4,11 @@ import { Server, Socket } from "socket.io";
 import HistoryResponseAdapter from "../adapters/HistoryResponseAdapter";
 import MembersResponseAdapter from "../adapters/MembersResponseAdapter";
 import VoteResponseAdapter from "../adapters/VoteResponseAdapter";
-import PointsProvider from "../services/PointsProvider";
 import PokersCleanupService from "../services/PokersCleanupService";
 import PokersService from "../services/PokersService";
 import { Vote } from "../services/PokerStoryHandler";
+import PointProviderFactory from "../services/voting/PointProviderFactory";
+import { VotingSystem } from "../services/voting/VotingSystem";
 
 @WebSocketGateway( { namespace: "/pokers" } )
 /**
@@ -20,7 +21,7 @@ export default class PokersGateway implements OnGatewayInit {
 	 * Constructor
 	 *
 	 * @param {PokersService} pokersService The Poker service.
-	 * @param {PointsProvider} pointsProvider The points provider service.
+	 * @param {PointProviderFactory} pointProviderFactory The points provider factory service.
 	 * @param {PokersCleanupService} pokersCleanupService The Poker cleanup service.
 	 * @param {VoteResponseAdapter} voteResponseAdapter The Vote response Adapter.
 	 * @param {HistoryResponseAdapter} historyResponseAdapter The History response Adapter.
@@ -28,7 +29,7 @@ export default class PokersGateway implements OnGatewayInit {
 	 */
 	constructor(
 		private readonly pokersService: PokersService,
-		private readonly pointsProvider: PointsProvider,
+		private readonly pointProviderFactory: PointProviderFactory,
 		private readonly pokersCleanupService: PokersCleanupService,
 		private readonly voteResponseAdapter: VoteResponseAdapter,
 		private readonly historyResponseAdapter: HistoryResponseAdapter,
@@ -56,7 +57,6 @@ export default class PokersGateway implements OnGatewayInit {
 		this.server.on( "connection", ( socket: Socket ) => {
 			// Let the client know the points that can be chosen from.
 			socket.emit( "userId", this.generateId() );
-			socket.emit( "points", this.pointsProvider.getPoints() );
 
 			socket.on( "disconnecting", () => {
 				const rooms = this.pokersService.disconnect( socket );
@@ -98,15 +98,12 @@ export default class PokersGateway implements OnGatewayInit {
 
 		client.emit( "joined", message.poker );
 
-		const story = this.pokersService.getStory( message.poker );
-		client.emit( "story", story.name );
-
 		const vote = this.pokersService.getVote( client, message.poker );
 		if ( vote ) {
 			client.emit( "myVote", { currentVote: vote.currentValue, initialVote: vote.initialValue } );
 		}
 
-		this.send( message.poker, { members: true, votes: true, history: true } );
+		this.send( message.poker, { story: true, points: true, members: true, votes: true, history: true } );
 	}
 
 	@SubscribeMessage( "leave" )
@@ -123,7 +120,7 @@ export default class PokersGateway implements OnGatewayInit {
 		this.send( message.poker, { votes: true } );
 
 		// Send this vote to all sockets for the current user.
-		const vote    = this.pokersService.getVote( client, message.poker );
+		const vote = this.pokersService.getVote( client, message.poker );
 		const sockets = this.pokersService.getUserSockets( this.pokersService.getUserId( client ) );
 
 		for ( const socket of sockets ) {
@@ -143,6 +140,12 @@ export default class PokersGateway implements OnGatewayInit {
 		this.pokersService.setName( message.poker, client, message.name );
 
 		this.send( message.poker, { members: true, votes: true } );
+	}
+
+	@SubscribeMessage( "setVotingSystem" )
+	setVotingSystem( client: Socket, message: { poker: string, votingSystem: VotingSystem } ): void {
+		this.pokersService.setStoryVotingSystem( message.poker, message.votingSystem );
+		this.send( message.poker, { story: true, points: true, votes: true } );
 	}
 
 	@SubscribeMessage( "newStory" )
@@ -189,6 +192,7 @@ export default class PokersGateway implements OnGatewayInit {
 
 	/* eslint-enable require-jsdoc */
 
+	/* eslint-disable complexity */
 	/**
 	 * Sends data to all members in the room.
 	 *
@@ -202,6 +206,7 @@ export default class PokersGateway implements OnGatewayInit {
 		votes = false,
 		members = false,
 		history = false,
+		points = false,
 		all = false,
 	} = {} ) {
 		// Don't send stuff to rooms that are cleaned up.
@@ -211,39 +216,115 @@ export default class PokersGateway implements OnGatewayInit {
 		}
 
 		if ( all || story ) {
-			this.server.to( poker ).emit(
-				"story",
-				this.pokersService.getStory( poker ).name,
-			);
+			this.sendStory( poker );
 		}
 
 		if ( all || members ) {
-			this.server.to( poker ).emit(
-				"memberList",
-				this.membersResponseAdapter.format(
-					this.pokersService.getGroupedMembers( poker ),
-				),
-			);
+			this.sendMembers( poker );
 		}
 
 		if ( all || votes ) {
-			this.server.to( poker ).emit(
-				"votes",
-				this.voteResponseAdapter.format(
-					this.pokersService.getVotes( poker ),
-					this.pokersService.getVotedNames( poker ),
-					this.pokersService.getStory( poker ),
-				),
-			);
+			this.sendVotes( poker );
 		}
 
 		if ( all || history ) {
-			this.server.to( poker ).emit(
-				"history",
-				this.historyResponseAdapter.format(
-					this.pokersService.getHistory( poker ),
-				),
-			);
+			this.sendHistory( poker );
 		}
+
+		if ( all || points ) {
+			this.sendPoints( poker );
+		}
+	}
+	/* eslint-enable complexity */
+
+	/**
+	 * Sends the points to all members in the room.
+	 *
+	 * @param {string} poker The room to send to.
+	 *
+	 * @private
+	 *
+	 * @returns {void}
+	 */
+	private sendPoints( poker: string ) {
+		this.server.to( poker ).emit(
+			"points",
+			this.pointProviderFactory.getPointProvider( this.pokersService.getStory( poker ).votingSystem ).getPoints(),
+		);
+	}
+
+	/**
+	 * Sends the history to all members in the room.
+	 *
+	 * @param {string} poker The room to send to.
+	 *
+	 * @private
+	 *
+	 * @returns {void}
+	 */
+	private sendHistory( poker: string ) {
+		this.server.to( poker ).emit(
+			"history",
+			this.historyResponseAdapter.format(
+				this.pokersService.getHistory( poker ),
+			),
+		);
+	}
+
+	/**
+	 * Sends the votes to all members in the room.
+	 *
+	 * @param {string} poker The room to send to.
+	 *
+	 * @private
+	 *
+	 * @returns {void}
+	 */
+	private sendVotes( poker: string ) {
+		this.server.to( poker ).emit(
+			"votes",
+			this.voteResponseAdapter.format(
+				this.pokersService.getVotes( poker ),
+				this.pokersService.getVotedNames( poker ),
+				this.pokersService.getStory( poker ),
+			),
+		);
+	}
+
+	/**
+	 * Sends the members to all members in the room.
+	 *
+	 * @param {string} poker The room to send to.
+	 *
+	 * @private
+	 *
+	 * @returns {void}
+	 */
+	private sendMembers( poker: string ) {
+		this.server.to( poker ).emit(
+			"memberList",
+			this.membersResponseAdapter.format(
+				this.pokersService.getGroupedMembers( poker ),
+			),
+		);
+	}
+
+	/**
+	 * Sends the story to all members in the room.
+	 *
+	 * @param {string} poker The room to send to.
+	 *
+	 * @private
+	 *
+	 * @returns {void}
+	 */
+	private sendStory( poker: string ) {
+		const currentStory = this.pokersService.getStory( poker );
+		this.server.to( poker ).emit(
+			"story",
+			{
+				name: currentStory.name,
+				votingSystem: currentStory.votingSystem,
+			} );
 	}
 }
