@@ -1,4 +1,4 @@
-export default [
+:export default [
 	"avontuurlijk (adventurous)",
 	"behulpzaam (helpful)",
 	"belangstellend (shows interest in others)",
