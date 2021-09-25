@@ -26,4 +26,4 @@ RUN yarn install --network-timeout 3600000
 COPY . .
 COPY --from=development /usr/src/app/dist ./dist
 
-CMD ["node", "dist/main"]
+CMD ["node", "dist/backend"]

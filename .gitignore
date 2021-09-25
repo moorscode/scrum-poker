@@ -30,5 +30,4 @@ lerna-debug.log*
 .vscode
 
 /.env
-/docker-compose.yml
 /docker
