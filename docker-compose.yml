@@ -10,7 +10,13 @@ services:
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+    environment:
+      - TZ=Europe/Amsterdam
     ports:
       - ${SERVER_PORT}:${SERVER_PORT}
     env_file: .env
     command: node dist/backend/main
+    labels:
+      - wud.watch=false
