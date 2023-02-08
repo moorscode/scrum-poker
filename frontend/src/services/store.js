@@ -1,5 +1,6 @@
 import Vue from "vue";
 import Vuex from "vuex";
+import { sortVotes } from "./voteSorting.ts";
 
 Vue.use( Vuex );
 
@@ -61,9 +62,7 @@ export default new Vuex.Store( {
 			state.votingSystem = data.votingSystem;
 		},
 		SOCKET_VOTES( state, data ) {
-			const votes = data.votes.sort( ( a, b ) => a.currentValue - b.currentValue ) || [];
-
-			state.votes = votes;
+			state.votes = sortVotes( data.votes, state.points );
 			state.votesRevealed = data.votesRevealed;
 			state.voteCount = data.voteCount;
 			state.votedNames = data.votedNames || [];
