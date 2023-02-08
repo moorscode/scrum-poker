@@ -5,7 +5,6 @@ services:
     container_name: scrum-poker
     build:
       context: .
-      target: production
     restart: unless-stopped
     volumes:
       - .:/usr/src/app
