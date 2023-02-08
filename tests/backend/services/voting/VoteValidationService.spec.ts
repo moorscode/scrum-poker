@@ -1,5 +1,5 @@
-import PointProviderFactory from "../../../../backend/src/services/voting/PointProviderFactory";
-import VoteValidationService from "../../../../backend/src/services/voting/VoteValidationService";
+import PointProviderFactory from "../../../../backend/services/voting/PointProviderFactory";
+import VoteValidationService from "../../../../backend/services/voting/VoteValidationService";
 
 describe( "VoteValidationService", () => {
 	let voteValidationService: VoteValidationService;

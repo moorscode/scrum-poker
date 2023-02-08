@@ -1,4 +1,4 @@
-import { Vote } from "../../../backend/src/services/PokerStoryHandler";
+import { Vote } from "../../../backend/services/PokerStoryHandler";
 import { sortVotes } from "../../../frontend/src/services/voteSorting";
 
 describe( "the voteSorting", () => {

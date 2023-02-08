@@ -1,9 +1,9 @@
 import { Test } from "@nestjs/testing";
 import { Socket } from "socket.io";
-import PokersService from "../../../backend/src/services/PokersService";
-import SocketUserHandler from "../../../backend/src/services/SocketUsersHandler";
-import PointProviderFactory from "../../../backend/src/services/voting/PointProviderFactory";
-import VoteValidationService from "../../../backend/src/services/voting/VoteValidationService";
+import PokersService from "../../../backend/services/PokersService";
+import SocketUserHandler from "../../../backend/services/SocketUsersHandler";
+import PointProviderFactory from "../../../backend/services/voting/PointProviderFactory";
+import VoteValidationService from "../../../backend/services/voting/VoteValidationService";
 
 describe( "PokersService", () => {
 	let pokersService: PokersService;

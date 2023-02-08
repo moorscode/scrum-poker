@@ -1,5 +1,5 @@
 import { Socket } from "socket.io";
-import SocketUserHandler from "../../../backend/src/services/SocketUsersHandler";
+import SocketUserHandler from "../../../backend/services/SocketUsersHandler";
 
 describe( "SocketUserHandler", () => {
 	let socketUserHandler: SocketUserHandler;

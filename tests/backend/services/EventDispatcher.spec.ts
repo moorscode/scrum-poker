@@ -1,4 +1,4 @@
-import EventDispatcher from "../../../backend/src/base/EventDispatcher";
+import EventDispatcher from "../../../backend/base/EventDispatcher";
 
 describe( "EventDispatcher", () => {
 	let eventDispatcher: EventDispatcher;

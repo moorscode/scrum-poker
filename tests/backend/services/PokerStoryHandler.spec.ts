@@ -1,8 +1,8 @@
 import { Test } from "@nestjs/testing";
-import PokerMemberManager from "../../../backend/src/services/PokerMemberManager";
-import PokerStoryHandler from "../../../backend/src/services/PokerStoryHandler";
-import PointProviderFactory from "../../../backend/src/services/voting/PointProviderFactory";
-import VoteValidationService from "../../../backend/src/services/voting/VoteValidationService";
+import PokerMemberManager from "../../../backend/services/PokerMemberManager";
+import PokerStoryHandler from "../../../backend/services/PokerStoryHandler";
+import PointProviderFactory from "../../../backend/services/voting/PointProviderFactory";
+import VoteValidationService from "../../../backend/services/voting/VoteValidationService";
 
 describe( "PokerStoryHandler", () => {
 	let pokerStoryHandler: PokerStoryHandler;

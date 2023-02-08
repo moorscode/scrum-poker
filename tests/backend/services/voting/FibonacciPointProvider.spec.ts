@@ -1,4 +1,4 @@
-import FibonacciPointProvider from "../../../../backend/src/services/voting/FibonacciPointProvider";
+import FibonacciPointProvider from "../../../../backend/services/voting/FibonacciPointProvider";
 
 describe( "FibonacciPointProvider", () => {
 	let fibonacciPointProvider: FibonacciPointProvider;
