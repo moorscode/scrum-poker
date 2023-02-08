@@ -73,8 +73,8 @@
     "vue-template-compiler": "^2.6.12",
     "webpack": "^5.37.0",
     "webpack-bundle-analyzer": "^4.4.1",
-    "webpack-cli": "^4.6.0",
-    "webpack-dev-server": "^4.11.1"
+    "webpack-dev-server": "^4.11.1",
+    "webpack-cli": "^5.0.1"
   },
   "jest": {
     "moduleFileExtensions": [
