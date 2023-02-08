@@ -30,16 +30,16 @@ export function sortVotes( votes, availablePoints ) {
 	 *    coffee: 11
 	 * }
 	 */
-	const orderedPoints = availablePoints.reduce( ( acc, currentValue, index ) => {
+	const indexedPoints = availablePoints.reduce( ( acc, currentValue, index ) => {
 		return { ...acc, [ currentValue ]: index };
 	}, {} );
 
 	return votes.sort( ( a, b ) => {
 		// If the votes are equal, sort based on the initial vote.
 		if ( a.currentValue === b.currentValue ) {
-			return orderedPoints[ a.initialValue ] - orderedPoints[ b.initialValue ];
+			return indexedPoints[ a.initialValue ] - indexedPoints[ b.initialValue ];
 		}
 
-		return orderedPoints[ a.currentValue ] - orderedPoints[ b.currentValue ];
+		return indexedPoints[ a.currentValue ] - indexedPoints[ b.currentValue ];
 	} );
 }
