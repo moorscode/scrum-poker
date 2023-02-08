@@ -1,11 +1,10 @@
-FROM node:16.19-alpine
+FROM node:16.19-alpine as build
 
 WORKDIR /usr/src/app
 
 COPY package.json ./
 COPY yarn.lock ./
 
-RUN yarn install --network-timeout 3600000
 
 COPY nest-cli.json ./nest-cli.json
 COPY tsconfig.build.json ./tsconfig.build.json
@@ -14,7 +13,15 @@ COPY backend ./backend
 COPY frontend ./frontend
 COPY .env ./.env
 
-RUN yarn build
+RUN yarn install && yarn build && yarn install --production --force
+
+FROM node:16.19-alpine
+
+WORKDIR /usr/src/app
+
+COPY --from=build /usr/src/app/dist ./dist
+COPY --from=build /usr/src/app/node_modules ./node_modules
+COPY .env ./.env
 
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
