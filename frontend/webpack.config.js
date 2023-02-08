@@ -80,7 +80,7 @@ const config = {
 		},
 	},
 	devServer: {
-		contentBase: path.join( __dirname, "public" ),
+		static: path.join( __dirname, "public" ),
 		compress: true,
 		port: dotenv.parsed.SOCKET_PORT || 9000,
 		proxy: {
