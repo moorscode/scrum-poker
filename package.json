@@ -23,7 +23,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand"
   },
   "dependencies": {
-    "@nestjs/cli": "^7.6.0",
+    "@nestjs/cli": "^9.2.0",
     "@nestjs/schematics": "^7.3.1",
     "@nestjs/common": "^7.6.18",
     "@nestjs/config": "^0.6.3",
