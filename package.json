@@ -55,7 +55,7 @@
     "@vue/test-utils": "^2.0.0-rc.6",
     "copy-webpack-plugin": "^8.1.1",
     "css-loader": "^5.2.4",
-    "dotenv": "^9.0.2",
+    "dotenv": "^16.0.3",
     "eslint": "^7.26.0",
     "eslint-config-yoast-base": "github:moorscode/eslint-config-yoast-base",
     "eslint-config-yoast-typescript": "github:moorscode/eslint-config-yoast-typescript",
