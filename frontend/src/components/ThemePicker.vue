@@ -18,6 +18,7 @@ export default {
 				{ value: "default", text: "Default" },
 				{ value: "rounded", text: "Rounded" },
 				{ value: "old-skool", text: "Old Skool" },
+				{ value: "mos", text: "MOS" },
 			],
 		};
 	},
