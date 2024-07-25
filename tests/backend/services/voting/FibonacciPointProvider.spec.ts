@@ -11,7 +11,7 @@ describe( "FibonacciPointProvider", () => {
 		it( "should return all points", () => {
 			const result = fibonacciPointProvider.getPoints();
 
-			expect( result ).toStrictEqual( [ 0, 0.5, 1, 2, 3, 5, 8, 13, 21, 100, "?", "coffee" ] );
+			expect( result ).toStrictEqual( [ 0, 1, 2, 3, 5, 8, 13, 21, 99, "?", "coffee" ] );
 		} );
 	} );
 

@@ -1,4 +1,4 @@
-FROM node:16.19-alpine as build
+FROM node:20-alpine AS build
 
 WORKDIR /usr/src/app
 
@@ -16,7 +16,7 @@ COPY .env ./.env
 
 RUN yarn build
 
-FROM node:16.19-alpine
+FROM node:20-alpine
 
 WORKDIR /usr/src/app
 

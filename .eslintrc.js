@@ -7,10 +7,6 @@ module.exports = {
 		extraFileExtensions: [ ".vue" ],
 	},
 	plugins: [ "@typescript-eslint/eslint-plugin" ],
-	"extends": [
-		'yoast-base',
-		'yoast-typescript',
-	],
 	root: true,
 	env: {
 		node: true,
