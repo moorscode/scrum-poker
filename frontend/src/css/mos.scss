@@ -153,6 +153,9 @@ h1 {
 
   &.finished {
     color: var( --refinement-finished-header-color );
+    &::after {
+      content: '';
+    }
   }
 }
 
@@ -216,7 +219,11 @@ input[type=submit] {
     color: var( --icon-color );
   }
 
-  &:active {
+  &[disabled] {
+    cursor: unset;
+  }
+
+  &:active, &[disabled] {
     position: relative;
     top: 1px;
     box-shadow: none;
