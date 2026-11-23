@@ -35,6 +35,8 @@ export type ObscuredVote = Vote & {
 export default class PokerStoryHandler {
 	private readonly story: Story;
 	private pointProvider: PointProviderInterface;
+	private readonly onMemberState: () => void;
+	private readonly onMemberRemoved: ( memberId: string ) => void;
 
 	/**
 	 * Creates a new Poker Story.
@@ -51,8 +53,24 @@ export default class PokerStoryHandler {
 		this.story = { name: "", votes: [], voters: 0, votesRevealed: false, votingSystem };
 		this.pointProvider = pointProviderFactory.getPointProvider( votingSystem );
 
-		this.membersManager.on( "member-state", this.recalculate.bind( this ) );
-		this.membersManager.on( "member-removed", this.removeVote.bind( this ) );
+		this.onMemberState   = this.recalculate.bind( this );
+		this.onMemberRemoved = this.removeVote.bind( this );
+
+		this.membersManager.on( "member-state", this.onMemberState );
+		this.membersManager.on( "member-removed", this.onMemberRemoved );
+	}
+
+	/**
+	 * Stops reacting to member changes, freezing the story as it is.
+	 *
+	 * Must be called once the story is finished, otherwise members leaving
+	 * later would still remove their votes from it.
+	 *
+	 * @returns {void}
+	 */
+	public close(): void {
+		this.membersManager.off( "member-state", this.onMemberState );
+		this.membersManager.off( "member-removed", this.onMemberRemoved );
 	}
 
 	/**
@@ -99,7 +117,8 @@ export default class PokerStoryHandler {
 
 		story.voters = this.membersManager.getVoterCount();
 
-		if ( story.votes.length === 0 ) {
+		// Without votes, or with a non-numeric voting system like Emoji, there is no meaningful average.
+		if ( story.votes.length === 0 || this.pointProvider.getNumericPoints().length === 0 ) {
 			delete story.voteAverage;
 			delete story.nearestPointAverage;
 
@@ -205,11 +224,20 @@ export default class PokerStoryHandler {
 	 * @returns {Vote[]} List of votes.
 	 */
 	public getVotes(): Vote[] {
-		if ( this.story.votesRevealed || this.hasAllVotes() ) {
+		if ( this.areVotesVisible() ) {
 			return this.getUnobscuredVotes();
 		}
 
 		return this.getObscuredVotes();
+	}
+
+	/**
+	 * Whether the vote values may be shown to everybody.
+	 *
+	 * @returns {boolean} True if the votes are revealed or everybody has voted.
+	 */
+	public areVotesVisible(): boolean {
+		return this.story.votesRevealed || this.hasAllVotes();
 	}
 
 	/**
@@ -332,11 +360,14 @@ export default class PokerStoryHandler {
 	}
 
 	/**
-	 * Checks if everybody has voted.
+	 * Checks if every connected voter has voted.
 	 *
-	 * @returns {boolean} True if every client has voted.
+	 * Votes left behind by disconnected members don't count, otherwise they
+	 * could stand in for a connected voter who is still deciding.
+	 *
+	 * @returns {boolean} True if every connected voter has voted.
 	 */
 	private hasAllVotes(): boolean {
-		return this.story.votes.length === this.membersManager.getVoterCount();
+		return this.getVotePendingClients().length === 0;
 	}
 }

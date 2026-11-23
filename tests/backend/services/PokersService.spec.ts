@@ -27,7 +27,7 @@ describe( "PokersService", () => {
 		it( "returns the rooms a socket is in", () => {
 			const socket: Socket = {
 				id: "socket",
-				rooms: { room: "room" },
+				rooms: new Set( [ "socket", "room" ] ),
 				join: jest.fn(),
 				leave: jest.fn(),
 			} as unknown as Socket;
@@ -50,7 +50,7 @@ describe( "PokersService", () => {
 		it( "does nothing if a user is not known", () => {
 			const socket: Socket = {
 				id: "socket",
-				rooms: { room: "room" },
+				rooms: new Set( [ "socket", "room" ] ),
 				join: jest.fn(),
 				leave: jest.fn(),
 			} as unknown as Socket;
@@ -63,14 +63,14 @@ describe( "PokersService", () => {
 		it( "returns no room if a userid is still in the room", () => {
 			const socket: Socket = {
 				id: "socket",
-				rooms: { room: "room" },
+				rooms: new Set( [ "socket", "room" ] ),
 				join: jest.fn(),
 				leave: jest.fn(),
 			} as unknown as Socket;
 
 			const socket2: Socket = {
 				id: "socket2",
-				rooms: { room: "room" },
+				rooms: new Set( [ "socket2", "room" ] ),
 				join: jest.fn(),
 				leave: jest.fn(),
 			} as unknown as Socket;
@@ -91,7 +91,7 @@ describe( "PokersService", () => {
 		it( "disconnects a user from a room", () => {
 			const socket: Socket = {
 				id: "socket",
-				rooms: { room: "room" },
+				rooms: new Set( [ "socket", "room" ] ),
 				join: jest.fn(),
 				leave: jest.fn(),
 			} as unknown as Socket;
@@ -115,7 +115,7 @@ describe( "PokersService", () => {
 		it( "does nothing if a user is not known", () => {
 			const socket: Socket = {
 				id: "socket",
-				rooms: { room: "room" },
+				rooms: new Set( [ "socket", "room" ] ),
 				join: jest.fn(),
 				leave: jest.fn(),
 			} as unknown as Socket;

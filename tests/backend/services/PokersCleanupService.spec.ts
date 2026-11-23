@@ -53,14 +53,14 @@ describe( "PokersCleanupService", () => {
 				id: "socket",
 				join: jest.fn(),
 				leave: jest.fn(),
-				rooms: { room: "room" },
+				rooms: new Set( [ "socket", "room" ] ),
 			} as unknown as Socket;
 
 			const socket2: Socket = {
 				id: "socket2",
 				join: jest.fn(),
 				leave: jest.fn(),
-				rooms: { room: "room" },
+				rooms: new Set( [ "socket2", "room" ] ),
 			} as unknown as Socket;
 
 			pokersService.identify( socket, "user1" );

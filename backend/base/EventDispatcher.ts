@@ -42,6 +42,22 @@ export default class EventDispatcher implements EventDispatcherInterface {
 	}
 
 	/**
+	 * Removes a function from an event.
+	 *
+	 * @param {string} event The event to unhook from.
+	 * @param {CallableFunction} callback The method that was registered with `on`.
+	 *
+	 * @returns {void}
+	 */
+	public off( event: string, callback: CallableFunction ): void {
+		if ( ! this.events[ event ] ) {
+			return;
+		}
+
+		this.events[ event ] = this.events[ event ].filter( ( registered: CallableFunction ) => registered !== callback );
+	}
+
+	/**
 	 * Dispatches an event.
 	 *
 	 * @param {string} event   The event identifier.
