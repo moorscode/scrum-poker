@@ -32,6 +32,9 @@ export default class PokerRoomCoordinator {
 	 public newStory(): void {
 		this.historyList.addStory( this.storyService.getStory() );
 
+		// Freeze the finished story so later member changes don't rewrite the history.
+		this.storyService.close();
+
 		// Create a new story.
 		this.storyService = new PokerStoryHandler( this.membersManager, this.pointProviderFactory, this.storyService.getStory().votingSystem );
 	}
@@ -262,7 +265,8 @@ export default class PokerRoomCoordinator {
 	public getVotes(): CurrentVotes {
 		const voted: Member[] = this.getVotedClients();
 
-		const groupedVoterNames: GroupVoteNames = voted.reduce( ( accumulator, member: Member ) => {
+		// Grouping names by vote value reveals who voted what, so only do it once the votes are visible.
+		const groupedVoterNames: GroupVoteNames = ! this.storyService.areVotesVisible() ? {} : voted.reduce( ( accumulator, member: Member ) => {
 			const vote: Vote            = this.getCurrentVote( member.id );
 			const voteGroupKey: string  = vote.initialValue + "/" + vote.currentValue;
 

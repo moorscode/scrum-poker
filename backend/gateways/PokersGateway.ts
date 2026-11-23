@@ -121,6 +121,11 @@ export default class PokersGateway implements OnGatewayInit {
 
 		// Send this vote to all sockets for the current user.
 		const vote = this.pokersService.getVote( client, message.poker );
+		if ( ! vote ) {
+			// The vote was rejected, e.g. it doesn't fit a voting system that was just switched.
+			return;
+		}
+
 		const sockets = this.pokersService.getUserSockets( this.pokersService.getUserId( client ) );
 
 		for ( const socket of sockets ) {

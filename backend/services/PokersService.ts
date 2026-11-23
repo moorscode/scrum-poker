@@ -128,7 +128,7 @@ export default class PokersService {
 			return [];
 		}
 
-		const socketRooms = Object.keys( socket.rooms ).filter( ( room: string ) => room !== socket.id );
+		const socketRooms = Array.from( socket.rooms ).filter( ( room: string ) => room !== socket.id );
 
 		const userSockets      = this.socketUsersService.getUserSockets( memberId );
 		const remainingSockets = userSockets.filter( ( userSocket: Socket ) => userSocket.id !== socket.id );
@@ -141,7 +141,7 @@ export default class PokersService {
 			( accumulator, otherSocket: Socket ) => {
 				return accumulator
 					.concat(
-						Object.keys( otherSocket.rooms ).filter( ( room: string ) => room !== otherSocket.id ),
+						Array.from( otherSocket.rooms ).filter( ( room: string ) => room !== otherSocket.id ),
 					);
 			},
 			[],

@@ -7,6 +7,25 @@ describe( "EventDispatcher", () => {
 		eventDispatcher = new EventDispatcher();
 	} );
 
+	describe( "off", () => {
+		it( "stops calling a removed callback", () => {
+			const removed = jest.fn();
+			const kept = jest.fn();
+
+			eventDispatcher.on( "event", removed );
+			eventDispatcher.on( "event", kept );
+			eventDispatcher.off( "event", removed );
+			eventDispatcher.dispatch( "event" );
+
+			expect( removed ).not.toBeCalled();
+			expect( kept ).toBeCalledTimes( 1 );
+		} );
+
+		it( "ignores events without listeners", () => {
+			expect( () => eventDispatcher.off( "unknown", jest.fn() ) ).not.toThrow();
+		} );
+	} );
+
 	describe( "dispatch", () => {
 		it( "dispatches a registered event", () => {
 			const callback = jest.fn();

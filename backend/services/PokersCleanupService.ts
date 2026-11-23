@@ -84,7 +84,7 @@ export default class PokersCleanupService {
 		const TIMEOUT = 30000;
 		const now     = Date.now();
 
-		// Kick after 5 minutes of inactivity.
+		// Kick after 30 seconds of being disconnected.
 		return room.getDisconnected().filter( ( member: Member ) => ( now - member.disconnectTime > TIMEOUT ) );
 	}
 }
