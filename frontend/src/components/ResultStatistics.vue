@@ -1,5 +1,5 @@
 <template>
-	<section v-if="average !== ''">
+	<section v-if="average !== ''" class="statistics">
 		<p>
 			Average: {{ average }}<br>
 			Standard deviation: {{ standardDeviation }}<br>
@@ -31,7 +31,7 @@ export default {
 				return "Not enough clarity, please go further in depth.";
 			}
 
-			if ( this.votes.every( ( vote ) => isNaN( vote ) ) ) {
+			if ( this.votes.every( ( vote ) => isNaN( vote.currentValue ) ) ) {
 				return "";
 			}
 

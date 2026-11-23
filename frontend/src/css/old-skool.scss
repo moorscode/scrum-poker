@@ -63,6 +63,13 @@ button:disabled {
 	box-shadow: none;
 }
 
+input[type=text],
+select,
+.table,
+div.voting li {
+	border-radius: 0;
+}
+
 input[type=text] {
 	padding: 8px;
 	border-bottom: var( --border-color );

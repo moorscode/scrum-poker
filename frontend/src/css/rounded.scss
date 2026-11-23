@@ -1,24 +1,50 @@
+/* Rounded: the default theme with pill-shaped controls and poker-chip cards. */
+
 .poker {
-	border-radius: 8px;
-	border-color: transparent;
+	border-radius: 28px;
 }
 
-button, input[type=submit] {
-	border-radius: 4px;
+button,
+input[type=submit],
+input[type=text],
+select {
+	border-radius: 999px;
 }
 
-button.choice {
+input[type=text],
+select {
+	padding-left: 14px;
+}
+
+button.choice,
+button.result {
+	width: 56px;
+	height: 56px;
 	border-radius: 50%;
-	&:last-child {
-		border-radius: 4px;
-		padding: 0 16px;
-	}
 }
 
-.members-list {
-	border-radius: 8px;
+button.choice.choice--coffee {
+	flex-direction: row;
+	gap: 6px;
+	width: auto;
+	padding: 0 18px;
+	border-radius: 999px;
 }
 
+button.choice.picked::after {
+	top: 2px;
+	right: 2px;
+}
+
+.table {
+	border-radius: 20px;
+}
+
+.members-list,
 button.result > .vote-names {
-	border-radius: 8px;
+	border-radius: 16px;
+}
+
+.choices {
+	gap: 6px;
 }

@@ -14,11 +14,12 @@ export default {
 	data() {
 		return {
 			theme: window.localStorage.getItem( "theme" ) || "default",
+			// Overlay themes are loaded on top of the default theme; standalone themes replace it.
 			themes: [
 				{ value: "default", text: "Default" },
 				{ value: "rounded", text: "Rounded" },
 				{ value: "old-skool", text: "Old Skool" },
-				{ value: "mos", text: "MOS" },
+				{ value: "mos", text: "MOS", standalone: true },
 			],
 		};
 	},
@@ -30,6 +31,13 @@ export default {
 			window.localStorage.setItem( "theme", this.theme );
 
 			const parts = this.theme.split( ":" );
+
+			const selected = this.themes.find( ( entry ) => entry.value === parts[ 0 ] );
+			const baseTheme = document.getElementById( "base-theme" );
+			if ( baseTheme ) {
+				baseTheme.disabled = Boolean( selected && selected.standalone );
+			}
+
 			if ( parts[ 1 ] ) {
 				document.body.setAttribute( "data-theme", parts[ 1 ] );
 			} else {
