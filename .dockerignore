@@ -1,0 +1,10 @@
+node_modules
+dist
+coverage
+.git
+.github
+.idea
+.vscode
+docker
+docker-compose.yml
+*.log
