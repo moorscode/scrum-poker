@@ -30,7 +30,7 @@
     "@nestjs/core": "^11",
     "@nestjs/platform-express": "^11",
     "@nestjs/platform-socket.io": "^11",
-    "@nestjs/schedule": "^6",
+    "@nestjs/schedule": "^12",
     "@nestjs/websockets": "^11",
     "reflect-metadata": "^0.2",
     "rxjs": "^7",
