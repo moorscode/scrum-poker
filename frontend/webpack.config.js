@@ -14,7 +14,7 @@ const config = {
 	context: __dirname,
 	entry: [
 		"./src/index.js",
-		...glob.sync( path.join( __dirname, "src/css/*.scss" ) ),
+		...glob.sync( "src/css/*.scss", { cwd: __dirname, posix: true } ).map( ( file ) => "./" + file ),
 	],
 	output: {
 		path: path.resolve( process.cwd(), "dist/frontend" ),
@@ -83,12 +83,13 @@ const config = {
 		"static": path.join( __dirname, "public" ),
 		compress: true,
 		port: dotenv.parsed.SOCKET_PORT || 9000,
-		proxy: {
-			"/socket.io": {
+		proxy: [
+			{
+				context: [ "/socket.io" ],
 				target: "http://localhost:" + dotenv.parsed.SERVER_PORT,
 				ws: true,
 			},
-		},
+		],
 	},
 };
 
