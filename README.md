@@ -62,6 +62,8 @@ $ yarn build
 $ yarn start:prod
 ```
 
+In development, open the Vite dev server at `http://localhost:9000` (the `SOCKET_PORT` from `.env`). It reloads on changes and forwards the websocket to the app on `SERVER_PORT`.
+
 ## License
 
 Scrum Poker is [GPL 3.0+](LICENSE).
