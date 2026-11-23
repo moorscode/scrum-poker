@@ -599,7 +599,7 @@ button.result {
 }
 
 p.final {
-  & > button.result {
+  & button.result {
     &,
     &:active {
       font-weight: bold;

@@ -1,5 +1,5 @@
 <template>
-  <section v-if="room">
+  <section v-if="room" class="nickname">
     <form
       class="username"
       :class="[!nickname ? 'hover' : '']"

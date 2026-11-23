@@ -16,7 +16,7 @@
 		<div v-cloak v-if="room" class="pokerMain">
 			<refinement-finished v-if="refinementFinished" />
 
-			<section v-if="!refinementFinished">
+			<section v-if="!refinementFinished" class="board">
 				<member-list />
 				<nickname />
 				<observer />

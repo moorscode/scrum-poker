@@ -6,6 +6,7 @@
 	  :disabled="observer"
       :class="[
         'choice',
+        point === 'coffee' ? 'choice--coffee' : '',
         pointIsPickedClass(point),
         myVote === point ? 'highlighted' : '',
         myInitialVote === point ? 'initial' : '',

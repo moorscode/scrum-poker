@@ -1,5 +1,5 @@
 <template>
-  <span>
+  <span class="story-actions">
     <button
       class="newStory"
       :disabled="voteCount === 0 || observer"

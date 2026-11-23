@@ -1,6 +1,6 @@
 <template>
-  <span>
-    <p :class="[ 'results', members.length === voteCount ? 'final' : '' ]">
+  <span class="table">
+    <p :class="[ 'results', allVoted ? 'final' : '' ]">
       <span
         v-for="vote of votes"
         class="resultContainer"
@@ -15,7 +15,7 @@
           />
           {{ vote.initialValue }}
         </button>
-        <button class="result">
+        <button :class="[ 'result', resultStateClass( vote ) ]">
           <i
             v-if="vote.currentValue === 'coffee'"
             :class="['fas','fa-mug-hot']"
@@ -68,6 +68,16 @@ export default {
 					return '<i class="fas fa-clipboard-check" title="Voted!"></i>';
 				default:
 					return vote.currentValue;
+			}
+		},
+		resultStateClass( vote ) {
+			switch ( vote.currentValue ) {
+				case "#":
+					return "result--pending";
+				case "!":
+					return "result--hidden";
+				default:
+					return "";
 			}
 		},
 		getGroupedVoteNames( vote ) {
